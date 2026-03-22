@@ -168,7 +168,8 @@ Navigate scenes in your play log:
 - Advantage: `2d20kh1` (keep highest)
 - Disadvantage: `2d20kl1` (keep lowest)
 - Exploding: `4d6!` (reroll on max)
-- Target: `6d6>4` (count successes)
+- Success: `6d6>>4` (count dice >= target)
+- Target: `6d6>4` (sum vs target)
 
 ## Oracle Tables
 
