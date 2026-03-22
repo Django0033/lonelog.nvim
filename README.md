@@ -17,7 +17,7 @@ Using lazy.nvim:
 
 ```lua
 {
-  "your-username/lonelog.nvim",
+  "Django0033/lonelog.nvim",
   config = function()
     require("lonelog").setup({
       use_telescope = false,  -- Set to true or "auto" to use Telescope picker
