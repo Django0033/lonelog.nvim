@@ -10,6 +10,7 @@ A Neovim plugin for solo tabletop RPG players. Provides oracles, dice rolling, a
 - **Lonelog Scenes**: Navigate scenes like `S1`, `S2`, `S5a`, `T1-S1`, `S7.1`
 - **Offline Support**: Works without Telescope using native sidebar picker
 - **Insert Results**: Press `<CR>` in result window to insert into your markdown file
+- **Copy to Clipboard**: Press `y` in result window to copy to system clipboard
 
 ## Installation
 
@@ -102,6 +103,7 @@ require("lonelog").setup({
 | `<leader>ls` | Navigate scenes |
 | `<leader>li` | Insert last result |
 | `q` | Close floating window |
+| `y` | Copy result to clipboard |
 | `<CR>` | Insert result into buffer |
 
 ### Quick Dice Rolls
