@@ -383,7 +383,27 @@ These features require new systems, significant architecture changes, or externa
 
 ---
 
-**11. Multi-File Campaign Navigation**
+**11. Auto-completion de Tags**
+
+Completion para nombres de tags mientras escribes en buffers markdown.
+
+*Why it fits:* Omnicompletion or inline completion triggered in markdown buffers, suggesting NPC names, locations, and other tags from the current file.
+
+**Complejidad:** ~100 líneas
+
+---
+
+**12. Chaos Factor UI**
+
+Ajuste visual e interactivo del Chaos Factor (1-9) para el oráculo Mythic.
+
+*Why it fits:* A floating window or status display showing the current chaos factor with +/- controls, persisted in config.
+
+**Complejidad:** ~60 líneas
+
+---
+
+**13. Multi-File Campaign Navigation**
 
 Extend tag and scene navigation to work across multiple session files, with a campaign-level index.
 
@@ -391,7 +411,7 @@ Extend tag and scene navigation to work across multiple session files, with a ca
 
 ---
 
-**12. Character Sheet Integration**
+**14. Character Sheet Integration**
 
 Parse PC tags with stat blocks and provide a character sheet view that auto-updates based on parsed tags.
 
@@ -399,7 +419,7 @@ Parse PC tags with stat blocks and provide a character sheet view that auto-upda
 
 ---
 
-**13. Automated Dungeon/Room Generator**
+**15. Automated Dungeon/Room Generator**
 
 Use configured generators to create dungeon maps or room sequences, outputting Lonelog format tags.
 
@@ -407,7 +427,7 @@ Use configured generators to create dungeon maps or room sequences, outputting L
 
 ---
 
-**14. Interactive Combat Tracker**
+**16. Interactive Combat Tracker**
 
 Track combat rounds, initiative order, and enemy HP using a dedicated buffer or floating window.
 
@@ -415,7 +435,7 @@ Track combat rounds, initiative order, and enemy HP using a dedicated buffer or 
 
 ---
 
-**15. Campaign Archive/Export**
+**17. Campaign Archive/Export**
 
 Export a campaign's session logs to a consolidated format (HTML, PDF, unified markdown) with cross-referenced tags.
 
