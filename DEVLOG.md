@@ -105,7 +105,7 @@ Full plugin implementation including:
 
 ---
 
-### Commit `c88fa6f` - Simplify insert with copy+paste
+### Commit `0d401aa` - Simplify insert with copy+paste
 **Date:** 2026-03-25  
 **Files:** `lua/lonelog/ui.lua`  
 
