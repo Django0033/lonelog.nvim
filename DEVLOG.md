@@ -283,31 +283,13 @@ The `ui/parsers.lua` module provides unified exports for both parsers.
 
 ## Future Possibilities
 
-Features are ordered by implementation complexity, starting with the simplest.
+Features are ordered by implementation complexity (lines of code), from simplest to most complex.
 
-### Low Complexity
-
-These features require minimal changes and extend existing patterns.
+**Total estimated:** ~2,880 líneas
 
 ---
 
-**1. Dice Roll History**
-
-Track the last N dice rolls and oracle results during a session, viewable via a command or sidebar view.
-
-*Why it fits:* The UI module already tracks `active_windows` and `window_content`. Adding a history array follows existing patterns.
-
----
-
-**2. Tag Search by Name**
-
-Add a search/filter input when opening the tags picker, allowing users to type part of a tag name to filter before selecting.
-
-*Why it fits:* The parsers already extract structured tag data. The sidebar can be extended with a filter prompt before showing results.
-
----
-
-**3. Configurable Dice Notation**
+**1. Configurable Dice Notation** (~40 líneas)
 
 Allow users to customize the dice notation format (e.g., use `d` instead of `D`, change the exploding symbol).
 
@@ -315,7 +297,15 @@ Allow users to customize the dice notation format (e.g., use `d` instead of `D`,
 
 ---
 
-**4. Persistent Chaos Factor**
+**2. Tag Search by Name** (~60 líneas)
+
+Add a search/filter input when opening the tags picker, allowing users to type part of a tag name to filter before selecting.
+
+*Why it fits:* The parsers already extract structured tag data. The sidebar can be extended with a filter prompt before showing results.
+
+---
+
+**3. Persistent Chaos Factor** (~50 líneas)
 
 Save the Mythic oracle's chaos factor to a file and restore it on Neovim restart.
 
@@ -323,29 +313,23 @@ Save the Mythic oracle's chaos factor to a file and restore it on Neovim restart
 
 ---
 
-**5. Custom Oracle Tables**
+**4. Chaos Factor UI** (~60 líneas)
 
-Allow users to define custom oracle tables with weighted entries in their config.
+Ajuste visual e interactivo del Chaos Factor (1-9) para el oráculo Mythic.
 
-*Why it fits:* The oracle system uses weighted random selection. User tables would extend the `tables` table naturally.
-
----
-
-### Medium Complexity
-
-These features require new modules or significant UI changes.
+*Why it fits:* A floating window or status display showing the current chaos factor with +/- controls, persisted in config.
 
 ---
 
-**6. Dice Macro System**
+**5. Dice Roll History** (~80 líneas)
 
-Define named dice roll sequences in config (e.g., `attack = "2d6+3"`) that can be rolled via commands.
+Track the last N dice rolls and oracle results during a session, viewable via a command or sidebar view.
 
-*Why it fits:* The dice engine already parses complex notation. A macro system would substitute definitions before passing to `dice.roll()`.
+*Why it fits:* The UI module already tracks `active_windows` and `window_content`. Adding a history array follows existing patterns.
 
 ---
 
-**7. Insertable Tag Templates**
+**6. Insertable Tag Templates** (~90 líneas)
 
 Provide commands or keybindings that insert common tag templates at cursor (e.g., `<leader>ln` inserts `[N:Name|]`).
 
@@ -353,7 +337,31 @@ Provide commands or keybindings that insert common tag templates at cursor (e.g.
 
 ---
 
-**8. Session Roll Statistics**
+**7. Dice Macro System** (~100 líneas)
+
+Define named dice roll sequences in config (e.g., `attack = "2d6+3"`) that can be rolled via commands.
+
+*Why it fits:* The dice engine already parses complex notation. A macro system would substitute definitions before passing to `dice.roll()`.
+
+---
+
+**8. Auto-completion de Tags** (~100 líneas)
+
+Completion para nombres de tags mientras escribes en buffers markdown.
+
+*Why it fits:* Omnicompletion or inline completion triggered in markdown buffers, suggesting NPC names, locations, and other tags from the current file.
+
+---
+
+**9. Custom Oracle Tables** (~120 líneas)
+
+Allow users to define custom oracle tables with weighted entries in their config.
+
+*Why it fits:* The oracle system uses weighted random selection. User tables would extend the `tables` table naturally.
+
+---
+
+**10. Session Roll Statistics** (~150 líneas)
 
 Generate a session summary showing dice rolls by type, oracle result distribution, and tag/scene counts.
 
@@ -361,15 +369,7 @@ Generate a session summary showing dice rolls by type, oracle result distributio
 
 ---
 
-**9. Custom Random Tables Generator**
-
-Allow users to define custom random tables in config and roll against them via command.
-
-*Why it fits:* The oracle system provides a proven pattern for weighted random selection. A new `tables.lua` module would mirror this architecture.
-
----
-
-**10. Scene Graph View**
+**11. Scene Graph View** (~180 líneas)
 
 Display scenes as a tree or hierarchical list in a floating window, showing relationships more clearly.
 
@@ -377,41 +377,23 @@ Display scenes as a tree or hierarchical list in a floating window, showing rela
 
 ---
 
-### High Complexity
+**12. Custom Random Tables Generator** (~200 líneas)
 
-These features require new systems, significant architecture changes, or external integrations.
+Allow users to define custom random tables in config and roll against them via command.
 
----
-
-**11. Auto-completion de Tags**
-
-Completion para nombres de tags mientras escribes en buffers markdown.
-
-*Why it fits:* Omnicompletion or inline completion triggered in markdown buffers, suggesting NPC names, locations, and other tags from the current file.
-
-**Complejidad:** ~100 líneas
+*Why it fits:* The oracle system provides a proven pattern for weighted random selection. A new `tables.lua` module would mirror this architecture.
 
 ---
 
-**12. Chaos Factor UI**
+**13. Campaign Archive/Export** (~300 líneas)
 
-Ajuste visual e interactivo del Chaos Factor (1-9) para el oráculo Mythic.
+Export a campaign's session logs to a consolidated format (HTML, PDF, unified markdown) with cross-referenced tags.
 
-*Why it fits:* A floating window or status display showing the current chaos factor with +/- controls, persisted in config.
-
-**Complejidad:** ~60 líneas
+*Why it fits:* Parser infrastructure extracts all campaign elements. An export module would aggregate and render this data.
 
 ---
 
-**13. Multi-File Campaign Navigation**
-
-Extend tag and scene navigation to work across multiple session files, with a campaign-level index.
-
-*Why it fits:* Parsers work on buffer content and could scan multiple files. This requires a new indexer module and campaign-scoped pickers.
-
----
-
-**14. Character Sheet Integration**
+**14. Character Sheet Integration** (~350 líneas)
 
 Parse PC tags with stat blocks and provide a character sheet view that auto-updates based on parsed tags.
 
@@ -419,15 +401,15 @@ Parse PC tags with stat blocks and provide a character sheet view that auto-upda
 
 ---
 
-**15. Automated Dungeon/Room Generator**
+**15. Multi-File Campaign Navigation** (~400 líneas)
 
-Use configured generators to create dungeon maps or room sequences, outputting Lonelog format tags.
+Extend tag and scene navigation to work across multiple session files, with a campaign-level index.
 
-*Why it fits:* Session files show complex room tracking. A generator could combine random tables with room connection logic.
+*Why it fits:* Parsers work on buffer content and could scan multiple files. This requires a new indexer module and campaign-scoped pickers.
 
 ---
 
-**16. Interactive Combat Tracker**
+**16. Interactive Combat Tracker** (~450 líneas)
 
 Track combat rounds, initiative order, and enemy HP using a dedicated buffer or floating window.
 
@@ -435,11 +417,11 @@ Track combat rounds, initiative order, and enemy HP using a dedicated buffer or 
 
 ---
 
-**17. Campaign Archive/Export**
+**17. Automated Dungeon/Room Generator** (~500 líneas)
 
-Export a campaign's session logs to a consolidated format (HTML, PDF, unified markdown) with cross-referenced tags.
+Use configured generators to create dungeon maps or room sequences, outputting Lonelog format tags.
 
-*Why it fits:* Parser infrastructure extracts all campaign elements. An export module would aggregate and render this data.
+*Why it fits:* Session files show complex room tracking. A generator could combine random tables with room connection logic.
 
 ---
 
