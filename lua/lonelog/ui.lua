@@ -165,36 +165,20 @@ function M.insert_result(win_id)
 		vim.notify("lonelog: Could not find target window", vim.log.levels.ERROR)
 		return
 	end
-	vim.api.nvim_set_current_win(target_winid)
-	local cursor = vim.api.nvim_win_get_cursor(target_winid)
-	local line_num, col_1indexed = cursor[1], cursor[2]
-	local current_line = vim.api.nvim_buf_get_lines(target_bufnr, line_num - 1, line_num, false)[1] or ""
-	local char_at_cursor = current_line:sub(col_1indexed, col_1indexed)
-	-- Check if cursor is on a word, add space if needed
-	local needs_space = char_at_cursor:match("%w") ~= nil
-	if needs_space then
-		local pos = col_1indexed
-		while pos <= #current_line and current_line:sub(pos, pos):match("%w") do
-			pos = pos + 1
-		end
-		col_1indexed = pos - 1
-	end
-	local text_after = current_line:sub(col_1indexed + 1)
-	local lines_to_insert = vim.tbl_filter(function(l)
-		return l ~= ""
-	end, content)
-	if needs_space and #lines_to_insert > 0 then
-		lines_to_insert[1] = " " .. lines_to_insert[1]
-	end
-	local insert_pos = col_1indexed
-	local new_text = table.concat(lines_to_insert, "\n")
-	vim.api.nvim_buf_set_text(target_bufnr, line_num - 1, insert_pos, line_num - 1, insert_pos, { new_text })
-	if text_after ~= "" then
-		local new_col = insert_pos + #new_text
-		vim.api.nvim_buf_set_text(target_bufnr, line_num - 1, new_col, line_num - 1, new_col, { text_after })
-	end
-	vim.notify("lonelog: Inserted " .. #lines_to_insert .. " line(s)", vim.log.levels.INFO)
+
+	-- Copy to clipboard
+	local text = table.concat(content, "\n")
+	vim.fn.setreg("+", text)
+	vim.notify("lonelog: Copied to clipboard", vim.log.levels.INFO)
+
+	-- Close floating window
 	M.close(win_id)
+
+	-- Change target buffer
+	vim.api.nvim_set_current_win(target_winid)
+
+	-- Paste (in normal mode)
+	vim.cmd('normal! "+p')
 end
 
 -- Check if current buffer is a markdown file (can insert results)

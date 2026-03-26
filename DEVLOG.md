@@ -94,13 +94,24 @@ Full plugin implementation including:
 
 ---
 
-### Commit `0898434` - Add clipboard copy feature
+### Commit `e2a0cce` - Add clipboard copy feature
 **Date:** 2026-03-25  
 **Files:** `lua/lonelog/ui.lua`  
 
 - Add `M.copy_result()` function for clipboard operations
 - Add 'y' and 'Y' keymaps in floating windows
-- Update help messages to show 'y' to copy option
+- Copy to system clipboard using '+' register
+- Update help messages in result windows
+
+---
+
+### Commit `c88fa6f` - Simplify insert with copy+paste
+**Date:** 2026-03-25  
+**Files:** `lua/lonelog/ui.lua`  
+
+- Refactor `M.insert_result()` to use copy+paste instead of complex position calculations
+- `<CR>` now copies result to clipboard and pastes in target buffer
+- Simplifies cursor position handling across different buffer states
 
 ---
 
@@ -223,8 +234,8 @@ The `parsers.lua` module handles two main parsing tasks:
 
 - **Floating Windows** - Centered results display with rounded borders
 - **Native Sidebar Picker** - Telescope alternative with keyboard navigation (j/k)
-- **Result Insertion** - Press Enter in result window to insert at cursor
 - **Clipboard Copy** - Press 'y' in result window to copy to system clipboard
+- **Copy+Paste Insertion** - Press Enter in result window to copy and paste result
 - **Markdown Integration** - Optimized for `.md` buffer targets
 
 ---
