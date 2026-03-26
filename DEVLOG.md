@@ -26,12 +26,16 @@ lonelog.nvim/
 ├── lua/lonelog/              # Core modules
 │   ├── init.lua              # Entry point and public API
 │   ├── config.lua            # Configuration management
-│   ├── dice.lua              # Dice rolling engine
-│   ├── oracle.lua            # Oracle system
-│   └── ui/
-│       ├── ui.lua            # Floating windows and result display
-│       ├── sidebar.lua        # Native picker (Telescope alternative)
-│       └── parsers.lua       # Lonelog tags and scenes parser
+│   ├── dice.lua              # Dice rolling engine (220 lines)
+│   ├── oracle.lua            # Oracle system (144 lines)
+│   ├── parsers/              # Parsing modules
+│   │   ├── tags.lua          # Tag parsing (246 lines)
+│   │   └── scenes.lua        # Scene parsing (239 lines)
+│   └── ui/                   # UI modules
+│       ├── ui.lua            # Module index with exports (20 lines)
+│       ├── floating.lua      # Floating windows (228 lines)
+│       ├── picker.lua        # Picker abstraction (29 lines)
+│       └── sidebar.lua       # Native picker (118 lines)
 ├── plugin/
 │   └── lonelog.lua           # Vim commands and keybindings
 ├── tests/
@@ -41,6 +45,7 @@ lonelog.nvim/
 │   └── test_integration.lua # 17 integration tests
 ├── SPEC.md                  # Technical specification
 ├── REFACTORING.md           # Refactoring notes
+├── DEVLOG.md               # Development log
 └── README.md                # User documentation
 ```
 
@@ -115,6 +120,25 @@ Full plugin implementation including:
 
 ---
 
+### Commit `42170b9` - Module Refactoring
+**Date:** 2026-03-25  
+**Files:** Multiple files  
+
+- Split monolithic `parsers.lua` into modular structure:
+  - `lua/lonelog/parsers/tags.lua` - Tag parsing functions
+  - `lua/lonelog/parsers/scenes.lua` - Scene parsing functions
+  - `lua/lonelog/ui/parsers.lua` - Unified exports
+- Split monolithic `ui.lua` into:
+  - `lua/lonelog/ui/floating.lua` - Floating window management
+  - `lua/lonelog/ui/picker.lua` - Picker abstraction layer
+  - `lua/lonelog/ui.lua` - Clean index with exports
+- Added `should_use_telescope()` helper to parsers modules
+- Fixed parser paths in `init.lua` and `plugin/lonelog.lua`
+- Updated tests with complete vim mocks
+- Total: 58 tests passing
+
+---
+
 ## Architecture
 
 ### Core Modules
@@ -150,10 +174,12 @@ The `ui.pick()` function automatically selects the appropriate picker based on c
 
 ### Parsing System
 
-The `parsers.lua` module handles two main parsing tasks:
+The parsers directory handles two main parsing tasks:
 
-1. **Tag Parsing** - Extracts structured data from Lonelog tags
-2. **Scene Parsing** - Identifies scene markers and builds navigation indices
+1. **Tag Parsing** (`parsers/tags.lua`) - Extracts structured data from Lonelog tags
+2. **Scene Parsing** (`parsers/scenes.lua`) - Identifies scene markers and builds navigation indices
+
+The `ui/parsers.lua` module provides unified exports for both parsers.
 
 ---
 

@@ -1,13 +1,31 @@
 #!/usr/bin/env lua
 
 vim = {
-  api = { nvim_buf_get_lines = function() return {} end },
+  deepcopy = function(t)
+    local function deepcopy(obj)
+      if type(obj) == 'table' then
+        local copy = {}
+        for k, v in pairs(obj) do
+          copy[deepcopy(k)] = deepcopy(v)
+        end
+        return copy
+      else
+        return obj
+      end
+    end
+    return deepcopy(t)
+  end,
+  api = {
+    nvim_buf_get_lines = function() return {} end,
+    nvim_buf_get_name = function() return "test.md" end,
+    nvim_get_current_buf = function() return 1 end,
+  },
   trim = function(s) return s:match("^%s*(.-)%s*$") end,
   tbl_filter = function(fn, t) local r = {}; for _, v in ipairs(t) do if fn(v) then table.insert(r, v) end end; return r end,
 }
 
 package.path = package.path .. ";./lua/?.lua"
-local M = require("lonelog.ui.parsers")
+local M = require("lonelog.ui.parsers").scenes
 
 local test_cases = {
   { input = "S1 *Lighthouse tower, dusk*", expected_type = "main", expected_id = "S1", expected_context = "Lighthouse tower, dusk" },
