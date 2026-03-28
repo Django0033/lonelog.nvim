@@ -289,7 +289,7 @@ Features are ordered by implementation complexity (lines of code), from simplest
 
 ---
 
-**1. Persistent Chaos Factor** (~50 líneas)
+**1. Persistent Chaos Factor** (~40 líneas) ✅ IMPLEMENTED
 
 Save the Mythic oracle's chaos factor to a file and restore it on Neovim restart.
 

@@ -10,7 +10,8 @@ M.parsers = require("lonelog.ui.parsers")
 -- Initialize plugin with user configuration
 function M.setup(opts)
 	M.config.setup(opts)
-    M.dice.setup()
+	M.dice.setup()
+	M.oracle.load_chaos()
 end
 
 -- Roll dice and show result in floating window
@@ -29,7 +30,7 @@ end
 -- For mythic: prompts for chaos factor first
 -- For others: rolls immediately
 function M.roll_oracle(table_name)
-	if table_name == "mythic" then
+	if table_name and table_name:lower() == "mythic" then
 		local chaos = M.oracle.get_chaos()
 		vim.ui.input(
 			{ prompt = string.format("Chaos factor (1-9, default %d, +/- to change): ", chaos) },
