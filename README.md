@@ -141,8 +141,8 @@ The plugin parses and navigates [Lonelog notation](https://github.com/valgur/lon
 | NPC | `[N:Name|tags]` | Non-player characters |
 | Location | `[L:Name|tags]` | Locations |
 | Event | `[E:Name X/Y]` | Events and clocks |
-| PC | `[PC:Name|stats]` | Player characters |
-| Thread | `[Thread:Name|state]` | Story threads |
+| PC | `[PC:Name|tags]` | Player characters |
+| Thread | `[Thread:Name|tags]` | Story threads |
 | Clock | `[Clock:Name X/Y]` | Clocks |
 | Track | `[Track:Name X/Y]` | Progress tracks |
 | Timer | `[Timer:Name X]` | Countdown timers |
