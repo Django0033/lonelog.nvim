@@ -63,6 +63,8 @@ require("lonelog").setup({
   -- Oracle settings
   oracle = {
     default_table = "fate",
+    persist_chaos = true,      -- Persist Mythic chaos factor to file
+    chaos_file = "chaos_factor.json",  -- Chaos factor file
   },
 
   -- Dice settings
@@ -78,7 +80,9 @@ require("lonelog").setup({
 | Command | Description |
 | ------- | ----------- |
 | `:LonelogOracle` | Open oracle picker |
-| `:LonelogOracle fate` | Roll specific oracle |
+| `:LonelogOracle fate` | Roll Fate oracle |
+| `:LonelogOracle mythic` | Roll Mythic oracle (prompts for chaos) |
+| `:LonelogOracle binary` | Roll Binary oracle |
 | `:LonelogDice` | Interactive dice roller |
 | `:LonelogDiceRoll 2d6+3` | Roll dice directly |
 | `:LonelogD4` | Quick roll 1d4 |
