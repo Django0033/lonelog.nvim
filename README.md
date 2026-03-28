@@ -38,6 +38,7 @@ require("lonelog").setup({
     dice = "<leader>ldr",
     tags = "<leader>lt",
     scenes = "<leader>ls",
+    chaos = "<leader>lC",
     d4 = "<leader>ld4",
     d6 = "<leader>ld6",
     d8 = "<leader>ld8",

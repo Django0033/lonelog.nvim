@@ -54,7 +54,7 @@ end
 function M.set_chaos(value)
 	if value and value >= 1 and value <= 9 then
 		chaos_factor = value
-        M.save_chaos()
+		M.save_chaos()
 		return true
 	end
 	return false
@@ -62,42 +62,113 @@ end
 
 -- Get path to chaos factor file
 local function get_chaos_file_path()
-    local cfg = require("lonelog.config").get().oracle
-    local data_dir = vim.fn.stdpath("data") .. "/lonelog"
-    return data_dir .. "/" .. cfg.chaos_file
+	local cfg = require("lonelog.config").get().oracle
+	local data_dir = vim.fn.stdpath("data") .. "/lonelog"
+	return data_dir .. "/" .. cfg.chaos_file
 end
 
 -- Load chaos factor from file
 function M.load_chaos()
-    local cfg = require("lonelog.config").get().oracle
-    if not cfg.persist_chaos then return end
+	local cfg = require("lonelog.config").get().oracle
+	if not cfg.persist_chaos then
+		return
+	end
 
-    local filepath = get_chaos_file_path()
-    local fd = io.open(filepath, "r")
-    if fd then
-        local content = fd:read("*all")
-        fd:close()
-        local chaos = tonumber(content:match("%d"))
-        if chaos and chaos >= 1 and chaos <= 9 then
-            chaos_factor = chaos
-        end
-    end
+	local filepath = get_chaos_file_path()
+	local fd = io.open(filepath, "r")
+	if fd then
+		local content = fd:read("*all")
+		fd:close()
+		local chaos = tonumber(content:match("%d"))
+		if chaos and chaos >= 1 and chaos <= 9 then
+			chaos_factor = chaos
+		end
+	end
 end
 
 -- Save chaos factor to file
 function M.save_chaos()
-    local cfg = require("lonelog.config").get().oracle
-    if not cfg.persist_chaos then
-        return
-    end
+	local cfg = require("lonelog.config").get().oracle
+	if not cfg.persist_chaos then
+		return
+	end
 
-    local filepath = get_chaos_file_path()
-    vim.fn.mkdir(vim.fn.stdpath("data") .. "/lonelog", "p")
-    local fd = io.open(filepath, "w")
-    if fd then
-        fd:write(tostring(chaos_factor))
-        fd:close()
-    end
+	local filepath = get_chaos_file_path()
+	vim.fn.mkdir(vim.fn.stdpath("data") .. "/lonelog", "p")
+	local fd = io.open(filepath, "w")
+	if fd then
+		fd:write(tostring(chaos_factor))
+		fd:close()
+	end
+end
+
+function M.show_chaos_ui()
+	local chaos = M.get_chaos()
+	local content = {
+		"",
+		"  Chaos Factor: " .. chaos,
+		"  Rango: 1-9",
+		"",
+		"  [-] Decrease [+] Increase",
+		"  [Enter] Confirm [q] Close",
+	}
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
+
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		width = 30,
+		height = 8,
+		row = math.floor((vim.o.lines - 8) / 2),
+		col = math.floor((vim.o.columns - 30) / 2),
+		style = "minimal",
+		border = "rounded",
+		title = " Mythic Chaos Factor ",
+	})
+
+	-- Keybindings
+	vim.keymap.set("n", "q", function()
+		vim.api.nvim_win_close(win, true)
+	end, { buffer = buf, nowait = true, silent = true })
+
+	vim.keymap.set("n", "+", function()
+		if chaos < 9 then
+			chaos = chaos + 1
+			vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+				"",
+				"  Chaos Factor: " .. chaos,
+				"  Range: 1-9",
+				"",
+				"  [-] Decrease [+] Increase",
+				"  [Enter] Confirm [q] Close",
+			})
+		end
+	end, { buffer = buf, nowait = true, silent = true })
+
+	vim.keymap.set("n", "-", function()
+		if chaos > 1 then
+			chaos = chaos - 1
+			vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
+				"",
+				"  Chaos Factor: " .. chaos,
+				"  Range: 1-9",
+				"",
+				"  [-] Decrease [+] Increase",
+				"  [Enter] Confirm [q] Close",
+			})
+		end
+	end, { buffer = buf, nowait = true, silent = true })
+
+	vim.keymap.set("n", "<CR>", function()
+		M.set_chaos(chaos)
+		vim.api.nvim_win_close(win, true)
+	end, { buffer = buf, nowait = true, silent = true })
+
+	vim.keymap.set("n", "<Enter>", function()
+		M.set_chaos(chaos)
+		vim.api.nvim_win_close(win, true)
+	end, { buffer = buf, nowait = true, silent = true })
 end
 
 -- Roll Mythic oracle using 2d10 + chaos modifier

@@ -14,14 +14,15 @@ local defaults = {
 		d12 = "<leader>ldb",
 		d20 = "<leader>ldw",
 		d100 = "<leader>ldc",
+		chaos = "<leader>lC",
 	},
 	use_telescope = "auto",
 	sidebar = { width = 50 },
 	float = { border = "rounded", height = 0.4, width = 0.6 },
 	oracle = {
 		default_table = "fate",
-        persist_chaos = true,
-        chaos_file = "chaos_factor.json"
+		persist_chaos = true,
+		chaos_file = "chaos_factor.json",
 	},
 	dice = { max_dice = 100, max_sides = 1000 },
 }

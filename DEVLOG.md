@@ -305,7 +305,7 @@ Add a search/filter input when opening the tags picker, allowing users to type p
 
 ---
 
-**3. Chaos Factor UI** (~60 líneas)
+**3. Chaos Factor UI** (~60 líneas) ✅ IMPLEMENTED
 
 Ajuste visual e interactivo del Chaos Factor (1-9) para el oráculo Mythic.
 

@@ -29,6 +29,9 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.scenes, function()
 		solo.parsers.scenes.show_scenes_picker()
 	end, { desc = "Navigate Scenes" })
+	map("n", cfg.get().keymaps.chaos, function()
+		solo.oracle.show_chaos_ui()
+	end, { desc = "Chaos Factor UI" })
 	map("n", "<leader>li", function()
 		local w, c = solo.ui.get_latest_content()
 		if c then
@@ -143,3 +146,7 @@ vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setu
 vim.defer_fn(function()
 	vim.api.nvim_exec_autocmds("User", { pattern = "LonelogLoaded" })
 end, 0)
+
+vim.api.nvim_create_user_command("LonelogChaos", function()
+	require("lonelog.oracle").show_chaos_ui()
+end, { nargs = 0, desc = "Open Chaos Factor UI" })
