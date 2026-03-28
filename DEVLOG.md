@@ -285,15 +285,15 @@ The `ui/parsers.lua` module provides unified exports for both parsers.
 
 Features are ordered by implementation complexity (lines of code), from simplest to most complex.
 
-**Total estimated:** ~2,880 líneas
+**Total estimated:** ~2,840 líneas (removed Configurable Dice Notation - already supported)
 
 ---
 
-**1. Configurable Dice Notation** (~40 líneas)
+**1. Persistent Chaos Factor** (~50 líneas)
 
-Allow users to customize the dice notation format (e.g., use `d` instead of `D`, change the exploding symbol).
+Save the Mythic oracle's chaos factor to a file and restore it on Neovim restart.
 
-*Why it fits:* The dice parser already handles multiple formats case-insensitively. Adding config options requires minimal changes.
+*Why it fits:* The chaos factor exists in module state. File persistence using `vim.fn.stdpath("data")` extends this cleanly.
 
 ---
 
@@ -305,15 +305,7 @@ Add a search/filter input when opening the tags picker, allowing users to type p
 
 ---
 
-**3. Persistent Chaos Factor** (~50 líneas)
-
-Save the Mythic oracle's chaos factor to a file and restore it on Neovim restart.
-
-*Why it fits:* The chaos factor exists in module state. File persistence using `vim.fn.stdpath("data")` extends this cleanly.
-
----
-
-**4. Chaos Factor UI** (~60 líneas)
+**3. Chaos Factor UI** (~60 líneas)
 
 Ajuste visual e interactivo del Chaos Factor (1-9) para el oráculo Mythic.
 
@@ -321,7 +313,7 @@ Ajuste visual e interactivo del Chaos Factor (1-9) para el oráculo Mythic.
 
 ---
 
-**5. Dice Roll History** (~80 líneas)
+**4. Dice Roll History** (~80 líneas)
 
 Track the last N dice rolls and oracle results during a session, viewable via a command or sidebar view.
 
@@ -329,7 +321,7 @@ Track the last N dice rolls and oracle results during a session, viewable via a 
 
 ---
 
-**6. Insertable Tag Templates** (~90 líneas)
+**5. Insertable Tag Templates** (~90 líneas)
 
 Provide commands or keybindings that insert common tag templates at cursor (e.g., `<leader>ln` inserts `[N:Name|]`).
 
@@ -337,7 +329,7 @@ Provide commands or keybindings that insert common tag templates at cursor (e.g.
 
 ---
 
-**7. Dice Macro System** (~100 líneas)
+**6. Dice Macro System** (~100 líneas)
 
 Define named dice roll sequences in config (e.g., `attack = "2d6+3"`) that can be rolled via commands.
 
@@ -345,7 +337,7 @@ Define named dice roll sequences in config (e.g., `attack = "2d6+3"`) that can b
 
 ---
 
-**8. Auto-completion de Tags** (~100 líneas)
+**7. Auto-completion de Tags** (~100 líneas)
 
 Completion para nombres de tags mientras escribes en buffers markdown.
 
@@ -353,7 +345,7 @@ Completion para nombres de tags mientras escribes en buffers markdown.
 
 ---
 
-**9. Custom Oracle Tables** (~120 líneas)
+**8. Custom Oracle Tables** (~120 líneas)
 
 Allow users to define custom oracle tables with weighted entries in their config.
 
@@ -361,7 +353,7 @@ Allow users to define custom oracle tables with weighted entries in their config
 
 ---
 
-**10. Session Roll Statistics** (~150 líneas)
+**9. Session Roll Statistics** (~150 líneas)
 
 Generate a session summary showing dice rolls by type, oracle result distribution, and tag/scene counts.
 
@@ -369,7 +361,7 @@ Generate a session summary showing dice rolls by type, oracle result distributio
 
 ---
 
-**11. Scene Graph View** (~180 líneas)
+**10. Scene Graph View** (~180 líneas)
 
 Display scenes as a tree or hierarchical list in a floating window, showing relationships more clearly.
 
@@ -377,7 +369,7 @@ Display scenes as a tree or hierarchical list in a floating window, showing rela
 
 ---
 
-**12. Custom Random Tables Generator** (~200 líneas)
+**11. Custom Random Tables Generator** (~200 líneas)
 
 Allow users to define custom random tables in config and roll against them via command.
 
@@ -385,7 +377,7 @@ Allow users to define custom random tables in config and roll against them via c
 
 ---
 
-**13. Campaign Archive/Export** (~300 líneas)
+**12. Campaign Archive/Export** (~300 líneas)
 
 Export a campaign's session logs to a consolidated format (HTML, PDF, unified markdown) with cross-referenced tags.
 
@@ -393,7 +385,7 @@ Export a campaign's session logs to a consolidated format (HTML, PDF, unified ma
 
 ---
 
-**14. Character Sheet Integration** (~350 líneas)
+**13. Character Sheet Integration** (~350 líneas)
 
 Parse PC tags with stat blocks and provide a character sheet view that auto-updates based on parsed tags.
 
@@ -401,7 +393,7 @@ Parse PC tags with stat blocks and provide a character sheet view that auto-upda
 
 ---
 
-**15. Multi-File Campaign Navigation** (~400 líneas)
+**14. Multi-File Campaign Navigation** (~400 líneas)
 
 Extend tag and scene navigation to work across multiple session files, with a campaign-level index.
 
@@ -409,7 +401,7 @@ Extend tag and scene navigation to work across multiple session files, with a ca
 
 ---
 
-**16. Interactive Combat Tracker** (~450 líneas)
+**15. Interactive Combat Tracker** (~450 líneas)
 
 Track combat rounds, initiative order, and enemy HP using a dedicated buffer or floating window.
 
@@ -417,7 +409,7 @@ Track combat rounds, initiative order, and enemy HP using a dedicated buffer or 
 
 ---
 
-**17. Automated Dungeon/Room Generator** (~500 líneas)
+**16. Automated Dungeon/Room Generator** (~500 líneas)
 
 Use configured generators to create dungeon maps or room sequences, outputting Lonelog format tags.
 
