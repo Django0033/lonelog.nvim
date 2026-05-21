@@ -97,6 +97,46 @@ local function setup_keymaps()
 		insert_template_at_cursor(ORACLE_TEMPLATE, 0, 2)
 	end, { desc = "Insert oracle sequence" })
 
+	-- Tag snippets with smart cursor
+	map("n", cfg.get().keymaps.tag_npc, function()
+		insert_text("[N:|]", 2)
+	end, { desc = "Insert NPC tag" })
+	map("n", cfg.get().keymaps.tag_location, function()
+		insert_text("[L:|]", 2)
+	end, { desc = "Insert location tag" })
+	map("n", cfg.get().keymaps.tag_pc, function()
+		insert_text("[PC:|]", 2)
+	end, { desc = "Insert PC tag" })
+	map("n", cfg.get().keymaps.tag_thread, function()
+		insert_text("[Thread:|Open]", 6)
+	end, { desc = "Insert thread tag" })
+	map("n", cfg.get().keymaps.tag_ref, function()
+		insert_text("[#N:|]", 2)
+	end, { desc = "Insert reference tag" })
+	map("n", cfg.get().keymaps.tag_foe, function()
+		insert_text("[F:|]", 2)
+	end, { desc = "Insert foe tag" })
+
+	-- Tag snippets insert mode
+	map("i", "<C-l>n", function()
+		insert_text("[N:|]", 3)
+	end, { desc = "Insert NPC tag" })
+	map("i", "<C-l>l", function()
+		insert_text("[L:|]", 3)
+	end, { desc = "Insert location tag" })
+	map("i", "<C-l>p", function()
+		insert_text("[PC:|]", 3)
+	end, { desc = "Insert PC tag" })
+	map("i", "<C-l>h", function()
+		insert_text("[Thread:|Open]", 7)
+	end, { desc = "Insert thread tag" })
+	map("i", "<C-l>r", function()
+		insert_text("[#N:|]", 3)
+	end, { desc = "Insert reference tag" })
+	map("i", "<C-l>f", function()
+		insert_text("[F:|]", 3)
+	end, { desc = "Insert foe tag" })
+
 	-- Insert mode mappings (Ctrl-l prefix)
 	map("i", "<C-l>a", function()
 		insert_text("@ ")
@@ -239,6 +279,31 @@ end, { desc = "Insert action sequence template" })
 vim.api.nvim_create_user_command("LonelogOracleSequence", function()
 	insert_template_at_cursor(ORACLE_TEMPLATE, 0, 2)
 end, { desc = "Insert oracle sequence template" })
+
+-- Tag snippet command
+vim.api.nvim_create_user_command("LonelogTag", function(o)
+	local tags = {
+		npc = "[N:|]",
+		location = "[L:|]",
+		pc = "[PC:|]",
+		thread = "[Thread:|Open]",
+		ref = "[#N:|]",
+		foe = "[F:|]",
+	}
+	local offsets = { npc = 2, location = 2, pc = 2, thread = 6, ref = 2, foe = 2 }
+	local snippet = tags[o.args]
+	if snippet then
+		insert_text(snippet, offsets[o.args])
+	else
+		vim.notify("lonelog: Unknown tag '" .. o.args .. "'", vim.log.levels.WARN)
+	end
+end, {
+	nargs = 1,
+	complete = function()
+		return { "npc", "location", "pc", "thread", "ref", "foe" }
+	end,
+	desc = "Insert Lonelog tag snippet",
+})
 
 -- Set up keymaps after plugin loads
 vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })
