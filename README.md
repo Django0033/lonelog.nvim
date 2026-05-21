@@ -110,6 +110,12 @@ require("lonelog").setup({
     insert_conseq   = "<leader>l=",  -- Insert =>
     action_seq      = "<leader>lA",  -- Action sequence template
     oracle_seq      = "<leader>lQ",  -- Oracle sequence template
+    tag_npc         = "<leader>ln",  -- Insert [N:Name|]
+    tag_location    = "<leader>ll",  -- Insert [L:Name|]
+    tag_pc          = "<leader>lp",  -- Insert [PC:Name|]
+    tag_thread      = "<leader>lth", -- Insert [Thread:Name|Open]
+    tag_ref         = "<leader>lr",  -- Insert [#N:Name]
+    tag_foe         = "<leader>lf",  -- Insert [F:Name|]
     scene_marker    = "<leader>lm",  -- Scene marker
     d4   = "<leader>ld4",         -- Quick roll 1d4
     d6   = "<leader>ld6",         -- Quick roll 1d6
@@ -153,6 +159,26 @@ Or use commands:
 :LonelogSymbol conseq
 :LonelogActionSequence
 :LonelogOracleSequence
+```
+
+### Tag Snippets
+
+Insert Lonelog tags with smart cursor positioning — the cursor lands right after the colon so you can type the name immediately:
+
+| Keymap (Normal) | Keymap (Insert) | Inserts |
+|-----------------|-----------------|---------|
+| `<leader>ln` | `<C-l>n` | `[N:\|]` — NPC |
+| `<leader>ll` | `<C-l>l` | `[L:\|]` — Location |
+| `<leader>lp` | `<C-l>p` | `[PC:\|]` — Player character |
+| `<leader>lth` | `<C-l>h` | `[Thread:\|Open]` — Thread |
+| `<leader>lr` | `<C-l>r` | `[#N:\|]` — Reference |
+| `<leader>lf` | `<C-l>f` | `[F:\|]` — Foe |
+
+Or use the command:
+
+```vim
+:LonelogTag npc
+:LonelogTag thread
 ```
 
 ### Dice Rolling
@@ -228,6 +254,7 @@ Scenes are automatically sorted in chronological order, with support for:
 | `:LonelogDiceRoll <notation>` | Roll specific dice notation |
 | `:LonelogD4` through `:LonelogD100` | Quick dice rolls |
 | `:LonelogSymbol <symbol>` | Insert notation symbol |
+| `:LonelogTag <type>` | Insert tag snippet (npc/location/pc/thread/ref/foe) |
 | `:LonelogActionSequence` | Insert action sequence template |
 | `:LonelogOracleSequence` | Insert oracle sequence template |
 | `:LonelogTags` | Browse Lonelog tags |
