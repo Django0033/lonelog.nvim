@@ -1,4 +1,14 @@
 -- Set up all plugin keybindings
+
+local function insert_text(text, cursor_offset)
+	vim.api.nvim_put({ text }, "c", true, true)
+	if cursor_offset then
+		local row = vim.fn.line(".")
+		local col = vim.fn.col(".") - cursor_offset
+		vim.api.nvim_win_set_cursor(0, { row, col })
+	end
+end
+
 local function setup_keymaps()
 	local cfg = require("lonelog.config")
 	local solo = require("lonelog")
@@ -40,6 +50,40 @@ local function setup_keymaps()
 			vim.notify("lonelog: No result to insert", vim.log.levels.WARN)
 		end
 	end, { desc = "Insert result" })
+
+	-- Notation Symbol Insertion
+	map("n", cfg.get().keymaps.insert_action, function()
+		insert_text("@ ")
+	end, { desc = "Insert action marker @" })
+	map("n", cfg.get().keymaps.insert_question, function()
+		insert_text("? ")
+	end, { desc = "Insert oracle question ?" })
+	map("n", cfg.get().keymaps.insert_dice, function()
+		insert_text("d: ")
+	end, { desc = "Insert dice roll d:" })
+	map("n", cfg.get().keymaps.insert_arrow, function()
+		insert_text(" -> ")
+	end, { desc = "Insert result arrow ->" })
+	map("n", cfg.get().keymaps.insert_conseq, function()
+		insert_text("=> ")
+	end, { desc = "Insert consequence =>" })
+
+	-- Insert mode mappings (Ctrl-l prefix)
+	map("i", "<C-l>a", function()
+		insert_text("@ ")
+	end, { desc = "Insert action marker @" })
+	map("i", "<C-l>q", function()
+		insert_text("? ")
+	end, { desc = "Insert oracle question ?" })
+	map("i", "<C-l>d", function()
+		insert_text("d: ")
+	end, { desc = "Insert dice roll d:" })
+	map("i", "<C-l>-", function()
+		insert_text(" -> ")
+	end, { desc = "Insert result arrow ->" })
+	map("i", "<C-l>=", function()
+		insert_text("=> ")
+	end, { desc = "Insert consequence =>" })
 
 	-- Quick dice rolls (1d4, 1d6, etc.)
 	local quick_dice = {
@@ -140,6 +184,23 @@ for _, d in ipairs({
 		require("lonelog").roll_dice(d[2])
 	end, { nargs = 0, desc = "Roll " .. d[2] })
 end
+
+-- Notation insertion commands
+vim.api.nvim_create_user_command("LonelogSymbol", function(o)
+	local symbols = {
+		["@"] = "@ ",
+		["?"] = "? ",
+		d = "d: ",
+		arrow = " -> ",
+		conseq = "=> ",
+	}
+	local text = symbols[o.args]
+	if text then
+		insert_text(text)
+	else
+		vim.notify("lonelog: Unknown symbol '" .. o.args .. "'", vim.log.levels.WARN)
+	end
+end, { nargs = 1, desc = "Insert Lonelog symbol (@, ?, d, arrow, conseq)" })
 
 -- Set up keymaps after plugin loads
 vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })
