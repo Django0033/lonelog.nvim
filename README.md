@@ -14,7 +14,7 @@
 
 - **Dice Engine** — Standard notation (`2d6+3`), advantage/disadvantage (`2d20kh1`), exploding dice (`4d6!`), success counting (`6d6>>4`), and sum-vs-target (`2d6>7`)
 - **Oracle System** — Weighted outcomes from Fate, Binary, and Mythic tables with persistent chaos factor
-- **Notation Insertion** — Insert Lonelog symbols (`@`, `?`, `d:`, `->`, `=>`) and tags (`[N:Name|]`, `[#N:Name]`) directly into your session log
+- **Notation Insertion** — Insert Lonelog symbols (`@`, `?`, `d:`, `->`, `=>`), multiline action/oracle sequences, and tag snippets (`[N:Name|]`, `[#N:Name]`) directly into your session log
 - **Tag Navigation** — Parse and browse NPCs, locations, threads, clocks, tracks, and more from your play log
 - **Scene Navigation** — Navigate main scenes, flashbacks, sub-scenes, and thread scenes with proper chronological ordering
 - **Telescope Integration** — Uses Telescope when available, falls back to a native sidebar picker automatically
@@ -108,6 +108,9 @@ require("lonelog").setup({
     insert_dice     = "<leader>ldd", -- Insert d:
     insert_arrow    = "<leader>l-",  -- Insert ->
     insert_conseq   = "<leader>l=",  -- Insert =>
+    action_seq      = "<leader>lA",  -- Action sequence template
+    oracle_seq      = "<leader>lQ",  -- Oracle sequence template
+    scene_marker    = "<leader>lm",  -- Scene marker
     d4   = "<leader>ld4",         -- Quick roll 1d4
     d6   = "<leader>ld6",         -- Quick roll 1d6
     d8   = "<leader>ld8",         -- Quick roll 1d8
@@ -133,12 +136,23 @@ Lonelog uses a structured notation for solo RPG session logs. Insert symbols dir
 | `<leader>l-` | `<C-l>-` | ` -> ` — Result arrow |
 | `<leader>l=` | `<C-l>=` | `\n=> ` — Consequence |
 
+### Notation Sequences
+
+Insert structured action and oracle sequences with a single keymap:
+
+| Keymap | Inserts |
+|--------|---------|
+| `<leader>lA` | Action sequence — `@ [action]` / `d: [roll] -> [outcome]` / `=> [consequence]` |
+| `<leader>lQ` | Oracle sequence — `? [question]` / `-> [answer]` / `=> [consequence]` |
+
 Or use commands:
 
 ```vim
 :LonelogSymbol @
 :LonelogSymbol arrow
 :LonelogSymbol conseq
+:LonelogActionSequence
+:LonelogOracleSequence
 ```
 
 ### Dice Rolling
@@ -214,6 +228,8 @@ Scenes are automatically sorted in chronological order, with support for:
 | `:LonelogDiceRoll <notation>` | Roll specific dice notation |
 | `:LonelogD4` through `:LonelogD100` | Quick dice rolls |
 | `:LonelogSymbol <symbol>` | Insert notation symbol |
+| `:LonelogActionSequence` | Insert action sequence template |
+| `:LonelogOracleSequence` | Insert oracle sequence template |
 | `:LonelogTags` | Browse Lonelog tags |
 | `:LonelogScenes` | Browse Lonelog scenes |
 | `:LonelogInsert` | Insert last result at cursor |
