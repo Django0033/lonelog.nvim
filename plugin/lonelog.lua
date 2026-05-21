@@ -9,6 +9,26 @@ local function insert_text(text, cursor_offset)
 	end
 end
 
+local ACTION_TEMPLATE = {
+	"@ [action]",
+	"d: [roll] -> [outcome]",
+	"=> [consequence]",
+}
+
+local ORACLE_TEMPLATE = {
+	"? [question]",
+	"-> [answer]",
+	"=> [consequence]",
+}
+
+-- Insert multiline template at cursor and position cursor
+local function insert_template_at_cursor(template, cursor_line, cursor_col)
+	local row = vim.fn.line(".") - 1
+	local col = vim.fn.col(".") - 1
+	vim.api.nvim_buf_set_text(0, row, col, row, col, template)
+	vim.api.nvim_win_set_cursor(0, { row + 1 + cursor_line, cursor_col })
+end
+
 local function setup_keymaps()
 	local cfg = require("lonelog.config")
 	local solo = require("lonelog")
@@ -67,6 +87,15 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.insert_conseq, function()
 		insert_text("=> ")
 	end, { desc = "Insert consequence =>" })
+
+	-- Multi-line notation sequences
+	map("n", cfg.get().keymaps.action_seq, function()
+		insert_template_at_cursor(ACTION_TEMPLATE, 0, 3)
+	end, { desc = "Insert action sequence" })
+
+	map("n", cfg.get().keymaps.oracle_seq, function()
+		insert_template_at_cursor(ORACLE_TEMPLATE, 0, 2)
+	end, { desc = "Insert oracle sequence" })
 
 	-- Insert mode mappings (Ctrl-l prefix)
 	map("i", "<C-l>a", function()
@@ -201,6 +230,15 @@ vim.api.nvim_create_user_command("LonelogSymbol", function(o)
 		vim.notify("lonelog: Unknown symbol '" .. o.args .. "'", vim.log.levels.WARN)
 	end
 end, { nargs = 1, desc = "Insert Lonelog symbol (@, ?, d, arrow, conseq)" })
+
+-- Multi-line sequence commands
+vim.api.nvim_create_user_command("LonelogActionSequence", function()
+	insert_template_at_cursor(ACTION_TEMPLATE, 0, 3)
+end, { desc = "Insert action sequence template" })
+
+vim.api.nvim_create_user_command("LonelogOracleSequence", function()
+	insert_template_at_cursor(ORACLE_TEMPLATE, 0, 2)
+end, { desc = "Insert oracle sequence template" })
 
 -- Set up keymaps after plugin loads
 vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })
