@@ -244,6 +244,24 @@ Scenes are automatically sorted in chronological order, with support for:
 - Main scenes (`S1`, `S2`), Flashbacks (`S5a`, `S8b`)
 - Sub-scenes (`S7.1`, `S7.2`), Thread scenes (`T1-S5`, `T1+T2-S5`)
 
+### Auto-Numbered Scene Markers
+
+Insert a scene marker with automatic numbering — scans backwards from the cursor to find the last scene and increments it:
+
+```vim
+<leader>lm       " Insert ### S1 *context* (auto-numbered)
+:LonelogSceneMarker
+```
+
+| Last scene | Inserts |
+|------------|---------|
+| `S1` | `S2` |
+| `S5a` | `S5b` |
+| `S7.1` | `S7.2` |
+| `T1-S5` | `T1-S6` |
+| `S5z` | `S6a` (wraps) |
+| *(none)* | `S1` |
+
 ## Commands
 
 | Command | Description |
@@ -257,6 +275,7 @@ Scenes are automatically sorted in chronological order, with support for:
 | `:LonelogTag <type>` | Insert tag snippet (npc/location/pc/thread/ref/foe) |
 | `:LonelogActionSequence` | Insert action sequence template |
 | `:LonelogOracleSequence` | Insert oracle sequence template |
+| `:LonelogSceneMarker` | Insert auto-numbered scene marker |
 | `:LonelogTags` | Browse Lonelog tags |
 | `:LonelogScenes` | Browse Lonelog scenes |
 | `:LonelogInsert` | Insert last result at cursor |

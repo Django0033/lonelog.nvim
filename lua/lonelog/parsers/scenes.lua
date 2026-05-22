@@ -130,6 +130,71 @@ function M.sort_scenes(scenes)
 	return scenes
 end
 
+-- Extract scene ID from a line (handles markdown headers and bare IDs)
+local function extract_scene_id(line)
+	local trimmed = line:match("^%s*(.-)%s*$") or ""
+	local id = trimmed:match("^###%s+(S[%d%.a-z]+)")
+		or trimmed:match("^###%s+(T[%d%+]+%-S[%d%.a-z]+)")
+	if id then return id end
+	if trimmed:match("T[0-9]+%+[0-9]*T?[0-9]+%-S") then
+		return trimmed:match("T[0-9]+%+[0-9]*T?[0-9]+%-S[0-9]*[a-z]?")
+	elseif trimmed:match("T[0-9]+%-S") then
+		return trimmed:match("T[0-9]+%-S[0-9]*[a-z]?")
+	elseif trimmed:match("S[0-9]+%.[0-9]+") then
+		return trimmed:match("S[0-9]+%.[0-9]+")
+	elseif trimmed:match("S[0-9]+[a-z]") then
+		return trimmed:match("S[0-9]+[a-z]")
+	elseif trimmed:match("S[0-9]+") then
+		return trimmed:match("S[0-9]+")
+	end
+	return nil
+end
+
+-- Compute the next scene ID from a given scene ID
+function M.next_scene_id(scene_id)
+	if scene_id:match("^T") then
+		local prefix, num = scene_id:match("^(.-S)(%d+)$")
+		if prefix and num then
+			return prefix .. tostring(tonumber(num) + 1)
+		end
+	elseif scene_id:match("^S%d+[a-z]$") then
+		local num, letter = scene_id:match("^S(%d+)([a-z])$")
+		local n = tonumber(num)
+		local next_letter = string.char(string.byte(letter) + 1)
+		if next_letter > 'z' then
+			return "S" .. tostring(n + 1) .. "a"
+		end
+		return "S" .. tostring(n) .. next_letter
+	elseif scene_id:match("^S%d+%.%d+$") then
+		local num, sub = scene_id:match("^S(%d+)%.(%d+)$")
+		return "S" .. num .. "." .. tostring(tonumber(sub) + 1)
+	elseif scene_id:match("^S%d+$") then
+		local num = scene_id:match("^S(%d+)$")
+		return "S" .. tostring(tonumber(num) + 1)
+	end
+	return "S1"
+end
+
+-- Scan backwards from cursor to find the last scene and generate the next ID
+function M.generate_next_scene_id()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local current_line = cursor[1]
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+
+	for i = current_line - 1, 1, -1 do
+		local line = lines[i]
+		if line then
+			local scene_id = extract_scene_id(line)
+			if scene_id then
+				return M.next_scene_id(scene_id)
+			end
+		end
+	end
+
+	return "S1"
+end
+
 -- Show picker for navigating scenes
 function M.show_scenes_picker()
 	local bufnr = vim.api.nvim_get_current_buf()

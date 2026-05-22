@@ -29,6 +29,16 @@ local function insert_template_at_cursor(template, cursor_line, cursor_col)
 	vim.api.nvim_win_set_cursor(0, { row + 1 + cursor_line, cursor_col })
 end
 
+-- Insert auto-numbered scene marker above current line
+local function insert_scene_marker()
+	local scenes_mod = require("lonelog.parsers.scenes")
+	local next_id = scenes_mod.generate_next_scene_id()
+	local text = "### " .. next_id .. " *context*"
+	local row = vim.fn.line(".") - 1
+	vim.api.nvim_buf_set_lines(0, row, row, false, { text, "" })
+	vim.api.nvim_win_set_cursor(0, { row + 1, #("### " .. next_id .. " *") })
+end
+
 local function setup_keymaps()
 	local cfg = require("lonelog.config")
 	local solo = require("lonelog")
@@ -136,6 +146,11 @@ local function setup_keymaps()
 	map("i", "<C-l>f", function()
 		insert_text("[F:|]", 3)
 	end, { desc = "Insert foe tag" })
+
+	-- Scene marker (auto-numbered)
+	map("n", cfg.get().keymaps.scene_marker, function()
+		insert_scene_marker()
+	end, { desc = "Insert auto-numbered scene" })
 
 	-- Insert mode mappings (Ctrl-l prefix)
 	map("i", "<C-l>a", function()
@@ -304,6 +319,11 @@ end, {
 	end,
 	desc = "Insert Lonelog tag snippet",
 })
+
+-- Scene marker command
+vim.api.nvim_create_user_command("LonelogSceneMarker", function()
+	insert_scene_marker()
+end, { nargs = 0, desc = "Insert auto-numbered scene marker" })
 
 -- Set up keymaps after plugin loads
 vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })
