@@ -72,7 +72,7 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.chaos, function()
 		solo.oracle.show_chaos_ui()
 	end, { desc = "Chaos Factor UI" })
-	map("n", "<leader>li", function()
+	map("n", cfg.get().keymaps.insert_result, function()
 		local w, c = solo.ui.get_latest_content()
 		if c then
 			solo.ui.insert_result(w)

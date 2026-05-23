@@ -3,10 +3,33 @@ local M = {}
 -- Default configuration values
 local defaults = {
 	keymaps = {
-		oracle = "<leader>lo",
-		dice = "<leader>ldr",
-		tags = "<leader>lt",
-		scenes = "<leader>ls",
+		-- Main features
+		oracle = "<leader>lO",
+		dice = "<leader>lD",
+		tags = "<leader>lT",
+		scenes = "<leader>lS",
+		chaos = "<leader>lC",
+
+		-- Insert symbols
+		insert_action = "<leader>lia",
+		insert_question = "<leader>liq",
+		insert_dice = "<leader>lid",
+		insert_arrow = "<leader>li-",
+		insert_conseq = "<leader>li=",
+		action_seq = "<leader>liA",
+		oracle_seq = "<leader>liQ",
+
+		-- Insert tags
+		tag_npc = "<leader>ltn",
+		tag_location = "<leader>ltl",
+		tag_pc = "<leader>ltp",
+		tag_thread = "<leader>ltt",
+		tag_ref = "<leader>ltr",
+		tag_foe = "<leader>ltf",
+
+		-- Insert result
+		insert_result = "<leader>lI",
+
 		d4 = "<leader>ld4",
 		d6 = "<leader>ld6",
 		d8 = "<leader>ld8",
@@ -14,20 +37,6 @@ local defaults = {
 		d12 = "<leader>ldb",
 		d20 = "<leader>ldw",
 		d100 = "<leader>ldc",
-		chaos = "<leader>lC",
-		insert_action = "<leader>la",
-		insert_question = "<leader>lq",
-		insert_dice = "<leader>ldd",
-		insert_arrow = "<leader>l-",
-		insert_conseq = "<leader>l=",
-		action_seq = "<leader>lA",
-		oracle_seq = "<leader>lQ",
-		tag_npc = "<leader>ln",
-		tag_location = "<leader>ll",
-		tag_pc = "<leader>lp",
-		tag_thread = "<leader>lth",
-		tag_ref = "<leader>lr",
-		tag_foe = "<leader>lf",
 		scene_marker = "<leader>lm",
 		complete_tag = "<C-l>c",
 	},

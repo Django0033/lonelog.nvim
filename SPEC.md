@@ -35,10 +35,10 @@ lonelog.nvim/
 {
   -- Keybindings
   keymaps = {
-    oracle = "<leader>lo",
-    dice = "<leader>ldr",
-    tags = "<leader>lt",
-    scenes = "<leader>ls",
+    oracle = "<leader>lO",
+    dice = "<leader>lD",
+    tags = "<leader>lT",
+    scenes = "<leader>lS",
     d4 = "<leader>ld4",
     d6 = "<leader>ld6",
     d8 = "<leader>ld8",
@@ -290,11 +290,11 @@ lonelog.parsers.show_scenes_picker_native(scenes)  -- Native version
 
 | Keymap | Action |
 |--------|--------|
-| `<leader>lo` | Open oracle |
-| `<leader>ldr` | Roll dice |
-| `<leader>lt` | Navigate tags |
-| `<leader>ls` | Navigate scenes |
-| `<leader>li` | Insert last result |
+| `<leader>lO` | Open oracle |
+| `<leader>lD` | Roll dice |
+| `<leader>lT` | Navigate tags |
+| `<leader>lS` | Navigate scenes |
+| `<leader>lI` | Insert last result |
 | `<leader>ld4` | Roll 1d4 |
 | `<leader>ld6` | Roll 1d6 |
 | `<leader>ld8` | Roll 1d8 |

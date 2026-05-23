@@ -99,33 +99,41 @@ require("lonelog").setup({
 
   -- All keymaps are customizable:
   keymaps = {
-    oracle       = "<leader>lo",  -- Open oracle picker
-    dice         = "<leader>ldr", -- Interactive dice roll
-    tags         = "<leader>lt",  -- Navigate tags
-    scenes       = "<leader>ls",  -- Navigate scenes
-    chaos        = "<leader>lC",  -- Chaos factor UI
-    insert_action   = "<leader>la",  -- Insert @
-    insert_question = "<leader>lq",  -- Insert ?
-    insert_dice     = "<leader>ldd", -- Insert d:
-    insert_arrow    = "<leader>l-",  -- Insert ->
-    insert_conseq   = "<leader>l=",  -- Insert =>
-    action_seq      = "<leader>lA",  -- Action sequence template
-    oracle_seq      = "<leader>lQ",  -- Oracle sequence template
-    tag_npc         = "<leader>ln",  -- Insert [N:Name|]
-    tag_location    = "<leader>ll",  -- Insert [L:Name|]
-    tag_pc          = "<leader>lp",  -- Insert [PC:Name|]
-    tag_thread      = "<leader>lth", -- Insert [Thread:Name|Open]
-    tag_ref         = "<leader>lr",  -- Insert [#N:Name]
-    tag_foe         = "<leader>lf",  -- Insert [F:Name|]
-    complete_tag    = "<C-l>c",      -- Tag autocomplete (insert mode)
-    scene_marker    = "<leader>lm",  -- Scene marker
-    d4   = "<leader>ld4",         -- Quick roll 1d4
-    d6   = "<leader>ld6",         -- Quick roll 1d6
-    d8   = "<leader>ld8",         -- Quick roll 1d8
-    d10  = "<leader>lda",         -- Quick roll 1d10
-    d12  = "<leader>ldb",         -- Quick roll 1d12
-    d20  = "<leader>ldw",         -- Quick roll 1d20
-    d100 = "<leader>ldc",         -- Quick roll 1d100
+    -- Main features
+    oracle    = "<leader>lO",  -- Open oracle picker
+    dice      = "<leader>lD",  -- Interactive dice roll
+    tags      = "<leader>lT",  -- Navigate tags
+    scenes    = "<leader>lS",  -- Navigate scenes
+    chaos     = "<leader>lC",  -- Chaos factor UI
+
+    -- Insert notation symbols
+    insert_action   = "<leader>lia",  -- Insert @
+    insert_question = "<leader>liq",  -- Insert ?
+    insert_dice     = "<leader>lid",  -- Insert d:
+    insert_arrow    = "<leader>li-",  -- Insert ->
+    insert_conseq   = "<leader>li=",  -- Insert =>
+    action_seq      = "<leader>liA",  -- Action sequence template
+    oracle_seq      = "<leader>liQ",  -- Oracle sequence template
+
+    -- Insert tag snippets
+    tag_npc      = "<leader>ltn",  -- Insert [N:Name|]
+    tag_location = "<leader>ltl",  -- Insert [L:Name|]
+    tag_pc       = "<leader>ltp",  -- Insert [PC:Name|]
+    tag_thread   = "<leader>ltt",  -- Insert [Thread:Name|Open]
+    tag_ref      = "<leader>ltr",  -- Insert [#N:Name]
+    tag_foe      = "<leader>ltf",  -- Insert [F:Name|]
+
+    insert_result = "<leader>lI",  -- Insert last result
+    scene_marker  = "<leader>lm",  -- Scene marker
+
+    -- Tag autocomplete (insert mode)
+    complete_tag = "<C-l>c",
+
+    -- Quick dice rolls
+    d4   = "<leader>ld4",   d6  = "<leader>ld6",
+    d8   = "<leader>ld8",   d10 = "<leader>lda",
+    d12  = "<leader>ldb",   d20 = "<leader>ldw",
+    d100 = "<leader>ldc",
   },
 })
 ```
@@ -138,11 +146,11 @@ Lonelog uses a structured notation for solo RPG session logs. Insert symbols dir
 
 | Keymap (Normal) | Keymap (Insert) | Inserts |
 |-----------------|-----------------|---------|
-| `<leader>la` | `<C-l>a` | `@ ` — Action marker |
-| `<leader>lq` | `<C-l>q` | `? ` — Oracle question |
-| `<leader>ldd` | `<C-l>d` | `d: ` — Dice roll |
-| `<leader>l-` | `<C-l>-` | ` -> ` — Result arrow |
-| `<leader>l=` | `<C-l>=` | `\n=> ` — Consequence |
+| `<leader>lia` | `<C-l>a` | `@ ` — Action marker |
+| `<leader>liq` | `<C-l>q` | `? ` — Oracle question |
+| `<leader>lid` | `<C-l>d` | `d: ` — Dice roll |
+| `<leader>li-` | `<C-l>-` | ` -> ` — Result arrow |
+| `<leader>li=` | `<C-l>=` | `\n=> ` — Consequence |
 
 ### Notation Sequences
 
@@ -150,8 +158,8 @@ Insert structured action and oracle sequences with a single keymap:
 
 | Keymap | Inserts |
 |--------|---------|
-| `<leader>lA` | Action sequence — `@ [action]` / `d: [roll] -> [outcome]` / `=> [consequence]` |
-| `<leader>lQ` | Oracle sequence — `? [question]` / `-> [answer]` / `=> [consequence]` |
+| `<leader>liA` | Action sequence — `@ [action]` / `d: [roll] -> [outcome]` / `=> [consequence]` |
+| `<leader>liQ` | Oracle sequence — `? [question]` / `-> [answer]` / `=> [consequence]` |
 
 Or use commands:
 
@@ -182,12 +190,12 @@ Insert Lonelog tags with smart cursor positioning — the cursor lands right aft
 
 | Keymap (Normal) | Keymap (Insert) | Inserts |
 |-----------------|-----------------|---------|
-| `<leader>ln` | `<C-l>n` | `[N:\|]` — NPC |
-| `<leader>ll` | `<C-l>l` | `[L:\|]` — Location |
-| `<leader>lp` | `<C-l>p` | `[PC:\|]` — Player character |
-| `<leader>lth` | `<C-l>h` | `[Thread:\|Open]` — Thread |
-| `<leader>lr` | `<C-l>r` | `[#N:\|]` — Reference |
-| `<leader>lf` | `<C-l>f` | `[F:\|]` — Foe |
+| `<leader>ltn` | `<C-l>n` | `[N:\|]` — NPC |
+| `<leader>ltl` | `<C-l>l` | `[L:\|]` — Location |
+| `<leader>ltp` | `<C-l>p` | `[PC:\|]` — Player character |
+| `<leader>ltt` | `<C-l>h` | `[Thread:\|Open]` — Thread |
+| `<leader>ltr` | `<C-l>r` | `[#N:\|]` — Reference |
+| `<leader>ltf` | `<C-l>f` | `[F:\|]` — Foe |
 
 Or use the command:
 
@@ -211,7 +219,7 @@ Supports standard RPG dice notation and advanced modifiers:
 | `NdN>T` | `2d6>7` | Sum vs target |
 
 ```vim
-<leader>ldr       " Interactive: type '2d6+3'
+<leader>lD       " Interactive: type '2d6+3'
 :LonelogDiceRoll 2d6+3
 :LonelogD20       " Quick roll 1d20
 ```
@@ -222,7 +230,7 @@ Roll oracles for game master decisions:
 
 | Oracle | Outcomes | Usage |
 |--------|----------|-------|
-| **Fate** | Exceptional Yes/No, Yes/No (but...), Maybe | `<leader>lo` |
+| **Fate** | Exceptional Yes/No, Yes/No (but...), Maybe | `<leader>lO` |
 | **Binary** | Yes / No | `:LonelogOracle binary` |
 | **Mythic** | 2d10 + chaos factor | `:LonelogOracle mythic` |
 
@@ -242,7 +250,7 @@ Browse all Lonelog entities in your session log:
 ```
 
 ```vim
-<leader>lt       " Browse tags by type
+<leader>lT       " Browse tags by type
 :LonelogTags
 ```
 
@@ -251,7 +259,7 @@ Browse all Lonelog entities in your session log:
 Navigate through your session outline:
 
 ```vim
-<leader>ls       " Browse scenes by type
+<leader>lS       " Browse scenes by type
 :LonelogScenes
 ```
 
