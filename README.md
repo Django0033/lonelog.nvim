@@ -18,6 +18,7 @@
 - **Tag Autocomplete** — Automatically suggests existing entity names when typing tags (`[N:`, `[L:`, `[PC:`, etc.) with relevance-based ordering
 - **Tag Navigation** — Parse and browse NPCs, locations, threads, clocks, tracks, and more from your play log
 - **Inline Tables** — Define tables inline (`tbl: Name (d6)` with indented entries or bracket shorthand `[A, B, C]`) and roll them directly on the line
+- **Generator Blocks** — Batch-roll indented sub-lines under a `gen:` header, with automatic label-to-table name resolution
 - **Scene Navigation** — Navigate main scenes, flashbacks, sub-scenes, and thread scenes with proper chronological ordering
 - **Telescope Integration** — Uses Telescope when available, falls back to a native sidebar picker automatically
 - **Zero Dependencies** — Pure Lua, no external packages required
@@ -319,6 +320,36 @@ Also works on `d:` lines for quick dice rolls:
 Before: d: 2d6+3
 After:  d: 2d6+3[4, 2] = 10
 ```
+
+### Generator Blocks
+
+Batch-roll entire sections using `gen:` headers. All indented sub-lines below the header are rolled in-place:
+
+```markdown
+gen: Generate NPC
+  Apariencia: d3        ← looks up table "apariencia"
+  Personalidad: d6      ← rolls without table lookup
+  Edad: 1d6             ← bare dice roll
+                           ← empty lines skip
+  tbl: Equipment (d6)   ← explicit table roll
+Other content           ← non-indented → stops
+```
+
+Each sub-line is processed independently. The `gen:` header itself is never modified:
+
+```
+Before:
+gen: Generate NPC
+  Apariencia: d3
+  Personalidad: d6
+
+After:
+gen: Generate NPC
+  Apariencia: d3=2 -> Normal
+  Personalidad: d6=4
+```
+
+Put the cursor on the `gen:` line and press `<leader>lr` to batch-roll the entire block.
 
 ## Commands
 

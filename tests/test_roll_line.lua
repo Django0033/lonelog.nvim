@@ -29,11 +29,11 @@ local function reset_state()
 	_G.vim.notify = function() end
 end
 
--- Mock dice for deterministic results
 package.preload["lonelog.dice"] = function()
 	return {
 		roll = function(notation)
 			local mocks = {
+				["1d3"] = { total = 2, rolls = { 2 }, display = "1d3[2] = 2" },
 				["1d6"] = { total = 4, rolls = { 4 }, display = "1d6[4] = 4" },
 				["1d20"] = { total = 15, rolls = { 15 }, display = "1d20[15] = 15" },
 				["2d6+3"] = { total = 10, rolls = { 4, 3 }, display = "2d6+3[4, 3] = 10" },
@@ -67,12 +67,17 @@ local test_tables = T.parse_tables({
 	"tbl: Empty (d20)",
 	"tbl: Items (d6)",
 	"  1: Simple stuff",
+	"tbl: Apariencia (d3)",
+	"  1: Feo",
+	"  2: Normal",
+	"  3: Hermoso",
 })
 
 print("=== process_line (tbl: lines) ===")
 
 do
 	local r = roll_line.process_line("tbl: Forest (d6)", test_tables)
+	-- -> at start of pattern, - is literal
 	local ok = r ~= nil and r:match("tbl: Forest d6=4") and r:match("-> Deer")
 	if test("range table resolves entry", ok) then
 		passed = passed + 1
@@ -83,7 +88,8 @@ end
 
 do
 	local r = roll_line.process_line("tbl: Weather [Sunny, Rain, Storm]", test_tables)
-	local ok = r ~= nil and r:match("tbl: Weather d3=3") and r:match("-> Storm")
+	-- 1d3 mock returns total=2 -> entry 2 is "Rain"
+	local ok = r ~= nil and r:match("tbl: Weather d3=2") and r:match("-> Rain")
 	if test("bracket table resolves entry", ok) then
 		passed = passed + 1
 	else
@@ -135,6 +141,173 @@ end
 do
 	local r = roll_line.process_line("d: 1d6", test_tables)
 	if test("d: single die", r ~= nil and r:match("^d: 1d6%[4%] = 4")) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+print()
+print("=== process_line (label: notation patterns) ===")
+
+do
+	local r = roll_line.process_line("  Apariencia: d3", test_tables)
+	local ok = r ~= nil and r:match("Apariencia: d3=2") and r:match("-> Normal")
+	if test("label with matching table resolves entry", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("  Personalidad: d6", test_tables)
+	local ok = r ~= nil and r:match("Personalidad: d6=4") and not r:match("->")
+	if test("label without matching table skips arrow", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("    tbl: Forest (d6)", test_tables)
+	local ok = r ~= nil and r:match("tbl: Forest d6=4") and r:match("-> Deer")
+	if test("indented tbl: not caught by label pattern", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("  d: 1d6", test_tables)
+	local ok = r ~= nil and r:match("^  d: 1d6%[4%] = 4")
+	if test("indented d: not caught by label pattern", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("  Label without dice", test_tables)
+	if test("label without dice returns nil", r == nil) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("  d6", test_tables)
+	local ok = r ~= nil and r:match("^  d6=4")
+	if test("bare dice notation rolls", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+print()
+print("=== process_gen_block ===")
+
+do
+	local gen_lines = {
+		"gen: Generate NPC",
+		"  Apariencia: d3",
+		"  Personalidad: d6",
+	}
+	local changes = roll_line.process_gen_block(1, gen_lines, test_tables)
+	-- Escape - in mid-pattern arrow (%- is literal -, not lazy quantifier)
+	local ok = #changes == 2
+		and changes[1].index == 2
+		and changes[1].text:match("Apariencia: d3=2 %-> Normal")
+		and changes[2].index == 3
+		and changes[2].text:match("Personalidad: d6=4")
+	if test("batch processes all indented sub-lines", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local gen_lines = {
+		"gen: Generate",
+		"  Apariencia: d3",
+		"",
+		"  Personalidad: d6",
+		"Break",
+		"  Should not process",
+	}
+	local changes = roll_line.process_gen_block(1, gen_lines, test_tables)
+	local ok = #changes == 2
+		and changes[1].index == 2
+		and changes[2].index == 4
+	if test("skips empty lines and stops at non-indented", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local changes = roll_line.process_gen_block(1, { "gen: Nothing" }, test_tables)
+	if test("no indented lines returns empty", #changes == 0) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local gen_lines = {
+		"gen: End",
+		"  d6",
+		"  Apariencia: d3",
+	}
+	local changes = roll_line.process_gen_block(1, gen_lines, test_tables)
+	local ok = #changes == 2
+		and changes[1].index == 2
+		and changes[1].text:match("^  d6=4")
+		and changes[2].index == 3
+		and changes[2].text:match("Apariencia: d3=2 %-> Normal")
+	if test("works at end of buffer with bare dice", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local gen_lines = {
+		"gen: Only indented",
+		"  Apariencia: d3",
+	}
+	local changes = roll_line.process_gen_block(1, gen_lines, test_tables)
+	local ok = #changes == 1 and changes[1].index == 2
+	if test("processes single sub-line", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local gen_lines = {
+		"gen: Mixed content",
+		"  d6",
+		"  Label: d3",
+		"  plain text without dice",
+		"  tbl: Forest (d6)",
+	}
+	local changes = roll_line.process_gen_block(1, gen_lines, test_tables)
+	local ok = #changes == 3
+		and changes[1].text:match("^  d6=4")
+		and changes[2].text:match("Label: d3=2")
+		and changes[3].text:match("tbl: Forest d6=4 %-> Deer")
+	if test("processes mixed sub-line types", ok) then
 		passed = passed + 1
 	else
 		failed = failed + 1
@@ -235,6 +408,59 @@ do
 	roll_line.roll_current_line()
 
 	if test("no line notifies warn", notified ~= nil and notified.msg:match("No line to roll")) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	reset_state()
+	local changes = {}
+	_G.vim.api.nvim_buf_get_lines = function()
+		return {
+			"tbl: Apariencia (d3)",
+			"  1: Feo",
+			"  2: Normal",
+			"  3: Hermoso",
+			"gen: Generate NPC",
+			"  Apariencia: d3",
+			"  Personalidad: d6",
+		}
+	end
+	_G.vim.api.nvim_buf_set_lines = function(bufnr, start, e, strict, lines)
+		table.insert(changes, { start = start, e = e, lines = lines })
+	end
+	_G.vim.api.nvim_win_get_cursor = function() return { 5, 0 } end
+
+	roll_line.roll_current_line()
+
+	local ok = #changes == 2
+		and changes[1].start == 5
+		and changes[1].lines[1]:match("Apariencia: d3=2 %-> Normal")
+		and changes[2].start == 6
+		and changes[2].lines[1]:match("Personalidad: d6=4")
+	if test("roll_current_line handles gen: header batch", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	reset_state()
+	local notified = nil
+	_G.vim.api.nvim_buf_get_lines = function()
+		return { "", "gen: Nothing" }
+	end
+	_G.vim.notify = function(msg, level)
+		notified = { msg = msg, level = level }
+	end
+	_G.vim.api.nvim_win_get_cursor = function() return { 2, 0 } end
+
+	roll_line.roll_current_line()
+
+	if test("gen: with no sub-lines notifies info", notified ~= nil and notified.msg:match("No indented dice lines")) then
 		passed = passed + 1
 	else
 		failed = failed + 1

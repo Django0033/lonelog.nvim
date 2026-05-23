@@ -32,6 +32,18 @@ local function extract_d_notation(line)
 	return line:match("^%s*d:%s*([%w%+%-%>%%%!%#]+)")
 end
 
+local function extract_label_notation(line)
+	local trimmed = line:match("^%s*(.-)%s*$")
+	if not trimmed then return nil end
+	if trimmed:lower():match("^[tdg]%l+:") then return nil end
+	local _, _, label, notation = trimmed:find("^([^:([]+):%s*(%d*[dD][%d]+)")
+	if not label or not notation then return nil end
+	return {
+		label = label:match("^%s*(.-)%s*$"):lower(),
+		notation = notation,
+	}
+end
+
 function M.process_line(line, tables)
 	if not line then
 		return nil
@@ -86,7 +98,61 @@ function M.process_line(line, tables)
 		return indent .. "d: " .. result.display
 	end
 
+	local label_info = extract_label_notation(line)
+	if label_info then
+		local table_def = tables and tables[label_info.label]
+		local dice_notation = normalize(label_info.notation)
+		local dice = require("lonelog.dice")
+		local result, err = dice.roll(dice_notation)
+		if not result then
+			return nil, err
+		end
+
+		local entry_text = table_def and tp().resolve_entry(table_def, result.total)
+		local indent = line:match("^(%s*)")
+		local _, _, orig_label, orig_notation = line:find("^%s*([^:([]+):%s*(%d*[dD][%d]+)")
+		local output = indent .. orig_label .. ": " .. orig_notation .. "=" .. result.total
+		if entry_text then
+			output = output .. " -> " .. entry_text
+		end
+		return output
+	end
+
+	if not lower:match("^[tdg]%l+:") then
+		local bare_notation = trimmed:match("^(%d*[dD][%d]+)$")
+		if bare_notation then
+			local dice_notation = normalize(bare_notation)
+			local dice = require("lonelog.dice")
+			local result, err = dice.roll(dice_notation)
+			if not result then return nil, err end
+			local indent = line:match("^(%s*)")
+			return indent .. bare_notation .. "=" .. result.total
+		end
+	end
+
 	return nil
+end
+
+function M.process_gen_block(header_line_num, lines, tables)
+	if not lines or #lines == 0 then return {} end
+	local changes = {}
+	local i = header_line_num + 1
+	while i <= #lines do
+		local next_line = lines[i]
+		if not next_line then break end
+		if next_line:match("^%s+") then
+			local result, err = M.process_line(next_line, tables)
+			if result then
+				table.insert(changes, { index = i, text = result })
+			end
+			i = i + 1
+		elseif next_line:match("^%s*$") then
+			i = i + 1
+		else
+			break
+		end
+	end
+	return changes
 end
 
 function M.roll_current_line()
@@ -101,7 +167,21 @@ function M.roll_current_line()
 		return
 	end
 
+	local trimmed = current_line:match("^%s*(.-)%s*$")
 	local tables = tp().parse_tables(lines)
+
+	if trimmed and trimmed:lower():match("^gen:") then
+		local changes = M.process_gen_block(line_num, lines, tables)
+		if #changes == 0 then
+			vim.notify("lonelog: No indented dice lines to roll under gen:", vim.log.levels.INFO)
+			return
+		end
+		for _, change in ipairs(changes) do
+			vim.api.nvim_buf_set_lines(bufnr, change.index - 1, change.index, false, { change.text })
+		end
+		return
+	end
+
 	local result, err = M.process_line(current_line, tables)
 	if not result then
 		if err then
