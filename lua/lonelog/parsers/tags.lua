@@ -17,6 +17,7 @@ local TAG_TYPES = {
 	R = "Room",
 	F = "Foe",
 }
+M.TAG_TYPES = TAG_TYPES
 local TAG_LABELS = {
 	N = "NPCs",
 	L = "Locations",
