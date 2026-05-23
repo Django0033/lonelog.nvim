@@ -17,6 +17,7 @@
 - **Notation Insertion** — Insert Lonelog symbols (`@`, `?`, `d:`, `->`, `=>`), multiline action/oracle sequences, and tag snippets (`[N:Name|]`, `[#N:Name]`) directly into your session log
 - **Tag Autocomplete** — Automatically suggests existing entity names when typing tags (`[N:`, `[L:`, `[PC:`, etc.) with relevance-based ordering
 - **Tag Navigation** — Parse and browse NPCs, locations, threads, clocks, tracks, and more from your play log
+- **Inline Tables** — Define tables inline (`tbl: Name (d6)` with indented entries or bracket shorthand `[A, B, C]`) and roll them directly on the line
 - **Scene Navigation** — Navigate main scenes, flashbacks, sub-scenes, and thread scenes with proper chronological ordering
 - **Telescope Integration** — Uses Telescope when available, falls back to a native sidebar picker automatically
 - **Zero Dependencies** — Pure Lua, no external packages required
@@ -32,7 +33,7 @@
 ```lua
 {
   "Django0033/lonelog.nvim",
-  cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags", "LonelogScenes" },
+  cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags", "LonelogScenes", "LonelogRollLine" },
   config = function()
     require("lonelog").setup()
   end,
@@ -125,6 +126,9 @@ require("lonelog").setup({
 
     insert_result = "<leader>lI",  -- Insert last result
     scene_marker  = "<leader>lm",  -- Scene marker
+
+     -- Inline rolling
+     roll_line = "<leader>lr",  -- Roll dice/table on current line
 
     -- Tag autocomplete (insert mode)
     complete_tag = "<C-l>c",
@@ -285,6 +289,37 @@ Insert a scene marker with automatic numbering — scans backwards from the curs
 | `S5z` | `S6a` (wraps) |
 | *(none)* | `S1` |
 
+### Inline Table Rolling
+
+Define random tables inline and roll them directly in your session log:
+
+```markdown
+tbl: Forest Encounter (d6)
+  1-3: Nothing happens
+  4-5: A deer crosses
+  6: Bandit ambush!
+```
+
+Or use bracket shorthand for simple options:
+
+```markdown
+tbl: Weather [Sunny, Cloudy, Rain, Storm]
+```
+
+Place the cursor on the `tbl:` line and press `<leader>lr` or run `:LonelogRollLine`:
+
+```
+Before: tbl: Forest Encounter (d6)
+After:  tbl: Forest Encounter d6=4 -> A deer crosses
+```
+
+Also works on `d:` lines for quick dice rolls:
+
+```
+Before: d: 2d6+3
+After:  d: 2d6+3[4, 2] = 10
+```
+
 ## Commands
 
 | Command | Description |
@@ -302,6 +337,7 @@ Insert a scene marker with automatic numbering — scans backwards from the curs
 | `:LonelogSceneMarker` | Insert auto-numbered scene marker |
 | `:LonelogTags` | Browse Lonelog tags |
 | `:LonelogScenes` | Browse Lonelog scenes |
+| `:LonelogRollLine` | Roll dice/table on current line |
 | `:LonelogInsert` | Insert last result at cursor |
 | `:LonelogChaos` | Open chaos factor UI |
 
@@ -327,6 +363,14 @@ local scenes = ln.parsers.scenes.parse_scenes()
 local completion = require("lonelog.completion")
 completion.refresh_completions()  -- Force cache refresh for current buffer
 completion.complete_tag()         -- Trigger completion popup
+
+-- Parse and resolve inline tables
+local tables = require("lonelog.parsers.tables").parse_tables(lines)
+local result = require("lonelog.parsers.tables").resolve_entry(table_def, value)
+
+-- Roll on current line
+local modified = require("lonelog.roll_line").process_line(line, tables)
+require("lonelog.roll_line").roll_current_line()
 ```
 
 ## Requirements
