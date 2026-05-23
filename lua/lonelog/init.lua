@@ -5,6 +5,7 @@ M.config = require("lonelog.config")
 M.dice = require("lonelog.dice")
 M.oracle = require("lonelog.oracle")
 M.ui = require("lonelog.ui")
+M.roll_line = require("lonelog.roll_line")
 M.parsers = require("lonelog.ui.parsers")
 
 -- Initialize plugin with user configuration

@@ -196,6 +196,11 @@ local function setup_keymaps()
 		end
 	end
 
+	-- Roll line (tbl:/d: on current line)
+	map("n", cfg.get().keymaps.roll_line, function()
+		require("lonelog.roll_line").roll_current_line()
+	end, { desc = "Lonelog roll on current line" })
+
 	-- Visual mode: use selection as oracle context or dice notation
 	map("v", cfg.get().keymaps.oracle, function()
 		local t = vim.trim(vim.fn.getline("."):sub(vim.fn.col("v"), vim.fn.col(".")))
@@ -243,6 +248,9 @@ end, {
 	end,
 	desc = "Roll dice with notation",
 })
+vim.api.nvim_create_user_command("LonelogRollLine", function()
+	require("lonelog.roll_line").roll_current_line()
+end, { nargs = 0, desc = "Roll dice/table on current line" })
 vim.api.nvim_create_user_command("LonelogTags", function()
 	require("lonelog.ui.parsers").tags.show_tags_picker()
 end, { nargs = 0, desc = "Navigate tags" })

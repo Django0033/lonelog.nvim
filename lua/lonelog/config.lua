@@ -38,6 +38,7 @@ local defaults = {
 		d20 = "<leader>ldw",
 		d100 = "<leader>ldc",
 		scene_marker = "<leader>lm",
+		roll_line = "<leader>lr",
 		complete_tag = "<C-l>c",
 	},
 	use_telescope = "auto",

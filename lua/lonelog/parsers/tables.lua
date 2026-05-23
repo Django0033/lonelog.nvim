@@ -73,7 +73,7 @@ function M.parse_roll_line(line)
 	local dice = rest:match("(%d*[dD][%d]+)%s*$")
 	local name = dice and rest:match("(.-)%s*%d*[dD][%d]+%s*$") or rest
 	name = name:match("^%s*(.-)%s*$"):lower()
-	return { name = name, value = tonumber(value) }
+	return { name = name, value = tonumber(value), dice = dice }
 end
 
 function M.parse_header(line)

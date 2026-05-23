@@ -250,7 +250,7 @@ print("=== parse_roll_line ===")
 
 do
 	local r = tables.parse_roll_line("tbl: Forest Encounters d6=5")
-	if test("match with dice", r and r.name == "forest encounters" and r.value == 5) then
+	if test("match with dice", r and r.name == "forest encounters" and r.value == 5 and r.dice == "d6") then
 		passed = passed + 1
 	else
 		failed = failed + 1
@@ -259,7 +259,7 @@ end
 
 do
 	local r = tables.parse_roll_line("tbl: Weather =3")
-	if test("match without dice", r and r.name == "weather" and r.value == 3) then
+	if test("match without dice", r and r.name == "weather" and r.value == 3 and r.dice == nil) then
 		passed = passed + 1
 	else
 		failed = failed + 1
@@ -286,12 +286,14 @@ end
 
 do
 	local r = tables.parse_roll_line("tbl: Complex Name d20=18")
-	if test("d20 notation", r and r.name == "complex name" and r.value == 18) then
+	if test("d20 notation", r and r.name == "complex name" and r.value == 18 and r.dice == "d20") then
 		passed = passed + 1
 	else
 		failed = failed + 1
 	end
 end
+
+
 
 print()
 print("=" .. string.rep("=", 60))
