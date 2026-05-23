@@ -12,19 +12,25 @@ function M.parse_tables(lines)
 
 		local header = M.parse_header(trimmed)
 		if header and header.dice then
-			current = { name = header.name, dice = header.dice, entries = {} }
-			result[header.name:lower()] = current
-			if header.options then
-				for idx, opt in ipairs(header.options) do
-					table.insert(current.entries, { min = idx, max = idx, text = opt })
+			if not result[header.name:lower()] then
+				current = { name = header.name, dice = header.dice, entries = {} }
+				result[header.name:lower()] = current
+				if header.options then
+					for idx, opt in ipairs(header.options) do
+						table.insert(current.entries, { min = idx, max = idx, text = opt })
+					end
+					current = nil
 				end
+			else
 				current = nil
 			end
 			goto continue
 		end
 		if header and not header.dice then
-			current = { name = header.name, dice = nil, entries = {} }
-			result[header.name:lower()] = current
+			if not result[header.name:lower()] then
+				current = { name = header.name, dice = nil, entries = {} }
+				result[header.name:lower()] = current
+			end
 			goto continue
 		end
 

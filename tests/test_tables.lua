@@ -245,6 +245,22 @@ do
 	end
 end
 
+do
+	local r = tables.parse_tables({
+		"tbl: Dup (d6)",
+		"  1: First",
+		"  2: Second",
+		"tbl: Dup (d6)",
+	})
+	local t = r["dup"]
+	local ok = t and #t.entries == 2 and t.entries[1].text == "First" and t.entries[2].text == "Second"
+	if test("duplicate definition does not overwrite entries", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
 print()
 print("=== parse_roll_line ===")
 

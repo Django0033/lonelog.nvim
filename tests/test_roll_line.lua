@@ -314,6 +314,31 @@ do
 	end
 end
 
+do
+	-- Simulate full buffer with table def + gen block + duplicate tbl: inside gen
+	local buffer_lines = {
+		"tbl: Apariencia (d3)",
+		"  1: Feo",
+		"  2: Normal",
+		"  3: Hermoso",
+		"gen: Generate NPC",
+		"  Apariencia: d3",
+		"  Personalidad: d6",
+		"  tbl: Apariencia (d3)",
+	}
+	local tables = T.parse_tables(buffer_lines)
+	local changes = roll_line.process_gen_block(5, buffer_lines, tables)
+	local ok = #changes == 3
+		and changes[1].text:match("Apariencia: d3=2 %-> Normal")
+		and changes[2].text:match("Personalidad: d6=4")
+		and changes[3].text:match("tbl: Apariencia d3=2 %-> Normal")
+	if test("gen: block with duplicate tbl: definition resolves correctly", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
 print()
 print("=== process_line (no match cases) ===")
 
