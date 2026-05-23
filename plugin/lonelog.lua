@@ -169,6 +169,14 @@ local function setup_keymaps()
 		insert_text("=> ")
 	end, { desc = "Insert consequence =>" })
 
+	-- Tag completion
+	map("i", cfg.get().keymaps.complete_tag, function()
+		local ok, err = pcall(require("lonelog.completion").complete_tag)
+		if not ok then
+			vim.notify("lonelog: " .. tostring(err), vim.log.levels.ERROR)
+		end
+	end, { desc = "Complete Lonelog tag" })
+
 	-- Quick dice rolls (1d4, 1d6, etc.)
 	local quick_dice = {
 		{ key = "d4", dice = "1d4" },
@@ -334,3 +342,23 @@ end, 0)
 vim.api.nvim_create_user_command("LonelogChaos", function()
 	require("lonelog.oracle").show_chaos_ui()
 end, { nargs = 0, desc = "Open Chaos Factor UI" })
+
+vim.api.nvim_create_user_command("LonelogCompleteTag", function()
+	local ok, err = pcall(require("lonelog.completion").complete_tag)
+	if not ok then
+		vim.notify("lonelog: " .. tostring(err), vim.log.levels.ERROR)
+	end
+end, { nargs = 0, desc = "Trigger Lonelog tag autocomplete" })
+
+vim.api.nvim_create_augroup("LonelogCompletion", { clear = true })
+vim.api.nvim_create_autocmd("TextChangedI", {
+	group = "LonelogCompletion",
+	pattern = "*",
+	callback = function()
+		if vim.bo.filetype ~= "markdown" then
+			return
+		end
+		require("lonelog.completion").try_complete()
+	end,
+	desc = "Lonelog tag autocomplete",
+})

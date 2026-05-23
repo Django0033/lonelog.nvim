@@ -29,6 +29,7 @@ local defaults = {
 		tag_ref = "<leader>lr",
 		tag_foe = "<leader>lf",
 		scene_marker = "<leader>lm",
+		complete_tag = "<C-l>c",
 	},
 	use_telescope = "auto",
 	sidebar = { width = 50 },
