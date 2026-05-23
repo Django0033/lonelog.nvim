@@ -15,6 +15,7 @@
 - **Dice Engine** — Standard notation (`2d6+3`), advantage/disadvantage (`2d20kh1`), exploding dice (`4d6!`), success counting (`6d6>>4`), and sum-vs-target (`2d6>7`)
 - **Oracle System** — Weighted outcomes from Fate, Binary, and Mythic tables with persistent chaos factor
 - **Notation Insertion** — Insert Lonelog symbols (`@`, `?`, `d:`, `->`, `=>`), multiline action/oracle sequences, and tag snippets (`[N:Name|]`, `[#N:Name]`) directly into your session log
+- **Tag Autocomplete** — Automatically suggests existing entity names when typing tags (`[N:`, `[L:`, `[PC:`, etc.) with relevance-based ordering
 - **Tag Navigation** — Parse and browse NPCs, locations, threads, clocks, tracks, and more from your play log
 - **Scene Navigation** — Navigate main scenes, flashbacks, sub-scenes, and thread scenes with proper chronological ordering
 - **Telescope Integration** — Uses Telescope when available, falls back to a native sidebar picker automatically
@@ -116,6 +117,7 @@ require("lonelog").setup({
     tag_thread      = "<leader>lth", -- Insert [Thread:Name|Open]
     tag_ref         = "<leader>lr",  -- Insert [#N:Name]
     tag_foe         = "<leader>lf",  -- Insert [F:Name|]
+    complete_tag    = "<C-l>c",      -- Tag autocomplete (insert mode)
     scene_marker    = "<leader>lm",  -- Scene marker
     d4   = "<leader>ld4",         -- Quick roll 1d4
     d6   = "<leader>ld6",         -- Quick roll 1d6
@@ -159,6 +161,19 @@ Or use commands:
 :LonelogSymbol conseq
 :LonelogActionSequence
 :LonelogOracleSequence
+```
+
+### Tag Autocomplete
+
+When editing a tag like `[N:Jonah|`, `[L:Library|`, or `[PC:A`, the plugin automatically suggests matching entity names from your current buffer:
+
+- **Auto-trigger** — Suggestions appear as you type after `[TYPE:`
+- **Relevance sorting** — Exact matches first, then prefix matches, then alphabetical
+- **Per-buffer cache** — Tag data refreshes only when the buffer changes
+
+```vim
+<C-l>c       " Manual trigger in insert mode
+:LonelogCompleteTag
 ```
 
 ### Tag Snippets
@@ -272,6 +287,7 @@ Insert a scene marker with automatic numbering — scans backwards from the curs
 | `:LonelogDiceRoll <notation>` | Roll specific dice notation |
 | `:LonelogD4` through `:LonelogD100` | Quick dice rolls |
 | `:LonelogSymbol <symbol>` | Insert notation symbol |
+| `:LonelogCompleteTag` | Trigger tag autocomplete |
 | `:LonelogTag <type>` | Insert tag snippet (npc/location/pc/thread/ref/foe) |
 | `:LonelogActionSequence` | Insert action sequence template |
 | `:LonelogOracleSequence` | Insert oracle sequence template |
@@ -298,6 +314,11 @@ print(oracle.display)     -- e.g. "Yes, but..."
 -- Parse current buffer
 local tags = ln.parsers.tags.parse_tags()
 local scenes = ln.parsers.scenes.parse_scenes()
+
+-- Trigger tag completion programmatically
+local completion = require("lonelog.completion")
+completion.refresh_completions()  -- Force cache refresh for current buffer
+completion.complete_tag()         -- Trigger completion popup
 ```
 
 ## Requirements
