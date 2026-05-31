@@ -13,6 +13,15 @@ function M.setup(opts)
 	M.config.setup(opts)
 	M.dice.setup()
 	M.oracle.load_chaos()
+
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "markdown",
+		group = vim.api.nvim_create_augroup("LonelogSyntax", { clear = true }),
+		callback = function()
+			vim.cmd("runtime! after/syntax/markdown/lonelog.vim")
+		end,
+		desc = "Load lonelog syntax highlighting for markdown buffers",
+	})
 end
 
 -- Roll dice and show result in floating window
