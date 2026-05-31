@@ -220,12 +220,13 @@ function M.roll(table_name)
 	}
 end
 
--- List all available oracle tables
+-- List all available oracle tables (sorted for deterministic order)
 function M.list_tables()
 	local r = {}
 	for k in pairs(tables) do
 		table.insert(r, k:sub(1, 1):upper() .. k:sub(2))
 	end
+	table.sort(r)
 	return r
 end
 
