@@ -124,6 +124,9 @@ Call setup() with an optional table of overrides. All keys and defaults:
       max_sides = 1000, -- maximum sides per die
     },
 
+    -- Prompt for scene context when inserting scene markers
+    prompt_for_scene_context = true,
+
     -- All keymaps (see |lonelog-keymaps| for defaults)
     keymaps = {
       -- Main features
@@ -296,8 +299,14 @@ Config key: use_telescope~
     T1-S5 -> T1-S6   S5z -> S6a (letter wraps)
     (none) -> S1
 
-  Format:  ### S1 [context]
-  Cursor is placed at "context" for immediate editing.
+  When |lonelog-config| prompt_for_scene_context is enabled (default), you
+  are prompted for a context description via |vim.fn.input()|. If you leave
+  the input empty, no context is added.
+    Input: "Tavern"   ->  ### S3 *Tavern*
+    Input: ""         ->  ### S3
+
+  When prompt_for_scene_context is disabled, the behavior matches the
+  original Lonelog placeholder format:  ### S1 *context*
 
   Also see |lonelog-notation-scenes| for scene ID format.
 
@@ -491,8 +500,13 @@ Lonelog is a structured markdown notation for solo RPG session logs
 
 6.4 Scene markers                            *lonelog-notation-scenes*
 >
-  ### S1 [context] [L:Location]
+  ### S1 *context* [L:Location]
 <
+  Auto-numbering computes the next scene ID from the last scene in buffer:
+    S1   -> S2    S5a  -> S5b   S7.1 -> S7.2
+    T1-S5 -> T1-S6   S5z -> S6a (letter wraps)
+    (none) -> S1
+
   Scene ID formats:
     S1         - Main scene
     S5a        - Flashback (letter suffix)
@@ -500,7 +514,11 @@ Lonelog is a structured markdown notation for solo RPG session logs
     T1-S5      - Thread scene (thread T1, scene S5)
     T1+T2-S5   - Merged thread scene
 
-  Context is extracted from text enclosed in asterisks.
+  Context is text enclosed in asterisks (*...*).
+
+  When |lonelog-config| prompt_for_scene_context is enabled (default),
+  pressing <leader>lm prompts for context. Leaving the prompt empty
+  omits the *...* section entirely.
 
 6.5 Dice notation                              *lonelog-notation-dice*
 >
