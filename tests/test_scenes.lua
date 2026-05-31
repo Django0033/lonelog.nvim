@@ -119,6 +119,29 @@ else
 end
 
 print()
+print("Testing build_scene_line function:")
+print("==============================")
+
+local scene_tests = {
+  { next_id = "S1", context = "Tavern", expected = "### S1 *Tavern*", name = "with context" },
+  { next_id = "S5", context = "", expected = "### S5", name = "empty context" },
+  { next_id = "S5", context = nil, expected = "### S5", name = "nil context" },
+  { next_id = "S10a", context = "Flashback: Forest", expected = "### S10a *Flashback: Forest*", name = "with complex context" },
+  { next_id = "T1-S3", context = "", expected = "### T1-S3", name = "thread scene no context" },
+}
+
+for _, tc in ipairs(scene_tests) do
+  local result = M.build_scene_line(tc.next_id, tc.context)
+  if result == tc.expected then
+    print(string.format("PASS [%s] %s", tc.name, result))
+    passed = passed + 1
+  else
+    print(string.format("FAIL [%s] got %s, expected %s", tc.name, result, tc.expected))
+    failed = failed + 1
+  end
+end
+
+print()
 print(string.format("RESULTS: %d passed, %d failed", passed, failed))
 
 if failed > 0 then

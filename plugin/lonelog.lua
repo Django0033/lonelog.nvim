@@ -30,13 +30,22 @@ local function insert_template_at_cursor(template, cursor_line, cursor_col)
 end
 
 -- Insert auto-numbered scene marker above current line
+-- Prompts for context if config.prompt_for_scene_context is true
 local function insert_scene_marker()
 	local scenes_mod = require("lonelog.parsers.scenes")
+	local cfg = require("lonelog.config").get()
 	local next_id = scenes_mod.generate_next_scene_id()
-	local text = "### " .. next_id .. " *context*"
+
+	local context
+	if cfg.prompt_for_scene_context then
+		context = vim.fn.input("Scene context: ")
+		if context == "" then context = nil end
+	end
+
+	local text = scenes_mod.build_scene_line(next_id, context)
 	local row = vim.fn.line(".") - 1
 	vim.api.nvim_buf_set_lines(0, row, row, false, { text, "" })
-	vim.api.nvim_win_set_cursor(0, { row + 1, #("### " .. next_id .. " *") })
+	vim.api.nvim_win_set_cursor(0, { row + 1, #("### " .. next_id .. " ") })
 end
 
 local function setup_keymaps()

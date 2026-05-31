@@ -195,6 +195,15 @@ function M.generate_next_scene_id()
 	return "S1"
 end
 
+-- Build a scene line with optional context
+-- context: string or nil. nil = no *...*, empty string = no *...*, non-empty = *context*
+function M.build_scene_line(next_id, context)
+	if context and context ~= "" then
+		return "### " .. next_id .. " *" .. context .. "*"
+	end
+	return "### " .. next_id
+end
+
 -- Show picker for navigating scenes
 function M.show_scenes_picker()
 	local bufnr = vim.api.nvim_get_current_buf()
