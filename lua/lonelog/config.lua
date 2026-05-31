@@ -26,6 +26,9 @@ local defaults = {
 		tag_thread = "<leader>ltt",
 		tag_ref = "<leader>ltr",
 		tag_foe = "<leader>ltf",
+		tag_clock = "<leader>ltc",
+		tag_track = "<leader>ltk",
+		tag_timer = "<leader>lti",
 
 		-- Insert result
 		insert_result = "<leader>lI",

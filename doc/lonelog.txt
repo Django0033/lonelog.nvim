@@ -1,0 +1,780 @@
+*lonelog.txt*    Lonelog: Solo RPG toolkit for Neovim
+
+==============================================================================
+CONTENTS                                                *lonelog-contents*
+
+  1. Introduction  ........................................ |lonelog-intro|
+  2. Installation  ........................................ |lonelog-install|
+  3. Configuration ........................................ |lonelog-config|
+  4. Commands ............................................. |lonelog-commands|
+    4.1 Main picker ...................................... |lonelog-command-Lonelog|
+    4.2 Oracles .......................................... |lonelog-command-oracle|
+    4.3 Dice ............................................. |lonelog-command-dice|
+    4.4 Notation symbols ................................. |lonelog-command-symbols|
+    4.5 Tags ............................................. |lonelog-command-tags|
+    4.6 Scenes ........................................... |lonelog-command-scenes|
+    4.7 Progress elements ................................ |lonelog-command-progress|
+    4.8 Inline rolling ................................... |lonelog-command-roll|
+  5. Keymaps ............................................. |lonelog-keymaps|
+  6. Lonelog notation .................................... |lonelog-notation|
+    6.1 Core symbols ..................................... |lonelog-notation-symbols|
+    6.2 Tag format ....................................... |lonelog-notation-tags|
+    6.3 Progress elements ................................ |lonelog-notation-progress|
+    6.4 Scene markers .................................... |lonelog-notation-scenes|
+    6.5 Dice notation .................................... |lonelog-notation-dice|
+    6.6 Inline tables .................................... |lonelog-notation-tables|
+    6.7 Generator blocks ................................. |lonelog-notation-gen|
+  7. Oracle system ........................................ |lonelog-oracle|
+  8. Tag autocomplete ..................................... |lonelog-completion|
+  9. Floating results ..................................... |lonelog-float|
+  10. Add-ons (Lonelog spec) .............................. |lonelog-addons|
+    10.1 Combat add-on ................................... |lonelog-addon-combat|
+    10.2 Dungeon add-on .................................. |lonelog-addon-dungeon|
+    10.3 Resources add-on ................................ |lonelog-addon-resources|
+  11. Tips and workflows .................................. |lonelog-tips|
+  12. Public API .......................................... |lonelog-api|
+  13. Requirements ........................................ |lonelog-requirements|
+
+==============================================================================
+1. INTRODUCTION                                        *lonelog-intro*
+
+lonelog.nvim is a solo tabletop RPG toolkit for Neovim. It provides oracles,
+dice rolling, notation insertion, tag and scene navigation, inline tables,
+and clock/track/timer tracking — all in pure Lua with zero external
+dependencies.
+
+The plugin implements the Lonelog notation standard (v1.4.1) by Roberto
+Bisceglie, a structured markdown format for solo RPG session logs.
+
+Key features:
+  - Dice engine: 2d6+3, 2d20kh1, 4d6!, 6d6>>4, 2d6>7
+  - Oracle system: Fate, Binary, Mythic with persistent chaos factor
+  - Tag navigation: NPCs, locations, threads, PCs, foes, rooms, inventory
+  - Scene navigation: main, flashback, sub-scenes, thread scenes
+  - Progress elements: clocks, tracks, timers with smart increment
+  - Inline tables: range tables and bracket shorthand
+  - Tag autocomplete with relevance sorting
+  - Inline rolling: dice, table lookups, generator blocks
+  - Telescope integration (optional, auto-detected)
+
+==============================================================================
+2. INSTALLATION                                        *lonelog-install*
+
+lazy.nvim~
+>
+  {
+    "Django0033/lonelog.nvim",
+    cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
+            "LonelogScenes", "LonelogRollLine" },
+    config = function()
+      require("lonelog").setup()
+    end,
+  }
+<
+
+packer.nvim~
+>
+  use {
+    "Django0033/lonelog.nvim",
+    config = function()
+      require("lonelog").setup()
+    end,
+  }
+<
+
+vim-pack (built-in)~
+>
+  git clone https://github.com/Django0033/lonelog.nvim.git \
+    ~/.local/share/nvim/site/pack/plugins/start/lonelog.nvim
+
+  " init.lua
+  require("lonelog").setup()
+<
+
+==============================================================================
+3. CONFIGURATION                                       *lonelog-config*
+
+Call setup() with an optional table of overrides. All keys and defaults:
+>
+  require("lonelog").setup({
+    -- Picker: "auto" (detect Telescope), true (always Telescope),
+    --         false (native sidebar)
+    use_telescope = "auto",
+
+    -- Native sidebar width
+    sidebar = { width = 50 },
+
+    -- Floating result window
+    float = {
+      border = "rounded",
+      height = 0.4,    -- fraction of editor height
+      width  = 0.6,    -- fraction of editor width
+    },
+
+    -- Oracle settings
+    oracle = {
+      default_table = "fate",          -- "fate", "binary", or "mythic"
+      persist_chaos = true,             -- save chaos factor to disk
+      chaos_file = "chaos_factor.json", -- filename in stdpath("data")/lonelog/
+    },
+
+    -- Dice safety limits
+    dice = {
+      max_dice  = 100,  -- maximum dice per roll
+      max_sides = 1000, -- maximum sides per die
+    },
+
+    -- All keymaps (see |lonelog-keymaps| for defaults)
+    keymaps = {
+      -- Main features
+      oracle = "<leader>lO",
+      dice   = "<leader>lD",
+      tags   = "<leader>lT",
+      scenes = "<leader>lS",
+      chaos  = "<leader>lC",
+
+      -- Notation insertion
+      insert_action   = "<leader>lia",
+      insert_question = "<leader>liq",
+      insert_dice     = "<leader>lid",
+      insert_arrow    = "<leader>li-",
+      insert_conseq   = "<leader>li=",
+      action_seq      = "<leader>liA",
+      oracle_seq      = "<leader>liQ",
+
+      -- Tag snippets
+      tag_npc      = "<leader>ltn",
+      tag_location = "<leader>ltl",
+      tag_pc       = "<leader>ltp",
+      tag_thread   = "<leader>ltt",
+      tag_ref      = "<leader>ltr",
+      tag_foe      = "<leader>ltf",
+      tag_clock    = "<leader>ltc",
+      tag_track    = "<leader>ltk",
+      tag_timer    = "<leader>lti",
+
+      -- Other
+      insert_result = "<leader>lI",
+      scene_marker  = "<leader>lm",
+      roll_line     = "<leader>lr",
+      complete_tag  = "<C-l>c",
+
+      -- Quick dice (1dN)
+      d4   = "<leader>ld4",  d6  = "<leader>ld6",
+      d8   = "<leader>ld8",  d10 = "<leader>lda",
+      d12  = "<leader>ldb",  d20 = "<leader>ldw",
+      d100 = "<leader>ldc",
+    },
+  })
+<
+
+Config key: use_telescope~
+  "auto"  - Use Telescope if the plugin is installed, native sidebar otherwise.
+  true    - Always use Telescope (error if not installed).
+  false   - Always use the built-in sidebar picker.
+
+==============================================================================
+4. COMMANDS                                              *lonelog-commands*
+
+4.1 Main picker                                    *:Lonelog* *lonelog-command-Lonelog*
+>
+  :Lonelog
+<
+  Opens the main action picker with options: Oracle, Dice, Tags, Scenes.
+  Select an action to run its sub-picker or prompt.
+
+4.2 Oracles                                    *:LonelogOracle* *lonelog-command-oracle*
+>
+  :LonelogOracle [table]
+<
+  Roll an oracle table. Optional table argument:
+    fate   - Fate oracle (7 weighted outcomes, default)
+    binary - Yes / No (50/50)
+    mythic - Mythic style 2d10 + chaos factor
+
+  Without arguments, opens a picker to select an oracle. For Mythic, you
+  are prompted for the chaos factor (1-9) with +/- adjustment.
+
+  Result is displayed in a colored floating window:
+    Exceptional (Yes/No) - Red     (DiagnosticError)
+    Yes / Yes, but...    - Green   (DiagnosticOk)
+    No / No, but...      - Yellow  (DiagnosticWarn)
+    Maybe                - Default (Normal)
+
+  Also see |lonelog-oracle|.
+
+4.3 Dice                                          *:LonelogDice* *:LonelogDiceRoll*
+                                                    *lonelog-command-dice*
+>
+  :LonelogDice
+  :LonelogDiceRoll 2d6+3
+  :LonelogD4
+  :LonelogD6
+  :LonelogD8
+  :LonelogD10
+  :LonelogD12
+  :LonelogD20
+  :LonelogD100
+<
+  LonelogDice     - Interactive prompt for dice notation.
+  LonelogDiceRoll - Roll a specific notation directly. Has command-line
+                    completion for common notations.
+  LonelogD4-D100  - Quick roll of 1dN.
+
+  Also see |lonelog-notation-dice| for supported notation grammar.
+
+4.4 Notation symbols                         *:LonelogSymbol* *:LonelogActionSequence*
+                                               *:LonelogOracleSequence*
+>
+  :LonelogSymbol @
+  :LonelogSymbol ?
+  :LonelogSymbol d
+  :LonelogSymbol arrow
+  :LonelogSymbol conseq
+  :LonelogActionSequence
+  :LonelogOracleSequence
+<
+  Insert Lonelog notation symbols into the buffer:
+    @       - Action marker
+    ?       - Oracle question marker
+    d       - Dice roll prefix (d:)
+    arrow   - Result arrow ( -> )
+    conseq  - Consequence (=>)
+
+  LonelogActionSequence inserts a 3-line action template:
+>
+    @ [action]
+    d: [roll] -> [outcome]
+    => [consequence]
+<
+  LonelogOracleSequence inserts a 3-line oracle template:
+>
+    ? [question]
+    -> [answer]
+    => [consequence]
+<
+
+4.5 Tags                    *:LonelogTag* *:LonelogTags* *lonelog-command-tags*
+>
+  :LonelogTag npc
+  :LonelogTag location
+  :LonelogTag pc
+  :LonelogTag thread
+  :LonelogTag ref
+  :LonelogTag foe
+<
+  Insert a tag snippet at cursor. Cursor lands after the colon for
+  immediate name entry.
+    npc      - [N:|]       NPC tag
+    location - [L:|]       Location tag
+    pc       - [PC:|]      Player character tag
+    thread   - [Thread:|Open]  Thread/quest tag
+    ref      - [#N:|]      Reference to existing NPC
+    foe      - [F:|]       Foe/combatant tag
+>
+  :LonelogTags
+<
+  Open the tag navigator picker. Browse all Lonelog tags in the current
+  buffer, filterable by type. Press Enter to jump to a tag's line.
+
+  Also see |lonelog-notation-tags| for tag format.
+
+4.6 Scenes                         *:LonelogScenes* *:LonelogSceneMarker*
+                                                  *lonelog-command-scenes*
+>
+  :LonelogScenes
+<
+  Open the scene navigator picker. Browse all scenes in the current buffer,
+  sorted in chronological order. Types: main (S1), flashback (S5a),
+  sub-scene (S7.1), thread scene (T1-S5). Press Enter to jump to a scene.
+>
+  :LonelogSceneMarker
+<
+  Insert a scene marker at the cursor with auto-numbering. Scans backwards
+  to find the last scene ID and generates the next one:
+    S1   -> S2    S5a  -> S5b   S7.1 -> S7.2
+    T1-S5 -> T1-S6   S5z -> S6a (letter wraps)
+    (none) -> S1
+
+  Format:  ### S1 [context]
+  Cursor is placed at "context" for immediate editing.
+
+  Also see |lonelog-notation-scenes| for scene ID format.
+
+4.7 Progress elements                    *:LonelogInsertClock*
+                                        *:LonelogInsertTrack*
+                                        *:LonelogInsertTimer*
+                                        *lonelog-command-progress*
+>
+  :LonelogInsertClock [name]
+  :LonelogInsertTrack [name]
+  :LonelogInsertTimer [name]
+<
+  Smart insert or increment of progress elements (clocks, tracks, timers).
+
+  Interactive mode (no args):~
+    Prompts for the element name, then for max value (default 5) if the tag
+    does not exist or is already complete. If the tag exists and is still
+    in progress, increments directly without prompting for max.
+
+  Direct mode (with args):~
+    Uses the name from args, then prompts for max only if a fresh insert is
+    needed. Timers never prompt for max (they have no max value).
+
+  Behaviour by element:
+    Clock   - [E:Name 0/5]  Increments +1 towards max
+    Track   - [Track:Name 0/5]  Increments +1 towards max
+    Timer   - [Timer:Name 0]    Decrements -1 towards 0
+
+  If the tag is found and incomplete, the value is updated in place. If
+  the tag is missing or already complete, a fresh tag is inserted at the
+  cursor with the specified max (or default 5).
+
+  Tag format:
+>
+    [E:Alarm 3/6]         - Event clock, name "Alarm", 3 of 6
+    [Track:Escape 5/8]    - Progress track, name "Escape", 5 of 8
+    [Timer:Dawn 3]        - Countdown timer, name "Dawn", 3 remaining
+<
+
+4.8 Inline rolling                      *:LonelogRollLine* *lonelog-command-roll*
+>
+  :LonelogRollLine
+<
+  Roll dice, resolve table lookups, or process generator blocks on the
+  current line. The behaviour depends on the line prefix:
+    d:        - Roll dice notation, append result.
+                Before:  d: 2d6+3
+                After:   d: 2d6+3[4, 2] = 10
+
+    tbl:      - Roll the table's dice and resolve the entry.
+                Before:  tbl: Forest (d6)
+                After:   tbl: Forest d6=4 -> A deer crosses
+
+    label:    - Look up label as table name, resolve if found.
+                Before:  Apariencia: d3
+                After:   Apariencia: d3=2 -> Normal
+                Before:  Personalidad: d6     (no matching table)
+                After:   Personalidad: d6=4
+
+    gen:      - |lonelog-notation-gen| Batch-process indented sub-lines.
+
+    bare dice - Roll and display.
+                Before:  2d6+3
+                After:   2d6+3[5, 1] = 9
+
+  Also works on visual-selected text, using the selection as notation.
+
+==============================================================================
+5. KEYMAPS                                              *lonelog-keymaps*
+
+All keymaps are configurable via |lonelog-config|.
+
+Normal mode keymaps~
+  Key            Action                        Command ~
+  <leader>lO     Open oracle picker            :LonelogOracle
+  <leader>lD     Interactive dice roller       :LonelogDice
+  <leader>lT     Navigate tags                 :LonelogTags
+  <leader>lS     Navigate scenes               :LonelogScenes
+  <leader>lC     Chaos factor UI               :LonelogChaos
+  <leader>lI     Insert last result            :LonelogInsert
+  <leader>lia    Insert action marker          @
+  <leader>liq    Insert oracle question        ?
+  <leader>lid    Insert dice prefix            d:
+  <leader>li-    Insert result arrow           ->
+  <leader>li=    Insert consequence            =>
+  <leader>liA    Action sequence template      3 lines
+  <leader>liQ    Oracle sequence template      3 lines
+  <leader>ltn    Insert NPC tag                [N:|]
+  <leader>ltl    Insert location tag           [L:|]
+  <leader>ltp    Insert PC tag                 [PC:|]
+  <leader>ltt    Insert thread tag             [Thread:|Open]
+  <leader>ltr    Insert reference tag          [#N:|]
+  <leader>ltf    Insert foe tag                [F:|]
+  <leader>ltc    Insert/increment clock        :LonelogInsertClock
+  <leader>ltk    Insert/increment track        :LonelogInsertTrack
+  <leader>lti    Insert/decrement timer        :LonelogInsertTimer
+  <leader>lm     Insert scene marker           :LonelogSceneMarker
+  <leader>lr     Roll current line             :LonelogRollLine
+  <leader>ld4    Roll 1d4                      :LonelogD4
+  <leader>ld6    Roll 1d6                      :LonelogD6
+  <leader>ld8    Roll 1d8                      :LonelogD8
+  <leader>lda    Roll 1d10                     :LonelogD10
+  <leader>ldb    Roll 1d12                     :LonelogD12
+  <leader>ldw    Roll 1d20                     :LonelogD20
+  <leader>ldc    Roll 1d100                    :LonelogD100
+
+Insert mode keymaps~
+  Key        Inserts              Description ~
+  <C-l>a     @                    Action marker
+  <C-l>q     ?                    Oracle question
+  <C-l>d     d:                   Dice prefix
+  <C-l>-      ->                  Result arrow
+  <C-l>=     =>                   Consequence
+  <C-l>n     [N:|]                NPC tag
+  <C-l>l     [L:|]                Location tag
+  <C-l>p     [PC:|]               PC tag
+  <C-l>h     [Thread:|Open]       Thread tag
+  <C-l>r     [#N:|]               Reference tag
+  <C-l>f     [F:|]                Foe tag
+  <C-l>c     (autocomplete)       Trigger tag completion
+
+Floating window keymaps (when a result float is focused)~
+  Key         Action ~
+  q           Close floating window
+  y / Y       Copy result to system clipboard (+ register)
+  <CR>        Copy and paste into target .md buffer (only in .md files)
+
+Sidebar picker keymaps (native mode)~
+  Key         Action ~
+  j           Move selection down
+  k           Move selection up
+  <CR>        Select item
+  q / <Esc>   Close sidebar
+
+==============================================================================
+6. LONELOG NOTATION                                     *lonelog-notation*
+
+Lonelog is a structured markdown notation for solo RPG session logs
+(v1.4.1 by Roberto Bisceglie, CC BY-SA 4.0).
+
+6.1 Core symbols                              *lonelog-notation-symbols*
+>
+  @           - Action by main character
+  @(Name)     - Action by named actor (NPC, ally, etc.)
+  ?           - Oracle question
+  d:          - Dice roll / resolution
+  ->          - Result (from oracle or dice)
+  =>          - Narrative consequence
+  (nota: ...) - Meta notes and reminders
+<
+
+6.2 Tag format                                  *lonelog-notation-tags*
+>
+  [TYPE:Name|tag1|tag2|...]
+  [#TYPE:Name]        - Reference to existing entity
+<
+  Tag types:
+    Type      Label         Example ~
+    N         NPC           [N:Jonah|friendly|wounded]
+    L         Location      [L:Library|dark|quiet]
+    PC        PC            [PC:Alex|HP 8]
+    E         Event/Clock   [E:Alert 2/6]
+    THREAD    Thread        [Thread:Main Quest|Open]
+    CLOCK     Clock         [Clock:Ritual 1/8]  (alias for E)
+    TRACK     Track         [Track:Escape 3/8]
+    TIMER     Timer         [Timer:Dawn 4]
+    INV       Inventory     [Inv:Antorcha|3]
+    R         Room          [R:1|active|reception]
+    F         Foe           [F:Matón|HP 6|cercano]
+
+  Pipe-separated metadata can include:
+    Regular tags      - e.g. friendly, wounded
+    Changes           - trait1 → trait2  (uses Unicode RIGHTWARDS ARROW)
+    Additions         - +new_trait
+    Removals          - -old_trait
+
+6.3 Progress elements                        *lonelog-notation-progress*
+>
+  [E:Name current/max]      - Clock, counts up (starts at 0)
+  [Clock:Name current/max]  - Clock alias
+  [Track:Name current/max]  - Track, counts up (starts at 0)
+  [Timer:Name current]      - Timer, counts down (starts at 0)
+<
+  Progress elements track progress toward completion:
+    - Clock/Track:  Increments +1 until current >= max
+    - Timer:        Decrements -1 until current <= 0
+
+  When a tag reaches completion, the next invocation inserts a fresh
+  tag (new instance). Tags with pipe-separated metadata preserve it
+  when incremented.
+
+6.4 Scene markers                            *lonelog-notation-scenes*
+>
+  ### S1 [context] [L:Location]
+<
+  Scene ID formats:
+    S1         - Main scene
+    S5a        - Flashback (letter suffix)
+    S7.1       - Sub-scene (decimal)
+    T1-S5      - Thread scene (thread T1, scene S5)
+    T1+T2-S5   - Merged thread scene
+
+  Context is extracted from text enclosed in asterisks.
+
+6.5 Dice notation                              *lonelog-notation-dice*
+>
+  Notation       Example        Description ~
+  NdN            1d20           Basic roll
+  NdN+M          2d6+3          Add modifier
+  NdN-M          1d20-2         Subtract modifier
+  NdN!           4d6!           Exploding (reroll max, up to 100 deep)
+  NdNkhK         2d20kh1        Keep highest (advantage)
+  NdNklK         2d20kl1        Keep lowest (disadvantage)
+  NdN>>T         6d6>>4         Success counting (dice >= target)
+  NdN>T          2d6>7          Sum vs target
+<
+  Safety limits (configurable): max 100 dice, max 1000 sides.
+
+6.6 Inline tables                            *lonelog-notation-tables*
+>
+  tbl: Name (d6)
+    1-3: Nothing happens
+    4-5: A deer crosses
+    6: Bandit ambush!
+<
+  Bracket shorthand (equal probability):
+>
+  tbl: Weather [Sunny, Cloudy, Rain, Storm]
+<
+  Rolls d4, assigns each option one value.
+
+  Rolling a tbl: line appends:  d6=4 -> A deer crosses.
+
+  Duplicate table names are ignored (first definition wins).
+
+6.7 Generator blocks                              *lonelog-notation-gen*
+>
+  gen: Generate NPC
+    Apariencia: d3       - Table lookup (if table "apariencia" exists)
+    Personalidad: d6     - Bare dice roll
+    Edad: 1d6            - Dice notation
+    <blank line>         - Skipped
+    tbl: Equipment (d6)  - Table roll
+  Other content           - Non-indented -> stops block
+<
+  Place cursor on the gen: line and press <leader>lr. All indented
+  sub-lines are processed in place. The gen: header is not modified.
+
+==============================================================================
+7. ORACLE SYSTEM                                        *lonelog-oracle*
+
+The plugin provides three oracle tables for game master decisions.
+
+Fate oracle (weighted)~
+  Result            Weight  Probability ~
+  Exceptional Yes    8       8%
+  Yes               23      23%
+  Yes, but...       15      15%
+  Maybe             28      28%
+  No, but...        15      15%
+  No                 8       8%
+  Exceptional No     3       3%
+
+Binary oracle (even)~
+  Result  Weight ~
+  Yes     50
+  No      50
+
+Mythic oracle (2d10 + chaos)~
+  Result          Condition ~
+  Exceptional No  final <= 4
+  No              final 5-10
+  Yes             final 11-17
+  Exceptional Yes final >= 18
+
+  Chaos factor range: 1-9 (default: 5).
+  Modifier applied to 2d10 roll:
+    CF  1  2  3  4  5  6  7  8  9
+    Mod -5 -4 -2 -1  0 +1 +2 +4 +5
+
+  Chaos factor is persistent (saved to disk when persist_chaos = true).
+  Adjust via <leader>lC or :LonelogChaos.
+
+==============================================================================
+8. TAG AUTOCOMPLETE                                *lonelog-completion*
+
+The plugin provides automatic tag name completion when editing tags.
+
+Auto-trigger~
+  As you type after [TYPE: in a markdown buffer, matching entity names are
+  suggested automatically. The cache refreshes only when the buffer changes.
+
+Manual trigger~
+  <C-l>c  (insert mode)
+  :LonelogCompleteTag
+
+Sorting~
+  1. Exact match (highest priority)
+  2. Prefix match
+  3. Alphabetical
+
+==============================================================================
+9. FLOATING RESULTS                                    *lonelog-float*
+
+Dice and oracle results are displayed in a floating window.
+
+Actions when focused~
+  q          - Close the window
+  y / Y      - Copy content to system clipboard
+  <CR>       - Copy and paste into the target .md buffer
+               (only works in markdown files)
+
+Insert last result~
+  <leader>lI   - Insert the most recent result at cursor position
+
+==============================================================================
+10. ADD-ONS (LONELOG SPEC)                              *lonelog-addons*
+
+The Lonelog standard defines three optional add-ons. The tags and notation
+for all three are parseable by lonelog.nvim:
+
+10.1 Combat add-on                            *lonelog-addon-combat*
+>
+  [COMBAT]
+  R1
+  @(Matón A) Ataca
+  d: 1d8+2 vs AC -> Fallo
+  @ Ataco al Matón A
+  d: 1d8+4 vs AC 11 -> Exito
+  => [F:Matón A|HP 3]
+  [/COMBAT]
+<
+  [COMBAT] / [/COMBAT]    - Delimit combat encounter
+  R1, R2, R3              - Round markers
+  [F:Name|stats]          - Foe/combatant tag
+  Roster:                 - Full team status per round
+
+  Use [Track:] for boss resources, [Clock:] for waves/alert.
+
+10.2 Dungeon add-on                          *lonelog-addon-dungeon*
+>
+  S5 *Pasillo norte*
+  @ Abro la puerta
+  ? Esta cerrada?
+  -> No (d6=5) => La puerta se abre.
+  [R:4|active|almacen|exits N:R1, S:R2]
+<
+  [R:ID|state|desc|exits]  - Room tag
+    States: unexplored, active, cleared, looted, locked, trapped, safe,
+            collapsed
+  [R:ID|cleared, looted]   - Update room state
+  exits N:R2, E:R3          - Room connections
+  [Clock:Antorcha X]        - Light source tracking
+
+10.3 Resources add-on                      *lonelog-addon-resources*
+>
+  [Inv:Objeto|cantidad|propiedades]
+  [Wealth:Oro 45|Plata 12]
+  [PC:Kael|Supply d8|Ammo d6]
+<
+  [Inv:]       - Inventory item with quantity
+  [Wealth:]    - Currency tracking
+  Supply dN    - Usage dice (d12->d10->d8->d6->d4->exhausted)
+  --- RESOURCES ---   - Resource status block
+
+==============================================================================
+11. TIPS AND WORKFLOWS                                 *lonelog-tips*
+
+Session workflow~
+  Start a session with a scene marker (<leader>lm):
+    ### S1 [context]
+  Use notation sequences (<leader>liA / <leader>liQ):
+    @ [action]
+    d: [roll] -> [outcome]
+    => [consequence]
+  Tag persistent elements:
+    [N:Guardia|alerta|armado]
+    [Thread:Salvar el pueblo|Open]
+  Track clocks and timers with <leader>ltc / <leader>lti.
+  End scenes, roll oracles with <leader>lO when uncertain.
+  Browse tags and scenes with <leader>lT / <leader>lS.
+
+Clocks vs Tracks~
+  Use [E:] (Event/Clock) for countdowns until a narrative event triggers
+  (guards arrive, ritual completes, etc.). Use [Track:] for linear progress
+  toward a goal (journey distance, research progress, resources gathered).
+
+Usage dice~
+  Track abstract resources with supply dice:
+  [PC:Kael|Supply d8]
+  When used: roll d8. 1-2 reduces the die step (d8->d6->d4->exhausted).
+
+==============================================================================
+12. PUBLIC API                                           *lonelog-api*
+>
+  local ln = require("lonelog")
+
+  -- Dice
+  local result, err = ln.dice.roll("2d6+3")
+  -- result.display = "2d6+3[4, 2] = 9"
+  -- result.total   = 9
+
+  -- Oracle
+  local oracle = ln.oracle.roll("fate")
+  -- oracle.display = "Yes, but..."
+
+  -- Chaos factor
+  ln.oracle.get_chaos()       -- -> number (1-9)
+  ln.oracle.set_chaos(value)  -- -> boolean (true if set)
+
+  -- List oracle tables
+  ln.oracle.list_tables()     -- -> string[]
+
+  -- Parser
+  local tags   = ln.parsers.parse_tags()
+  local scenes = ln.parsers.parse_scenes()
+  local summary_tags   = ln.parsers.tags_summary(tags)
+  local summary_scenes = ln.parsers.scenes_summary(scenes)
+
+  -- Inline tables
+  local tables = require("lonelog.parsers.tables").parse_tables(lines)
+  local entry  = require("lonelog.parsers.tables").resolve_entry(tbl, value)
+
+  -- Inline rolling
+  require("lonelog.roll_line").roll_current_line()
+  local modified = require("lonelog.roll_line").process_line(line, tables)
+
+  -- Tag completion
+  local comp = require("lonelog.completion")
+  comp.refresh_completions()
+  comp.complete_tag()
+<
+  Dice result structure~
+>
+  {
+    original  = "2d6+3",
+    count     = 2,
+    sides     = 6,
+    rolls     = {4, 3},
+    all_rolls = {4, 3},
+    modifier  = 3,
+    target    = 0,
+    exploding = false,
+    total     = 10,
+    display   = "2d6+3[4, 3] = 10",
+  }
+<
+  Oracle result structure~
+>
+  -- Fate/Binary:
+  {
+    table       = "fate",
+    table_name  = "Fate Oracle",
+    value       = "yes_but",
+    display     = "Yes, but...",
+  }
+
+  -- Mythic:
+  {
+    table           = "mythic",
+    table_name      = "Mythic",
+    value           = "yes",
+    display         = "Yes",
+    chaos           = 5,
+    chaos_modifier  = 0,
+    d10             = {7, 8},
+    dice_total      = 15,
+    final           = 15,
+  }
+<
+
+==============================================================================
+13. REQUIREMENTS                                    *lonelog-requirements*
+
+  - Neovim 0.8+ (vim.ui.input, vim.ui.select, nvim_open_win)
+  - (Optional) telescope.nvim for enhanced picker
+  - No external dependencies (pure Lua)
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:noet:

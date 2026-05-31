@@ -147,6 +147,17 @@ local function setup_keymaps()
 		insert_text("[F:|]", 3)
 	end, { desc = "Insert foe tag" })
 
+	-- Progress tags (smart increment or fresh insert)
+	map("n", cfg.get().keymaps.tag_clock, function()
+		vim.cmd("LonelogInsertClock")
+	end, { desc = "Insert/increment clock" })
+	map("n", cfg.get().keymaps.tag_track, function()
+		vim.cmd("LonelogInsertTrack")
+	end, { desc = "Insert/increment track" })
+	map("n", cfg.get().keymaps.tag_timer, function()
+		vim.cmd("LonelogInsertTimer")
+	end, { desc = "Insert/decrement timer" })
+
 	-- Scene marker (auto-numbered)
 	map("n", cfg.get().keymaps.scene_marker, function()
 		insert_scene_marker()
@@ -335,6 +346,43 @@ end, {
 	end,
 	desc = "Insert Lonelog tag snippet",
 })
+
+local function do_insert_progress(type_key, name, max_default, label)
+  if name then
+    if type_key:upper() ~= "TIMER"
+      and require("lonelog.commands.progress").check_needs_insert(type_key, name)
+    then
+      vim.ui.input({ prompt = "Max progress (default " .. max_default .. "): " }, function(m)
+        local max_val = tonumber(m) or max_default
+        require("lonelog.commands.progress").increment_progress(type_key, name, max_val)
+      end)
+    else
+      require("lonelog.commands.progress").increment_progress(type_key, name, max_default)
+    end
+  else
+    vim.ui.input({ prompt = label .. " name: " }, function(n)
+      if n and n ~= "" then
+        do_insert_progress(type_key, n, max_default, label)
+      end
+    end)
+  end
+end
+
+-- Progress element commands (smart increment or fresh insert)
+vim.api.nvim_create_user_command("LonelogInsertClock", function(o)
+	local name = o.args ~= "" and o.args or nil
+	do_insert_progress("E", name, 5, "Clock")
+end, { nargs = "?", desc = "Insert or increment event clock" })
+
+vim.api.nvim_create_user_command("LonelogInsertTrack", function(o)
+	local name = o.args ~= "" and o.args or nil
+	do_insert_progress("TRACK", name, 5, "Track")
+end, { nargs = "?", desc = "Insert or increment progress track" })
+
+vim.api.nvim_create_user_command("LonelogInsertTimer", function(o)
+	local name = o.args ~= "" and o.args or nil
+	do_insert_progress("TIMER", name, 5, "Timer")
+end, { nargs = "?", desc = "Insert or decrement timer" })
 
 -- Scene marker command
 vim.api.nvim_create_user_command("LonelogSceneMarker", function()
