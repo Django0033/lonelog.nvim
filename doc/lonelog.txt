@@ -35,8 +35,10 @@ CONTENTS                                                *lonelog-contents*
     10.3 Resources add-on ................................ |lonelog-addon-resources|
   11. Tips and workflows .................................. |lonelog-tips|
   12. Public API .......................................... |lonelog-api|
-  13. Requirements ........................................ |lonelog-requirements|
 
+  13. Syntax highlighting ................................. |lonelog-syntax|
+
+  14. Requirements ........................................ |lonelog-requirements|
 ==============================================================================
 1. INTRODUCTION                                        *lonelog-intro*
 
@@ -847,7 +849,47 @@ Usage dice~
 <
 
 ==============================================================================
-13. REQUIREMENTS                                    *lonelog-requirements*
+13. SYNTAX HIGHLIGHTING                             *lonelog-syntax*
+
+  Lonelog notation is automatically highlighted in markdown buffers when
+  this plugin is active. The following elements receive dedicated colors:
+
+  Highlight group          Element ~
+  lonelogSessionHeader     ## Session N headers
+  lonelogDateStamp         Standalone YYYY-MM-DD dates
+  lonelogSceneId           Scene IDs (S1, S5a, S7.1, T1-S5, ...)
+  lonelogTag               Entity tags [TYPE:name|...]
+  lonelogTagBracket        [ and ] delimiters
+  lonelogTagType           TYPE prefix (N, L, PC, E, F, ...)
+  lonelogTagSep            Pipe separator |
+  lonelogModArrow          → state-change arrow in tags
+  lonelogModPlus           +addition in tags
+  lonelogModMinus          -removal in tags
+  lonelogProgressNum       N/M progress values
+  lonelogAction            @ action marker
+  lonelogActor             @(Name) actor action
+  lonelogQuestion          ? oracle question
+  lonelogDicePrefix        d: dice prefix
+  lonelogDiceNotation      Inline dice notation (2d6, 1d20+3, ...)
+  lonelogArrow             -> and => result arrows
+  lonelogTableRef          [[table name]] references
+  lonelogTableBracket      [[ and ]] delimiters
+  lonelogGen               gen: generator header
+  lonelogNota              (nota: ...) meta notes
+  lonelogBlock             [COMBAT] / [/COMBAT] delimiters
+  lonelogRound             R1, R2, ... round markers
+
+  All groups link to standard Vim highlight groups by default
+  (Title, Identifier, Type, Number, Function, etc.) for colorscheme
+  compatibility. Override with your colorscheme or autocmd:
+>
+    autocmd ColorScheme * hi lonelogSceneId guifg=#ff8800
+<
+  The syntax file is at after/syntax/markdown/lonelog.vim and is
+  sourced automatically when a markdown buffer loads.
+
+==============================================================================
+14. REQUIREMENTS                                    *lonelog-requirements*
 
   - Neovim 0.8+ (vim.ui.input, vim.ui.select, nvim_open_win)
   - (Optional) telescope.nvim for enhanced picker
