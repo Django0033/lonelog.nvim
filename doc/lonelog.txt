@@ -380,6 +380,8 @@ Config key: use_telescope~
 All keymaps are configurable via |lonelog-config|.
 
 Normal mode keymaps~
+
+  Group 1: Main actions~
   Key            Action                        Command ~
   <leader>lO     Open oracle picker            :LonelogOracle
   <leader>lD     Interactive dice roller       :LonelogDice
@@ -387,6 +389,11 @@ Normal mode keymaps~
   <leader>lS     Navigate scenes               :LonelogScenes
   <leader>lC     Chaos factor UI               :LonelogChaos
   <leader>lI     Insert last result            :LonelogInsert
+  <leader>lM     Insert scene marker           :LonelogSceneMarker
+  <leader>lR     Roll current line             :LonelogRollLine
+
+  Group 2: Insert notation symbols~
+  Key            Action                        Command ~
   <leader>lia    Insert action marker          @
   <leader>liq    Insert oracle question        ?
   <leader>lid    Insert dice prefix            d:
@@ -394,17 +401,24 @@ Normal mode keymaps~
   <leader>li=    Insert consequence            =>
   <leader>liA    Action sequence template      3 lines
   <leader>liQ    Oracle sequence template      3 lines
+
+  Group 3: Entity tags~
+  Key            Action                        Command ~
   <leader>ltn    Insert NPC tag                [N:|]
   <leader>ltl    Insert location tag           [L:|]
   <leader>ltp    Insert PC tag                 [PC:|]
   <leader>ltt    Insert thread tag             [Thread:|Open]
   <leader>ltr    Insert reference tag          [#N:|]
   <leader>ltf    Insert foe tag                [F:|]
-  <leader>ltc    Insert/increment clock        :LonelogInsertClock
-  <leader>ltk    Insert/increment track        :LonelogInsertTrack
-  <leader>lti    Insert/decrement timer        :LonelogInsertTimer
-  <leader>lm     Insert scene marker           :LonelogSceneMarker
-  <leader>lr     Roll current line             :LonelogRollLine
+
+  Group 4: Progress elements~
+  Key            Action                        Command ~
+  <leader>lpc    Insert/increment clock        :LonelogInsertClock
+  <leader>lpt    Insert/increment track        :LonelogInsertTrack
+  <leader>lpi    Insert/decrement timer        :LonelogInsertTimer
+
+  Group 5: Quick dice~
+  Key            Action                        Command ~
   <leader>ld4    Roll 1d4                      :LonelogD4
   <leader>ld6    Roll 1d6                      :LonelogD6
   <leader>ld8    Roll 1d8                      :LonelogD8

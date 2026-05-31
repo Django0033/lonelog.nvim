@@ -107,15 +107,20 @@ require("lonelog").setup({
     width  = 0.6,                    -- fraction of editor width
   },
 
-  prompt_for_scene_context = true,   -- prompt for context on <leader>lm
+  prompt_for_scene_context = true,   -- prompt for context on <leader>lM
 
   keymaps = {
+    -- Main actions (uppercase)
     oracle    = "<leader>lO",
     dice      = "<leader>lD",
     tags      = "<leader>lT",
     scenes    = "<leader>lS",
     chaos     = "<leader>lC",
+    insert_result = "<leader>lI",
+    scene_marker  = "<leader>lM",
+    roll_line     = "<leader>lR",
 
+    -- Insert notation symbols
     insert_action   = "<leader>lia",
     insert_question = "<leader>liq",
     insert_dice     = "<leader>lid",
@@ -124,25 +129,27 @@ require("lonelog").setup({
     action_seq      = "<leader>liA",
     oracle_seq      = "<leader>liQ",
 
+    -- Entity tags
     tag_npc      = "<leader>ltn",
     tag_location = "<leader>ltl",
     tag_pc       = "<leader>ltp",
     tag_thread   = "<leader>ltt",
     tag_ref      = "<leader>ltr",
     tag_foe      = "<leader>ltf",
-    tag_clock    = "<leader>ltc",
-    tag_track    = "<leader>ltk",
-    tag_timer    = "<leader>lti",
 
-    insert_result = "<leader>lI",
-    scene_marker  = "<leader>lm",
-    roll_line     = "<leader>lr",
-    complete_tag  = "<C-l>c",
+    -- Progress elements
+    progress_clock = "<leader>lpc",
+    progress_track = "<leader>lpt",
+    progress_timer = "<leader>lpi",
 
+    -- Quick dice
     d4   = "<leader>ld4",   d6  = "<leader>ld6",
     d8   = "<leader>ld8",   d10 = "<leader>lda",
     d12  = "<leader>ldb",   d20 = "<leader>ldw",
     d100 = "<leader>ldc",
+
+    -- Tag completion (insert mode)
+    complete_tag  = "<C-l>c",
   },
 })
 ```
@@ -184,9 +191,9 @@ Lonelog uses a structured notation for solo RPG session logs. Insert symbols fro
 Clocks, tracks, and timers use smart insert-or-increment logic. On first use, you are prompted for the element name and (for clocks and tracks) the max value (default 5). On subsequent uses, if an incomplete tag exists, it is incremented in-place. If the tag is complete or missing, a fresh one is inserted.
 
 ```
-<leader>ltc   — insert or increment clock   [E:Name 0/5]
-<leader>ltk   — insert or increment track   [Track:Name 0/5]
-<leader>lti   — insert or decrement timer   [Timer:Name 0]
+<leader>lpc   — insert or increment clock   [E:Name 0/5]
+<leader>lpt   — insert or increment track   [Track:Name 0/5]
+<leader>lpi   — insert or decrement timer   [Timer:Name 0]
 ```
 
 Timers always decrement toward 0 and never prompt for max (no max field).
@@ -268,7 +275,7 @@ Scenes are identified by ID (main, flashback, sub-scene, thread) and sorted chro
 Insert a scene marker with the next ID automatically computed from the last scene in the buffer. When `prompt_for_scene_context` is enabled (default), you are prompted for a context description. If left empty, no context is added.
 
 ```
-<leader>lm    " insert scene marker (with context prompt if enabled)
+<leader>lM    " insert scene marker (with context prompt if enabled)
 :LonelogSceneMarker
 
   S1 -> S2     S5a -> S5b     S7.1 -> S7.2
@@ -292,7 +299,7 @@ Or use bracket shorthand for equal-probability options:
 tbl: Weather [Sunny, Cloudy, Rain, Storm]
 ```
 
-Place the cursor on any `tbl:`, `d:`, or bare dice line and press `<leader>lr`:
+Place the cursor on any `tbl:`, `d:`, or bare dice line and press `<leader>lR`:
 
 ```
 Before:  tbl: Forest Encounter (d6)
@@ -307,7 +314,7 @@ After:   Apariencia: d3=2 -> Normal
 
 ### Generator blocks
 
-Batch-roll entire sections with a `gen:` header. Place cursor on the `gen:` line and press `<leader>lr`:
+Batch-roll entire sections with a `gen:` header. Place cursor on the `gen:` line and press `<leader>lR`:
 
 ```markdown
 Before:

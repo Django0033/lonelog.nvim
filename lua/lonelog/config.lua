@@ -3,14 +3,17 @@ local M = {}
 -- Default configuration values
 local defaults = {
 	keymaps = {
-		-- Main features
+		-- Main actions (uppercase)
 		oracle = "<leader>lO",
 		dice = "<leader>lD",
 		tags = "<leader>lT",
 		scenes = "<leader>lS",
 		chaos = "<leader>lC",
+		insert_result = "<leader>lI",
+		scene_marker = "<leader>lM",
+		roll_line = "<leader>lR",
 
-		-- Insert symbols
+		-- Insert notation symbols
 		insert_action = "<leader>lia",
 		insert_question = "<leader>liq",
 		insert_dice = "<leader>lid",
@@ -19,20 +22,20 @@ local defaults = {
 		action_seq = "<leader>liA",
 		oracle_seq = "<leader>liQ",
 
-		-- Insert tags
+		-- Entity tags
 		tag_npc = "<leader>ltn",
 		tag_location = "<leader>ltl",
 		tag_pc = "<leader>ltp",
 		tag_thread = "<leader>ltt",
 		tag_ref = "<leader>ltr",
 		tag_foe = "<leader>ltf",
-		tag_clock = "<leader>ltc",
-		tag_track = "<leader>ltk",
-		tag_timer = "<leader>lti",
 
-		-- Insert result
-		insert_result = "<leader>lI",
+		-- Progress elements
+		progress_clock = "<leader>lpc",
+		progress_track = "<leader>lpt",
+		progress_timer = "<leader>lpi",
 
+		-- Quick dice
 		d4 = "<leader>ld4",
 		d6 = "<leader>ld6",
 		d8 = "<leader>ld8",
@@ -40,8 +43,8 @@ local defaults = {
 		d12 = "<leader>ldb",
 		d20 = "<leader>ldw",
 		d100 = "<leader>ldc",
-		scene_marker = "<leader>lm",
-		roll_line = "<leader>lr",
+
+		-- Tag completion (insert mode)
 		complete_tag = "<C-l>c",
 	},
 	use_telescope = "auto",

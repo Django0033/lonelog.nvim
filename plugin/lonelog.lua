@@ -55,7 +55,10 @@ local function setup_keymaps()
 		vim.keymap.set(mode, lhs, rhs, opts or { silent = true })
 	end
 
-	-- Main features
+	-- ================================================================
+	-- Group 1: Main actions (uppercase)
+	-- ================================================================
+
 	map("n", cfg.get().keymaps.oracle, function()
 		solo.ui.pick({
 			title = "Choose the Oracle",
@@ -89,8 +92,17 @@ local function setup_keymaps()
 			vim.notify("lonelog: No result to insert", vim.log.levels.WARN)
 		end
 	end, { desc = "Insert result" })
+	map("n", cfg.get().keymaps.scene_marker, function()
+		insert_scene_marker()
+	end, { desc = "Insert auto-numbered scene" })
+	map("n", cfg.get().keymaps.roll_line, function()
+		require("lonelog.roll_line").roll_current_line()
+	end, { desc = "Lonelog roll on current line" })
 
-	-- Notation Symbol Insertion
+	-- ================================================================
+	-- Group 2: Insert notation symbols (li-)
+	-- ================================================================
+
 	map("n", cfg.get().keymaps.insert_action, function()
 		insert_text("@ ")
 	end, { desc = "Insert action marker @" })
@@ -111,12 +123,14 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.action_seq, function()
 		insert_template_at_cursor(ACTION_TEMPLATE, 0, 3)
 	end, { desc = "Insert action sequence" })
-
 	map("n", cfg.get().keymaps.oracle_seq, function()
 		insert_template_at_cursor(ORACLE_TEMPLATE, 0, 2)
 	end, { desc = "Insert oracle sequence" })
 
-	-- Tag snippets with smart cursor
+	-- ================================================================
+	-- Group 3: Entity tags (lt-)
+	-- ================================================================
+
 	map("n", cfg.get().keymaps.tag_npc, function()
 		insert_text("[N:|]", 2)
 	end, { desc = "Insert NPC tag" })
@@ -136,7 +150,64 @@ local function setup_keymaps()
 		insert_text("[F:|]", 2)
 	end, { desc = "Insert foe tag" })
 
-	-- Tag snippets insert mode
+	-- ================================================================
+	-- Group 4: Progress elements (lp-)
+	-- ================================================================
+
+	map("n", cfg.get().keymaps.progress_clock, function()
+		vim.cmd("LonelogInsertClock")
+	end, { desc = "Insert/increment clock" })
+	map("n", cfg.get().keymaps.progress_track, function()
+		vim.cmd("LonelogInsertTrack")
+	end, { desc = "Insert/increment track" })
+	map("n", cfg.get().keymaps.progress_timer, function()
+		vim.cmd("LonelogInsertTimer")
+	end, { desc = "Insert/decrement timer" })
+
+	-- ================================================================
+	-- Group 5: Quick dice (ld-)
+	-- ================================================================
+
+	local quick_dice = {
+		{ key = "d4", dice = "1d4" },
+		{ key = "d6", dice = "1d6" },
+		{ key = "d8", dice = "1d8" },
+		{ key = "d10", dice = "1d10" },
+		{ key = "d12", dice = "1d12" },
+		{ key = "d20", dice = "1d20" },
+		{ key = "d100", dice = "1d100" },
+	}
+	for _, q in ipairs(quick_dice) do
+		local km = cfg.get().keymaps[q.key]
+		if km then
+			map("n", km, function()
+				solo.roll_dice(q.dice)
+			end, { desc = "Roll " .. q.dice })
+		end
+	end
+
+	-- ================================================================
+	-- Insert mode (C-l)
+	-- ================================================================
+
+	-- Notation symbols
+	map("i", "<C-l>a", function()
+		insert_text("@ ")
+	end, { desc = "Insert action marker @" })
+	map("i", "<C-l>q", function()
+		insert_text("? ")
+	end, { desc = "Insert oracle question ?" })
+	map("i", "<C-l>d", function()
+		insert_text("d: ")
+	end, { desc = "Insert dice roll d:" })
+	map("i", "<C-l>-", function()
+		insert_text(" -> ")
+	end, { desc = "Insert result arrow ->" })
+	map("i", "<C-l>=", function()
+		insert_text("=> ")
+	end, { desc = "Insert consequence =>" })
+
+	-- Entity tags
 	map("i", "<C-l>n", function()
 		insert_text("[N:|]", 3)
 	end, { desc = "Insert NPC tag" })
@@ -156,39 +227,6 @@ local function setup_keymaps()
 		insert_text("[F:|]", 3)
 	end, { desc = "Insert foe tag" })
 
-	-- Progress tags (smart increment or fresh insert)
-	map("n", cfg.get().keymaps.tag_clock, function()
-		vim.cmd("LonelogInsertClock")
-	end, { desc = "Insert/increment clock" })
-	map("n", cfg.get().keymaps.tag_track, function()
-		vim.cmd("LonelogInsertTrack")
-	end, { desc = "Insert/increment track" })
-	map("n", cfg.get().keymaps.tag_timer, function()
-		vim.cmd("LonelogInsertTimer")
-	end, { desc = "Insert/decrement timer" })
-
-	-- Scene marker (auto-numbered)
-	map("n", cfg.get().keymaps.scene_marker, function()
-		insert_scene_marker()
-	end, { desc = "Insert auto-numbered scene" })
-
-	-- Insert mode mappings (Ctrl-l prefix)
-	map("i", "<C-l>a", function()
-		insert_text("@ ")
-	end, { desc = "Insert action marker @" })
-	map("i", "<C-l>q", function()
-		insert_text("? ")
-	end, { desc = "Insert oracle question ?" })
-	map("i", "<C-l>d", function()
-		insert_text("d: ")
-	end, { desc = "Insert dice roll d:" })
-	map("i", "<C-l>-", function()
-		insert_text(" -> ")
-	end, { desc = "Insert result arrow ->" })
-	map("i", "<C-l>=", function()
-		insert_text("=> ")
-	end, { desc = "Insert consequence =>" })
-
 	-- Tag completion
 	map("i", cfg.get().keymaps.complete_tag, function()
 		local ok, err = pcall(require("lonelog.completion").complete_tag)
@@ -197,31 +235,10 @@ local function setup_keymaps()
 		end
 	end, { desc = "Complete Lonelog tag" })
 
-	-- Quick dice rolls (1d4, 1d6, etc.)
-	local quick_dice = {
-		{ key = "d4", dice = "1d4" },
-		{ key = "d6", dice = "1d6" },
-		{ key = "d8", dice = "1d8" },
-		{ key = "d10", dice = "1d10" },
-		{ key = "d12", dice = "1d12" },
-		{ key = "d20", dice = "1d20" },
-		{ key = "d100", dice = "1d100" },
-	}
-	for _, q in ipairs(quick_dice) do
-		local km = cfg.get().keymaps[q.key]
-		if km then
-			map("n", km, function()
-				solo.roll_dice(q.dice)
-			end, { desc = "Roll " .. q.dice })
-		end
-	end
+	-- ================================================================
+	-- Visual mode (reuse action keys for selected text)
+	-- ================================================================
 
-	-- Roll line (tbl:/d: on current line)
-	map("n", cfg.get().keymaps.roll_line, function()
-		require("lonelog.roll_line").roll_current_line()
-	end, { desc = "Lonelog roll on current line" })
-
-	-- Visual mode: use selection as oracle context or dice notation
 	map("v", cfg.get().keymaps.oracle, function()
 		local t = vim.trim(vim.fn.getline("."):sub(vim.fn.col("v"), vim.fn.col(".")))
 		solo.roll_oracle(t == "" and nil or t)
