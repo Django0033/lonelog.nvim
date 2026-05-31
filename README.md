@@ -27,6 +27,7 @@ All features are written in pure Lua with zero external dependencies. [Telescope
 - **Tag navigation** — Browse NPCs, locations, threads, PCs, foes, rooms, and inventory. Filter by type, jump to any tag
 - **Tag autocomplete** — Automatic suggestions when typing `[TYPE:` with relevance sorting (exact match > prefix > alphabetical). Per-buffer cache
 - **Scene navigation** — Navigate main scenes (`S1`), flashbacks (`S5a`), sub-scenes (`S7.1`), and thread scenes (`T1-S5`) with chronological ordering
+- **Auto-numbered session headers** — Insert `## Session 1` with date, recap, and goals sections. Auto-increments from the last session in buffer
 - **Auto-numbered scene markers** — Insert `### S1 *Tavern*` with automatic ID generation. Prompts for context via `vim.fn.input()` (configurable)
 - **Inline tables** — Define tables inline (`tbl: Name (d6)`) with range entries or bracket shorthand (`[A, B, C]`). Roll directly on the line
 - **Generator blocks** — Batch-roll indented sub-lines under a `gen:` header with label-to-table resolution
@@ -116,6 +117,7 @@ require("lonelog").setup({
     tags      = "<leader>lT",
     scenes    = "<leader>lS",
     chaos     = "<leader>lC",
+    session_header = "<leader>lH",
     insert_result = "<leader>lI",
     scene_marker  = "<leader>lM",
     roll_line     = "<leader>lR",
@@ -263,6 +265,24 @@ When typing after `[TYPE:` in a markdown buffer, matching entity names are sugge
 :LonelogCompleteTag
 ```
 
+### Session headers
+
+Insert an auto-numbered session header above the current line. Each session includes today's date, a recap section, and a goals section. Session numbers auto-increment from the last `## Session N` in the buffer.
+
+```
+<leader>lH    " insert session header
+:LonelogSession
+
+  ## Session 3
+  2026-05-31
+
+  ### Recap
+  -
+
+  ### Goals
+  -
+```
+
 ### Scene navigation
 
 Scenes are identified by ID (main, flashback, sub-scene, thread) and sorted chronologically.
@@ -363,6 +383,7 @@ Dice and oracle results open in a floating window:
 | `:LonelogInsertTrack [name]` | Insert or increment track |
 | `:LonelogInsertTimer [name]` | Insert or decrement timer |
 | `:LonelogSceneMarker` | Insert auto-numbered scene marker |
+| `:LonelogSession` | Insert auto-numbered session header |
 | `:LonelogTags` | Browse Lonelog tags |
 | `:LonelogScenes` | Browse Lonelog scenes |
 | `:LonelogRollLine` | Roll dice/table on current line |

@@ -84,6 +84,9 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.chaos, function()
 		solo.oracle.show_chaos_ui()
 	end, { desc = "Chaos Factor UI" })
+	map("n", cfg.get().keymaps.session_header, function()
+		require("lonelog.commands.session").insert_session_header()
+	end, { desc = "Insert session header" })
 	map("n", cfg.get().keymaps.insert_result, function()
 		local w, c = solo.ui.get_latest_content()
 		if c then
@@ -424,6 +427,11 @@ end, { nargs = "?", desc = "Insert or decrement timer" })
 vim.api.nvim_create_user_command("LonelogSceneMarker", function()
 	insert_scene_marker()
 end, { nargs = 0, desc = "Insert auto-numbered scene marker" })
+
+-- Session header command
+vim.api.nvim_create_user_command("LonelogSession", function()
+	require("lonelog.commands.session").insert_session_header()
+end, { nargs = 0, desc = "Insert auto-numbered session header" })
 
 -- Set up keymaps after plugin loads
 vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })

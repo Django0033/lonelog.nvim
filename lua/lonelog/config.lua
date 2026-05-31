@@ -9,6 +9,7 @@ local defaults = {
 		tags = "<leader>lT",
 		scenes = "<leader>lS",
 		chaos = "<leader>lC",
+		session_header = "<leader>lH",
 		insert_result = "<leader>lI",
 		scene_marker = "<leader>lM",
 		roll_line = "<leader>lR",

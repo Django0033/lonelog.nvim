@@ -15,6 +15,7 @@ CONTENTS                                                *lonelog-contents*
     4.6 Scenes ........................................... |lonelog-command-scenes|
     4.7 Progress elements ................................ |lonelog-command-progress|
     4.8 Inline rolling ................................... |lonelog-command-roll|
+    4.9 Session headers .................................. |lonelog-command-session|
   5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
@@ -24,6 +25,7 @@ CONTENTS                                                *lonelog-contents*
     6.5 Dice notation .................................... |lonelog-notation-dice|
     6.6 Inline tables .................................... |lonelog-notation-tables|
     6.7 Generator blocks ................................. |lonelog-notation-gen|
+    6.8 Session headers .................................. |lonelog-notation-session|
   7. Oracle system ........................................ |lonelog-oracle|
   8. Tag autocomplete ..................................... |lonelog-completion|
   9. Floating results ..................................... |lonelog-float|
@@ -374,6 +376,28 @@ Config key: use_telescope~
 
   Also works on visual-selected text, using the selection as notation.
 
+4.9 Session headers                          *:LonelogSession* *lonelog-command-session*
+>
+  :LonelogSession
+<
+  Insert an auto-numbered session header at the cursor. Scans the buffer to
+  find the last "## Session N" line, then inserts the next one with today's
+  date, a Recap section, and a Goals section.
+
+  Format:
+>
+    ## Session 3
+    2026-05-31
+
+    ### Recap
+    -
+
+    ### Goals
+    -
+<
+  The cursor is placed at the first Recap bullet for immediate typing.
+  If no session header exists in the buffer, Session 1 is inserted.
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -388,6 +412,7 @@ Normal mode keymaps~
   <leader>lT     Navigate tags                 :LonelogTags
   <leader>lS     Navigate scenes               :LonelogScenes
   <leader>lC     Chaos factor UI               :LonelogChaos
+  <leader>lH     Insert session header          :LonelogSession
   <leader>lI     Insert last result            :LonelogInsert
   <leader>lM     Insert scene marker           :LonelogSceneMarker
   <leader>lR     Roll current line             :LonelogRollLine
@@ -587,6 +612,16 @@ Lonelog is a structured markdown notation for solo RPG session logs
 <
   Place cursor on the gen: line and press <leader>lr. All indented
   sub-lines are processed in place. The gen: header is not modified.
+
+6.8 Session headers                            *lonelog-notation-session*
+>
+  ## Session N
+<
+
+  Auto-numbered session headers are inserted with |:LonelogSession| or
+  <leader>lH. The header includes today's date, a Recap section for
+  summarizing the previous session, and a Goals section for current
+  objectives. The cursor is placed at the Recap bullet for immediate typing.
 
 ==============================================================================
 7. ORACLE SYSTEM                                        *lonelog-oracle*
