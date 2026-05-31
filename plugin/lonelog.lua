@@ -98,6 +98,12 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.scene_marker, function()
 		insert_scene_marker()
 	end, { desc = "Insert auto-numbered scene" })
+	map("n", cfg.get().keymaps.scene_prev, function()
+		require("lonelog.parsers.scenes").navigate_scene(-1)
+	end, { desc = "Previous scene" })
+	map("n", cfg.get().keymaps.scene_next, function()
+		require("lonelog.parsers.scenes").navigate_scene(1)
+	end, { desc = "Next scene" })
 	map("n", cfg.get().keymaps.roll_line, function()
 		require("lonelog.roll_line").roll_current_line()
 	end, { desc = "Lonelog roll on current line" })
@@ -432,6 +438,15 @@ end, { nargs = 0, desc = "Insert auto-numbered scene marker" })
 vim.api.nvim_create_user_command("LonelogSession", function()
 	require("lonelog.commands.session").insert_session_header()
 end, { nargs = 0, desc = "Insert auto-numbered session header" })
+
+-- Scene navigation commands
+vim.api.nvim_create_user_command("LonelogScenePrev", function()
+	require("lonelog.parsers.scenes").navigate_scene(-1)
+end, { nargs = 0, desc = "Go to previous scene" })
+
+vim.api.nvim_create_user_command("LonelogSceneNext", function()
+	require("lonelog.parsers.scenes").navigate_scene(1)
+end, { nargs = 0, desc = "Go to next scene" })
 
 -- Set up keymaps after plugin loads
 vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })

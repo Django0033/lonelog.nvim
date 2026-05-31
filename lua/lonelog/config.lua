@@ -12,6 +12,8 @@ local defaults = {
 		session_header = "<leader>lH",
 		insert_result = "<leader>lI",
 		scene_marker = "<leader>lM",
+		scene_prev = "<leader>l[",
+		scene_next = "<leader>l]",
 		roll_line = "<leader>lR",
 
 		-- Insert notation symbols

@@ -19,7 +19,12 @@ vim = {
     nvim_buf_get_lines = function() return {} end,
     nvim_buf_get_name = function() return "test.md" end,
     nvim_get_current_buf = function() return 1 end,
+    nvim_win_get_cursor = function() return { 5, 0 } end,
+    nvim_win_set_cursor = function() end,
   },
+  cmd = function() end,
+  notify = function() end,
+  log = { levels = { INFO = 0 } },
   trim = function(s) return s:match("^%s*(.-)%s*$") end,
   tbl_filter = function(fn, t) local r = {}; for _, v in ipairs(t) do if fn(v) then table.insert(r, v) end end; return r end,
 }
@@ -138,6 +143,24 @@ for _, tc in ipairs(scene_tests) do
   else
     print(string.format("FAIL [%s] got %s, expected %s", tc.name, result, tc.expected))
     failed = failed + 1
+  end
+end
+
+print()
+print("Testing navigate_scene function:")
+print("==============================")
+
+if M.navigate_scene then
+  local nav_ok = true
+  -- Call with no scenes should not crash
+  local ok = pcall(M.navigate_scene, -1)
+  if ok then
+    print("PASS navigate_scene exists and handles no-scenes gracefully")
+    passed = passed + 1
+  else
+    print("FAIL navigate_scene raised an error on no-scenes")
+    failed = failed + 1
+    nav_ok = false
   end
 end
 

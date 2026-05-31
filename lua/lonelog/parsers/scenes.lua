@@ -310,4 +310,42 @@ function M.show_scenes_picker_native(all_scenes)
 	})
 end
 
+-- Navigate to the previous or next scene
+-- direction: -1 for prev, +1 for next
+function M.navigate_scene(direction)
+	local bufnr = vim.api.nvim_get_current_buf()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local cur_line = cursor[1]
+
+	local scenes = M.parse_scenes(bufnr)
+	if #scenes == 0 then
+		vim.notify("lonelog: No scenes found", vim.log.levels.INFO)
+		return
+	end
+
+	M.sort_scenes(scenes)
+
+	local current_idx = 0
+	for i, sc in ipairs(scenes) do
+		if sc.line <= cur_line then
+			current_idx = i
+		end
+	end
+
+	local target = current_idx + direction
+	if current_idx == 0 and direction == -1 then
+		vim.notify("lonelog: Cursor is before the first scene", vim.log.levels.INFO)
+		return
+	elseif target < 1 then
+		vim.notify("lonelog: Already at first scene", vim.log.levels.INFO)
+		return
+	elseif target > #scenes then
+		vim.notify("lonelog: Already at last scene", vim.log.levels.INFO)
+		return
+	end
+
+	vim.api.nvim_win_set_cursor(0, { scenes[target].line, 0 })
+	vim.cmd("normal! zz")
+end
+
 return M

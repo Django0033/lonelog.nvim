@@ -16,6 +16,7 @@ CONTENTS                                                *lonelog-contents*
     4.7 Progress elements ................................ |lonelog-command-progress|
     4.8 Inline rolling ................................... |lonelog-command-roll|
     4.9 Session headers .................................. |lonelog-command-session|
+  4.10 Scene navigation ................................. |lonelog-command-scene-nav|
   5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
@@ -400,6 +401,21 @@ Config key: use_telescope~
   The cursor is placed at the first Recap bullet for immediate typing.
   If no session header exists in the buffer, Session 1 is inserted.
 
+4.10 Scene navigation                    *:LonelogScenePrev* *:LonelogSceneNext*
+                                          *lonelog-command-scene-nav*
+>
+  :LonelogScenePrev     " Move to the previous scene
+  :LonelogSceneNext     " Move to the next scene
+<
+  Parses all scenes in the buffer, finds which scene the cursor is currently
+  in, and jumps to the adjacent scene. The view is centered on the target
+  scene line.
+
+  Behaviour:
+    - Cursor before the first scene: |:LonelogScenePrev| notifies, |:LonelogSceneNext| goes to S1
+    - Cursor inside a scene: jumps to the previous/next scene in ID order
+    - At the first/last scene: notifies "Already at first/last scene"
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -417,6 +433,8 @@ Normal mode keymaps~
   <leader>lH     Insert session header          :LonelogSession
   <leader>lI     Insert last result            :LonelogInsert
   <leader>lM     Insert scene marker           :LonelogSceneMarker
+  <leader>l[     Go to previous scene          :LonelogScenePrev
+  <leader>l]     Go to next scene              :LonelogSceneNext
   <leader>lR     Roll current line             :LonelogRollLine
 
   Group 2: Insert notation symbols~
@@ -570,6 +588,9 @@ Lonelog is a structured markdown notation for solo RPG session logs
   When |lonelog-config| prompt_for_scene_context is enabled (default),
   pressing <leader>lm prompts for context. Leaving the prompt empty
   omits the *...* section entirely.
+
+  Navigate between scenes with <leader>l[ (prev) and <leader>l] (next)
+  or |:LonelogScenePrev| and |:LonelogSceneNext| commands.
 
 6.5 Dice notation                              *lonelog-notation-dice*
 >

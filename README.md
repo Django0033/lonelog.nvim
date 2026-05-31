@@ -121,6 +121,8 @@ require("lonelog").setup({
     session_header = "<leader>lH",
     insert_result = "<leader>lI",
     scene_marker  = "<leader>lM",
+    scene_prev    = "<leader>l[",
+    scene_next    = "<leader>l]",
     roll_line     = "<leader>lR",
 
     -- Insert notation symbols
@@ -290,7 +292,11 @@ Scenes are identified by ID (main, flashback, sub-scene, thread) and sorted chro
 
 ```
 <leader>lS    " browse scenes
+<leader>l[    " go to previous scene
+<leader>l]    " go to next scene
 :LonelogScenes
+:LonelogScenePrev
+:LonelogSceneNext
 ```
 
 ### Auto-numbered scene markers
@@ -385,6 +391,8 @@ Dice and oracle results open in a floating window:
 | `:LonelogInsertTimer [name]` | Insert or decrement timer |
 | `:LonelogSceneMarker` | Insert auto-numbered scene marker |
 | `:LonelogSession` | Insert auto-numbered session header |
+| `:LonelogScenePrev` | Go to previous scene |
+| `:LonelogSceneNext` | Go to next scene |
 | `:LonelogTags` | Browse Lonelog tags |
 | `:LonelogScenes` | Browse Lonelog scenes |
 | `:LonelogRollLine` | Roll dice/table on current line |
