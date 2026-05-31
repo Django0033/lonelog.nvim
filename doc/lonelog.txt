@@ -399,6 +399,7 @@ Normal mode keymaps~
   <leader>lid    Insert dice prefix            d:
   <leader>li-    Insert result arrow           ->
   <leader>li=    Insert consequence            =>
+  <leader>liN    Insert actor action            @(Name)
   <leader>liA    Action sequence template      3 lines
   <leader>liQ    Oracle sequence template      3 lines
 
@@ -430,6 +431,7 @@ Normal mode keymaps~
 Insert mode keymaps~
   Key        Inserts              Description ~
   <C-l>a     @                    Action marker
+  <C-l>N     @(|)                 Actor action @(Name)
   <C-l>q     ?                    Oracle question
   <C-l>d     d:                   Dice prefix
   <C-l>-      ->                  Result arrow
@@ -470,6 +472,14 @@ Lonelog is a structured markdown notation for solo RPG session logs
   ->          - Result (from oracle or dice)
   =>          - Narrative consequence
   (nota: ...) - Meta notes and reminders
+
+  Insert via keymaps:
+    <leader>lia / <C-l>a   - @ (generic action)
+    <leader>liN / <C-l>N   - @(Name) (actor action, cursor on name)
+    <leader>liq / <C-l>q   - ?
+    <leader>lid / <C-l>d   - d:
+    <leader>li- / <C-l>-   - ->
+    <leader>li= / <C-l>=   = =>
 <
 
 6.2 Tag format                                  *lonelog-notation-tags*

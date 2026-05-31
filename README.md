@@ -126,6 +126,7 @@ require("lonelog").setup({
     insert_dice     = "<leader>lid",
     insert_arrow    = "<leader>li-",
     insert_conseq   = "<leader>li=",
+    actor_action    = "<leader>liN",
     action_seq      = "<leader>liA",
     oracle_seq      = "<leader>liQ",
 
@@ -167,6 +168,7 @@ Lonelog uses a structured notation for solo RPG session logs. Insert symbols fro
 | `<leader>lid` | `<C-l>d` | `d: ` — dice roll |
 | `<leader>li-` | `<C-l>-` | ` -> ` — result arrow |
 | `<leader>li=` | `<C-l>=` | `=> ` — consequence |
+| `<leader>liN` | `<C-l>N` | `@(Name) ` — actor action |
 | `<leader>liA` | | 3-line action sequence (`@ [action]` / `d: [roll] -> [outcome]` / `=> [consequence]`) |
 | `<leader>liQ` | | 3-line oracle sequence (`? [question]` / `-> [answer]` / `=> [consequence]`) |
 

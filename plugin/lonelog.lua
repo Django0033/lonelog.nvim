@@ -119,6 +119,11 @@ local function setup_keymaps()
 		insert_text("=> ")
 	end, { desc = "Insert consequence =>" })
 
+	-- Actor action marker
+	map("n", cfg.get().keymaps.actor_action, function()
+		insert_text("@(|) ", 3)
+	end, { desc = "Insert actor action @(Name)" })
+
 	-- Multi-line notation sequences
 	map("n", cfg.get().keymaps.action_seq, function()
 		insert_template_at_cursor(ACTION_TEMPLATE, 0, 3)
@@ -194,6 +199,9 @@ local function setup_keymaps()
 	map("i", "<C-l>a", function()
 		insert_text("@ ")
 	end, { desc = "Insert action marker @" })
+	map("i", "<C-l>N", function()
+		insert_text("@(|) ", 3)
+	end, { desc = "Insert actor action @(Name)" })
 	map("i", "<C-l>q", function()
 		insert_text("? ")
 	end, { desc = "Insert oracle question ?" })
@@ -330,14 +338,16 @@ vim.api.nvim_create_user_command("LonelogSymbol", function(o)
 		d = "d: ",
 		arrow = " -> ",
 		conseq = "=> ",
+		actor = "@(|) ",
 	}
 	local text = symbols[o.args]
 	if text then
-		insert_text(text)
+		local offset = o.args == "actor" and 3 or nil
+		insert_text(text, offset)
 	else
 		vim.notify("lonelog: Unknown symbol '" .. o.args .. "'", vim.log.levels.WARN)
 	end
-end, { nargs = 1, desc = "Insert Lonelog symbol (@, ?, d, arrow, conseq)" })
+end, { nargs = 1, desc = "Insert Lonelog symbol (@, ?, d, arrow, conseq, actor)" })
 
 -- Multi-line sequence commands
 vim.api.nvim_create_user_command("LonelogActionSequence", function()

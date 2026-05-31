@@ -19,6 +19,7 @@ local defaults = {
 		insert_dice = "<leader>lid",
 		insert_arrow = "<leader>li-",
 		insert_conseq = "<leader>li=",
+		actor_action = "<leader>liN",
 		action_seq = "<leader>liA",
 		oracle_seq = "<leader>liQ",
 

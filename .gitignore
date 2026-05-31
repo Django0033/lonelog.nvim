@@ -48,3 +48,9 @@ test_sessions.md
 reddit_publish_lonelog_users.md
 reddit_publish_nvim_users.md
 
+# Generated helptags
+doc/tags
+
+# Personal notes
+docs/todos/
+
