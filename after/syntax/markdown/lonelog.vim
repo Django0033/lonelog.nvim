@@ -89,6 +89,16 @@ syn match lonelogRound '\v^R\d+\s'
 syn match lonelogNarrativeDelim '\v^\\---$'
 syn match lonelogNarrativeDelim '\v^---\\$'
 
+" === Dialogue lines N (Name): "..." / PC [action] "..." ===
+syn match lonelogDialogueTag '\v^(N|PC)' contained
+syn match lonelogDialogueActor '\v\([^)]+\)' contained
+syn match lonelogDialogueColon ':' contained
+syn match lonelogDialogueString '\v".{-}"' contained
+
+syn match lonelogDialogue
+  \ '\v^(N|PC)\s*(\([^)]+\))?:\s*(\[.{-}\]\s*)?".{-}"'
+  \ contains=lonelogDialogueTag,lonelogDialogueActor,lonelogDialogueColon,lonelogDialogueString
+
 " ============================================================
 " Highlight links (default to standard groups for colorscheme compatibility)
 " ============================================================
@@ -119,6 +129,11 @@ hi def link lonelogNotaParen Comment
 hi def link lonelogBlock WarningMsg
 hi def link lonelogRound Constant
 hi def link lonelogNarrativeDelim Comment
+hi def link lonelogDialogue Normal
+hi def link lonelogDialogueTag Type
+hi def link lonelogDialogueActor Function
+hi def link lonelogDialogueColon Delimiter
+hi def link lonelogDialogueString String
 hi def link lonelogTagML Normal
 hi def link lonelogTagMLBracket Delimiter
 hi def link lonelogTagMLType Type
