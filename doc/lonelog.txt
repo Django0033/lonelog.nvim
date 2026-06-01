@@ -567,16 +567,16 @@ Config key: use_telescope~
    :LonelogRound     " Insert round marker with optional roster
 
    Inserts an auto-incremented round marker inside the current
-   |lonelog-command-combat| block. Prompts for the type of marker:
+   |lonelog-command-combat| block. A picker asks for the marker type:
 
-   "Ronda simple" — inserts R{N+1} where N is the highest existing
+   *Simple round* — inserts R{N+1} where N is the highest existing
    round number found within the enclosing [COMBAT] block.
 
 >
    R3
 <
 
-   "Ronda con roster" — inserts R{N+1} Roster: followed by all
+   *Round with roster* — inserts R{N+1} Roster: followed by all
    [PC:Name|HP N] and [F:Name|HP N] tags found in the current
    combat block, providing a compact round-by-round status summary.
 
