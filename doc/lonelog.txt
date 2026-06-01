@@ -22,7 +22,8 @@ CONTENTS                                                *lonelog-contents*
    4.13 Multi-line tags ................................... |lonelog-command-mltag|
     4.14 Campaign header ................................... |lonelog-command-campaign|
     4.15 Session summary .................................. |lonelog-command-summary|
-    5. Keymaps ............................................. |lonelog-keymaps|
+    4.16 Combat block ...................................... |lonelog-command-combat|
+     5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
     6.2 Tag format ....................................... |lonelog-notation-tags|
@@ -70,6 +71,7 @@ Key features:
   - Campaign YAML frontmatter
   - Narrative excerpt blocks, meta notes, dialogue syntax
   - Multi-line tags for detailed descriptions
+  - Combat blocks: [COMBAT] / [/COMBAT] tactical encounter delimiters
   - Telescope integration (optional, auto-detected)
   - 29 syntax highlight groups
   - Zero dependencies (pure Lua)
@@ -82,7 +84,7 @@ lazy.nvim~
   {
     "Django0033/lonelog.nvim",
     cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
-            "LonelogScenes", "LonelogRollLine" },
+            "LonelogScenes", "LonelogRollLine", "LonelogCombat" },
     config = function()
       require("lonelog").setup()
     end,
@@ -169,11 +171,8 @@ Call setup() with an optional table of overrides. All keys and defaults:
       tag_thread   = "<leader>ltt",
       tag_ref      = "<leader>ltr",
       tag_foe      = "<leader>ltf",
-      tag_clock    = "<leader>ltc",
-      tag_track    = "<leader>ltk",
-      tag_timer    = "<leader>lti",
-
        -- Other
+       combat_block    = "<leader>lB",
        session_summary = "<leader>lE",
        insert_result = "<leader>lI",
        scene_marker  = "<leader>lm",
@@ -545,6 +544,21 @@ Config key: use_telescope~
    or sharing play reports. The floating window supports standard
    copy/insert keybindings (q, y, <CR>, |<leader>lI|).
 
+4.16 Combat block                                  *:LonelogCombat*
+                                                    *lonelog-command-combat*
+>
+   :LonelogCombat    " Insert combat encounter block
+<
+   Inserts a combat block delimited by [COMBAT] and [/COMBAT], placing
+   the cursor on the blank middle line in insert mode for immediate
+   combat notation entry.
+
+>
+   [COMBAT]
+
+   [/COMBAT]
+<
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -564,10 +578,11 @@ Normal mode keymaps~
   <leader>lM     Insert scene marker           :LonelogSceneMarker
   <leader>l[     Go to previous scene          :LonelogScenePrev
   <leader>l]     Go to next scene              :LonelogSceneNext
-  <leader>lN     Insert narrative block         :LonelogNarrative
-  <leader>lR     Roll current line             :LonelogRollLine
-   <leader>lA     Insert campaign header         :LonelogCampaign
-   <leader>lE     Session summary                :LonelogSessionSummary
+   <leader>lN     Insert narrative block         :LonelogNarrative
+   <leader>lB     Insert combat block            :LonelogCombat
+   <leader>lR     Roll current line             :LonelogRollLine
+    <leader>lA     Insert campaign header         :LonelogCampaign
+    <leader>lE     Session summary                :LonelogSessionSummary
 
   Group 2: Insert notation symbols~
   Key            Action                        Command ~

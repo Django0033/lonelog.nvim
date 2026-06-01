@@ -9,6 +9,17 @@ local function insert_text(text, cursor_offset)
 	end
 end
 
+-- Shared quick dice data used by both keymaps and commands
+local QUICK_DICE = {
+	{ key = "d4", cmd = "D4", dice = "1d4" },
+	{ key = "d6", cmd = "D6", dice = "1d6" },
+	{ key = "d8", cmd = "D8", dice = "1d8" },
+	{ key = "d10", cmd = "D10", dice = "1d10" },
+	{ key = "d12", cmd = "D12", dice = "1d12" },
+	{ key = "d20", cmd = "D20", dice = "1d20" },
+	{ key = "d100", cmd = "D100", dice = "1d100" },
+}
+
 local ACTION_TEMPLATE = {
 	"@ [action]",
 	"d: [roll] -> [outcome]",
@@ -113,6 +124,9 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.campaign_header, function()
 		require("lonelog.commands.campaign").insert_campaign_header()
 	end, { desc = "Insert campaign header" })
+	map("n", cfg.get().keymaps.combat_block, function()
+		require("lonelog.commands.combat").insert_combat_block()
+	end, { desc = "Insert combat block" })
 	map("n", cfg.get().keymaps.session_summary, function()
 		require("lonelog.commands.summary").show_session_summary()
 	end, { desc = "Session summary" })
@@ -211,16 +225,7 @@ local function setup_keymaps()
 	-- Group 5: Quick dice (ld-)
 	-- ================================================================
 
-	local quick_dice = {
-		{ key = "d4", dice = "1d4" },
-		{ key = "d6", dice = "1d6" },
-		{ key = "d8", dice = "1d8" },
-		{ key = "d10", dice = "1d10" },
-		{ key = "d12", dice = "1d12" },
-		{ key = "d20", dice = "1d20" },
-		{ key = "d100", dice = "1d100" },
-	}
-	for _, q in ipairs(quick_dice) do
+	for _, q in ipairs(QUICK_DICE) do
 		local km = cfg.get().keymaps[q.key]
 		if km then
 			map("n", km, function()
@@ -354,18 +359,10 @@ vim.api.nvim_create_user_command("LonelogInsert", function()
 end, { nargs = 0, desc = "Insert last result" })
 
 -- Quick dice commands
-for _, d in ipairs({
-	{ "D4", "1d4" },
-	{ "D6", "1d6" },
-	{ "D8", "1d8" },
-	{ "D10", "1d10" },
-	{ "D12", "1d12" },
-	{ "D20", "1d20" },
-	{ "D100", "1d100" },
-}) do
-	vim.api.nvim_create_user_command("Lonelog" .. d[1], function()
-		require("lonelog").roll_dice(d[2])
-	end, { nargs = 0, desc = "Roll " .. d[2] })
+for _, d in ipairs(QUICK_DICE) do
+	vim.api.nvim_create_user_command("Lonelog" .. d.cmd, function()
+		require("lonelog").roll_dice(d.dice)
+	end, { nargs = 0, desc = "Roll " .. d.dice })
 end
 
 -- Notation insertion commands
@@ -476,6 +473,10 @@ end, { nargs = 0, desc = "Insert auto-numbered session header" })
 vim.api.nvim_create_user_command("LonelogNarrative", function()
 	require("lonelog.commands.narrative").insert_narrative_block()
 end, { nargs = 0, desc = "Insert narrative block" })
+
+vim.api.nvim_create_user_command("LonelogCombat", function()
+	require("lonelog.commands.combat").insert_combat_block()
+end, { nargs = 0, desc = "Insert combat block" })
 
 vim.api.nvim_create_user_command("LonelogNote", function()
 	require("lonelog.commands.note").insert_note()

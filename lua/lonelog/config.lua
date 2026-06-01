@@ -17,6 +17,7 @@ local defaults = {
 		scene_next = "<leader>l]",
 		roll_line = "<leader>lR",
 		campaign_header = "<leader>lA",
+		combat_block = "<leader>lB",
 		session_summary = "<leader>lE",
 
 		-- Insert notation symbols

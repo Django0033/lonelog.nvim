@@ -32,6 +32,7 @@ Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, and
 - **Scene markers** — Auto-numbered `### S3 *context*` with smart ID progression
 - **Campaign YAML** — Structured frontmatter with title, ruleset, genre, dates, themes
 - **Narrative blocks** — `\---` / `---\` delimiters for in-fiction prose
+- **Combat blocks** — `[COMBAT]` / `[/COMBAT]` tactical encounter delimiters
 - **Multi-line tags** — `[TYPE:Name\n  | content\n]` for detailed descriptions
 - **Meta notes** — `(note: ...)` / `(nota: ...)` inline annotations
 - **Session summary** — Per-session stats: scenes, tags, notation, progress, dice. Export to markdown
@@ -52,7 +53,7 @@ Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, and
 {
   "Django0033/lonelog.nvim",
   cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
-          "LonelogScenes", "LonelogRollLine" },
+          "LonelogScenes", "LonelogRollLine", "LonelogCombat" },
   config = function()
     require("lonelog").setup()
   end,
@@ -335,6 +336,7 @@ gen: Generate NPC
 | `:LonelogSceneNext` | Go to next scene |
 | `:LonelogSession` | Insert session header |
 | `:LonelogNarrative` | Insert narrative excerpt block |
+| `:LonelogCombat` | Insert combat block `[COMBAT]` / `[/COMBAT]` |
 | `:LonelogNote` | Insert meta note |
 | `:LonelogCampaign` | Insert campaign header |
 | `:LonelogSessionSummary` | Show session summary in floating window |
