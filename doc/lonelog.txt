@@ -738,7 +738,14 @@ Config key: addons~
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
-All keymaps are configurable via |lonelog-config|.
+All keymaps are configurable via |lonelog-config|. Set any keymap to |false|
+to disable it entirely, or set it to a different key to rebind:
+
+>   keymaps = {
+>     oracle = "<leader>zo",    -- rebind
+>     oracle_seq = false,       -- disable
+>   }
+<
 
 Normal mode keymaps~
 

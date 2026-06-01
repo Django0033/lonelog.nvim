@@ -63,7 +63,9 @@ local function setup_keymaps()
 	local cfg = require("lonelog.config")
 	local solo = require("lonelog")
 	local function map(mode, lhs, rhs, opts)
-		vim.keymap.set(mode, lhs, rhs, opts or { silent = true })
+		if lhs then
+			vim.keymap.set(mode, lhs, rhs, opts or { silent = true })
+		end
 	end
 
 	-- ================================================================

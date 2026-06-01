@@ -161,6 +161,16 @@ require("lonelog").setup({
   prompt_for_scene_context = true,
 
   keymaps = { /* see :help lonelog-keymaps */ },
+
+> [!TIP]
+> Set any keymap to `false` to disable it without overriding:
+> ```lua
+> keymaps = { oracle = false }  -- disable oracle keymap
+> ```
+> Set it to a string to rebind:
+> ```lua
+> keymaps = { oracle = "<leader>zo" }
+> ```
 })
 ```
 
