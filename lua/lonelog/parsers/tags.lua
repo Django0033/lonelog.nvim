@@ -38,22 +38,78 @@ local TAG_LABELS = {
 function M.parse_tags(bufnr)
 	bufnr = bufnr or vim.api.nvim_get_current_buf()
 	local tags = {}
-	for line_num, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
-		-- Match tag patterns like [N:Name] or [#N:Name]
-		for match in line:gmatch("%[[%#]?%w+:%s*[^%]]+%]") do
-			local parsed = M.parse_tag(match, line_num)
-			if parsed then
-				table.insert(tags, parsed)
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local i = 1
+	while i <= #lines do
+		local line = lines[i]
+
+		-- Check for multi-line tag start: line has [TYPE: but no ]
+		if line:match("^%[[%#]?%w+:") and not line:match("%]") then
+			local ml_lines = { line }
+			local j = i + 1
+			local found_close = false
+			while j <= #lines do
+				table.insert(ml_lines, lines[j])
+				if lines[j]:match("^%s*%]%s*$") then
+					found_close = true
+					break
+				end
+				j = j + 1
+			end
+
+			if found_close then
+				local raw = table.concat(ml_lines, "\n")
+				local parsed = M.parse_tag(raw, i)
+				if parsed then
+					table.insert(tags, parsed)
+				end
+				i = j
+			end
+		else
+			-- Single-line tag matching
+			for match in line:gmatch("%[[%#]?%w+:%s*[^%]]+%]") do
+				local parsed = M.parse_tag(match, i)
+				if parsed then
+					table.insert(tags, parsed)
+				end
 			end
 		end
+
+		i = i + 1
 	end
 	return tags
 end
 
+-- Normalize multi-line tag format to single-line:
+-- [N:Name\n  | content1\n  | content2\n] -> [N:Name|content1|content2]
+function M._normalize_multiline(raw)
+	local first = raw:match("^%[(.-)%s*\n")
+	if not first then
+		return raw
+	end
+	local pipes = {}
+	for line in raw:gmatch("[^\n]+") do
+		local content = line:match("^%s*|%s*(.-)%s*$")
+		if content and content ~= "" then
+			table.insert(pipes, content)
+		end
+	end
+	if #pipes == 0 then
+		return "[" .. first .. "]"
+	end
+	return "[" .. first .. "|" .. table.concat(pipes, "|") .. "]"
+end
+
 -- Parse a single tag string into an object
--- raw: the raw tag text like "[N:Jonah|friendly]"
+-- raw: the raw tag text like "[N:Jonah|friendly]" or multi-line content
 -- line_num: line number where tag appears
 function M.parse_tag(raw, line_num)
+	-- Normalize multi-line to single-line format
+	local is_multiline = raw:match("\n") ~= nil
+	if is_multiline then
+		raw = M._normalize_multiline(raw)
+	end
+
 	-- Check if it's a reference tag (starts with [#)
 	local is_ref = raw:match("%[[%#]?") == "[#"
 	-- Remove brackets
@@ -102,6 +158,7 @@ function M.parse_tag(raw, line_num)
 		additions = adds,
 		removals = removes,
 		is_reference = is_ref,
+		is_multiline = is_multiline or false,
 		line = line_num,
 		raw = raw,
 	}
@@ -111,7 +168,10 @@ end
 function M.format_tag_display(tag)
 	local parts =
 		{ "L" .. tag.line .. " | " .. (tag.is_reference and "#" or "") .. "[" .. tag.type .. "] " .. tag.name }
-	if #tag.tags > 0 then
+	if tag.is_multiline and #tag.tags > 0 then
+		table.insert(parts, "\n" .. string.rep(" ", 8) .. "├─ " .. table.concat(tag.tags, "\n" .. string.rep(" ", 8) .. "├─ "))
+	end
+	if not tag.is_multiline and #tag.tags > 0 then
 		table.insert(parts, " | " .. table.concat(tag.tags, ", "))
 	end
 	if #tag.changes > 0 then

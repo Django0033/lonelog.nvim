@@ -460,6 +460,137 @@ test("picker: format_item defaults to tostring", function()
 end)
 
 -- ============================================================================
+-- Test 4: Multi-line tag parsing via parse_tags
+-- ============================================================================
+
+print("\n=== Testing Multi-line Tag Parsing ===\n")
+
+test("tags: parse_tags detects multi-line regions", function()
+  vim = {
+    deepcopy = _G.vim.deepcopy,
+    api = {
+      nvim_buf_get_lines = function(bufnr, start, ending, strict)
+        return {
+          "[N:Jonah|friendly]",
+          "Some narrative text",
+          "[N:Solo",
+          "  | alone",
+          "  | wounded",
+          "]",
+          "[L:Cave|dark]",
+          "[N:Empty|]",
+        }
+      end,
+      nvim_buf_get_name = function(bufnr)
+        return "/test/lonelog.md"
+      end,
+      nvim_get_current_buf = function() return 1 end,
+      nvim_set_current_buf = function(bufnr) end,
+      nvim_win_set_cursor = function(winid, pos) end,
+    },
+    cmd = function(cmd) end,
+    notify = function(msg, level) end,
+    trim = function(s) return s:match("^%s*(.-)%s*$") end,
+    tbl_filter = function(fn, t) local r = {}; for _, v in ipairs(t) do if fn(v) then table.insert(r, v) end end; return r end,
+    tbl_map = function(fn, t) local r = {}; for _, v in ipairs(t) do table.insert(r, fn(v)) end; return r end,
+  }
+
+  local tags = require("lonelog.ui.parsers").tags
+  local results = tags.parse_tags(0)
+
+  assert_eq(#results, 4, "should find 4 tags (not 5, multi-line counts as one)")
+
+  -- Find the multi-line tag
+  local ml_tag
+  for _, t in ipairs(results) do
+    if t.is_multiline then
+      ml_tag = t
+      break
+    end
+  end
+
+  assert(ml_tag ~= nil, "should find a multi-line tag")
+  assert_eq(ml_tag.type, "N", "multi-line should be N type")
+  assert_eq(ml_tag.name, "Solo", "multi-line name should be Solo")
+  assert_eq(#ml_tag.tags, 2, "multi-line should have 2 content tags")
+  assert_eq(ml_tag.tags[1], "alone", "first content should be 'alone'")
+  assert_eq(ml_tag.tags[2], "wounded", "second content should be 'wounded'")
+  assert_eq(ml_tag.line, 3, "should be on line 3")
+end)
+
+test("tags: parse_tags handles multi-line with single content", function()
+  vim = {
+    deepcopy = _G.vim.deepcopy,
+    api = {
+      nvim_buf_get_lines = function(bufnr, start, ending, strict)
+        return {
+          "[N:Shadow",
+          "  | hidden",
+          "]",
+        }
+      end,
+    },
+    trim = function(s) return s:match("^%s*(.-)%s*$") end,
+  }
+
+  local tags = require("lonelog.ui.parsers").tags
+  local results = tags.parse_tags(0)
+
+  assert_eq(#results, 1, "should find 1 tag")
+  assert_eq(results[1].type, "N", "type should be N")
+  assert_eq(results[1].name, "Shadow", "name should be Shadow")
+  assert_eq(#results[1].tags, 1, "should have 1 tag entry")
+  assert_eq(results[1].tags[1], "hidden", "content should be 'hidden'")
+  assert(results[1].is_multiline, "should be marked multi-line")
+end)
+
+test("tags: parse_tags handles mixed single and multi-line", function()
+  vim = {
+    deepcopy = _G.vim.deepcopy,
+    api = {
+      nvim_buf_get_lines = function(bufnr, start, ending, strict)
+        return {
+          "[N:Jonah|friendly]",
+          "[L:Cave",
+          "  | dark",
+          "  | damp",
+          "]",
+          "[E:Storm]",
+        }
+      end,
+    },
+    trim = function(s) return s:match("^%s*(.-)%s*$") end,
+  }
+
+  local tags = require("lonelog.ui.parsers").tags
+  local results = tags.parse_tags(0)
+
+  assert_eq(#results, 3, "should find 3 tags")
+
+  local types = {}
+  for _, t in ipairs(results) do
+    types[t.type] = (types[t.type] or 0) + 1
+  end
+  assert_eq(types["N"], 1, "should have 1 N tag")
+  assert_eq(types["L"], 1, "should have 1 L tag")
+  assert_eq(types["E"], 1, "should have 1 E tag")
+
+  -- Verify the multi-line tag details
+  local l_tag
+  for _, t in ipairs(results) do
+    if t.type == "L" then
+      l_tag = t
+      break
+    end
+  end
+  assert(l_tag ~= nil, "should find L tag")
+  assert(l_tag.is_multiline, "L should be multi-line")
+  assert_eq(l_tag.name, "Cave", "L name should be Cave")
+  assert_eq(#l_tag.tags, 2, "should have 2 content tags")
+  assert_eq(l_tag.line, 2, "should be on line 2")
+end)
+
+-- ============================================================================
 -- Summary
 -- ============================================================================
 

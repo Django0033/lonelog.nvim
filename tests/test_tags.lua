@@ -44,6 +44,13 @@ local test_cases = {
   { input = "[R:1 | active | reception]", expected_type = "R", expected_name = "1" },
   { input = "[F: flesh blob | dead]", expected_type = "F", expected_name = "flesh blob" },
   { input = "[PC: Michael (Mirror) | hp 5/5]", expected_type = "PC", expected_name = "Michael (Mirror)" },
+  -- Multi-line tags (raw format with newlines)
+  { input = "[N:Name\n  | content1\n  | content2\n]", expected_type = "N", expected_name = "Name",
+    expected_tags = {"content1", "content2"}, expected_multiline = true },
+  { input = "[L:Cave\n  | dark\n  | damp\n]", expected_type = "L", expected_name = "Cave",
+    expected_tags = {"dark", "damp"}, expected_multiline = true },
+  { input = "[N:Solo\n  | alone\n]", expected_type = "N", expected_name = "Solo",
+    expected_tags = {"alone"}, expected_multiline = true },
 }
 
 print("Testing parse_tag function:")
@@ -71,6 +78,22 @@ for _, tc in ipairs(test_cases) do
       table.insert(errors, "expected reference tag")
       ok = false
     end
+    if tc.expected_ref == false and result.is_reference then
+      table.insert(errors, "expected non-reference tag")
+      ok = false
+    end
+    if tc.expected_multiline ~= nil and result.is_multiline ~= tc.expected_multiline then
+      table.insert(errors, string.format("is_multiline: got %s, expected %s", tostring(result.is_multiline), tostring(tc.expected_multiline)))
+      ok = false
+    end
+    if tc.expected_tags then
+      local got = table.concat(result.tags, ",")
+      local exp = table.concat(tc.expected_tags, ",")
+      if got ~= exp then
+        table.insert(errors, string.format("tags: got {%s}, expected {%s}", got, exp))
+        ok = false
+      end
+    end
     
     if ok then
       print(string.format("PASS [%s] %s", tc.expected_type, tc.input))
@@ -84,6 +107,48 @@ for _, tc in ipairs(test_cases) do
     end
   else
     print(string.format("FAIL [%s] %s - returned nil", tc.expected_type, tc.input))
+    failed = failed + 1
+  end
+end
+
+print()
+print()
+print("Testing _normalize_multiline function:")
+print("=======================================")
+
+-- Test _normalize_multiline directly
+local ml_tests = {
+  {
+    input = "[N:Name\n  | content1\n  | content2\n]",
+    expected = "[N:Name|content1|content2]",
+  },
+  {
+    input = "[L:Cave\n  | dark\n  | damp\n]",
+    expected = "[L:Cave|dark|damp]",
+  },
+  {
+    input = "[N:Solo\n  | alone\n]",
+    expected = "[N:Solo|alone]",
+  },
+  -- Single-line should pass through unchanged
+  {
+    input = "[N:Jonah|friendly]",
+    expected = "[N:Jonah|friendly]",
+  },
+  -- Empty content lines (no pipe content)
+  {
+    input = "[N:Empty\n|\n]",
+    expected = "[N:Empty]",
+  },
+}
+
+for _, tc in ipairs(ml_tests) do
+  local result = M._normalize_multiline(tc.input)
+  if result == tc.expected then
+    print(string.format("PASS normalize: %q", tc.input:gsub("\n", "\\n")))
+    passed = passed + 1
+  else
+    print(string.format("FAIL normalize: %q\n  got:      %q\n  expected: %q", tc.input:gsub("\n", "\\n"), result, tc.expected))
     failed = failed + 1
   end
 end

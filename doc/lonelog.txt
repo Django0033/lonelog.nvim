@@ -65,7 +65,13 @@ Key features:
   - Inline tables: range tables and bracket shorthand
   - Tag autocomplete with relevance sorting
   - Inline rolling: dice, table lookups, generator blocks
+  - Session headers with auto-numbering and date
+  - Campaign YAML frontmatter
+  - Narrative excerpt blocks, meta notes, dialogue syntax
+  - Multi-line tags for detailed descriptions
   - Telescope integration (optional, auto-detected)
+  - 29 syntax highlight groups
+  - Zero dependencies (pure Lua)
 
 ==============================================================================
 2. INSTALLATION                                        *lonelog-install*
@@ -758,10 +764,10 @@ Lonelog is a structured markdown notation for solo RPG session logs
   ## Session N
 <
 
-  Auto-numbered session headers are inserted with |:LonelogSession| or
-  <leader>lH. The header includes today's date, a Recap section for
-  summarizing the previous session, and a Goals section for current
-  objectives.   The cursor is placed at the Recap bullet for immediate typing.
+   Auto-numbered session headers are inserted with |:LonelogSession| or
+   <leader>lH. The header includes today's date, a Recap section for
+   summarizing the previous session, and a Goals section for current
+   objectives. The cursor is placed at the Recap bullet for immediate typing.
 
 6.9 Narrative excerpts                          *lonelog-notation-narrative*
 >
@@ -1004,7 +1010,8 @@ Usage dice~
 13. SYNTAX HIGHLIGHTING                             *lonelog-syntax*
 
   Lonelog notation is automatically highlighted in markdown buffers when
-  this plugin is active. The following elements receive dedicated colors:
+  this plugin is active. 29 highlight groups provide dedicated colors for
+  all notation elements:
 
   Highlight group          Element ~
   lonelogSessionHeader     ## Session N headers
@@ -1027,25 +1034,25 @@ Usage dice~
   lonelogTableRef          [[table name]] references
   lonelogTableBracket      [[ and ]] delimiters
   lonelogGen               gen: generator header
-   lonelogNota              (nota: ...) meta notes
-   lonelogNotaParen         ( and ) delimiters of meta notes
-   lonelogBlock             [COMBAT] / [/COMBAT] delimiters
-   lonelogRound             R1, R2, ... round markers
-   lonelogNarrativeDelim    \--- and ---\ delimiters
-   lonelogTagML             Multi-line tag [TYPE:Name ... ]
-   lonelogTagMLBracket      [ and ] delimiters (multi-line)
-   lonelogTagMLType         TYPE prefix in multi-line tags
-   lonelogTagMLSep          | separator in multi-line tags
-   lonelogTagMLContent      Content inside multi-line tags
-   lonelogDiceContext       [...] context tags inside d: lines
-   lonelogDiceContextBracket [ and ] delimiters of context
-   lonelogDialogue          Dialogue line container
-   lonelogDialogueTag       N or PC prefix in dialogue
-   lonelogDialogueActor     (Name) in dialogue
-   lonelogDialogueColon     : after actor in dialogue
-   lonelogDialogueString    "quoted speech" in dialogue
+  lonelogNota              (nota: ...) meta notes
+  lonelogNotaParen         ( and ) delimiters of meta notes
+  lonelogBlock             [COMBAT] / [/COMBAT] delimiters
+  lonelogRound             R1, R2, ... round markers
+  lonelogNarrativeDelim    \--- and ---\ delimiters
+  lonelogTagML             Multi-line tag [TYPE:Name ... ]
+  lonelogTagMLBracket      [ and ] delimiters (multi-line)
+  lonelogTagMLType         TYPE prefix in multi-line tags
+  lonelogTagMLSep          | separator in multi-line tags
+  lonelogTagMLContent      Content inside multi-line tags
+  lonelogDiceContext       [...] context tags inside d: lines
+  lonelogDiceContextBracket [ and ] delimiters of context
+  lonelogDialogue          Dialogue line container
+  lonelogDialogueTag       N or PC prefix in dialogue
+  lonelogDialogueActor     (Name) in dialogue
+  lonelogDialogueColon     : after actor in dialogue
+  lonelogDialogueString    "quoted speech" in dialogue
 
-   All groups link to standard Vim highlight groups by default
+  All groups link to standard Vim highlight groups by default
   (Title, Identifier, Type, Number, Function, etc.) for colorscheme
   compatibility. Override with your colorscheme or autocmd:
 >
