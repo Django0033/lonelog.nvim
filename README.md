@@ -201,6 +201,7 @@ require("lonelog").setup({
 | `NdNkhK` | `2d20kh1` | Keep highest |
 | `NdNklK` | `2d20kl1` | Keep lowest |
 | `NdN>>T` | `6d6>>4` | Success counting |
+| `4df` | `4df` | Fate dice (+, 0, -) |
 | `NdN>=T` | `1d20>=15` | Greater-or-equal |
 | `NdN<=T` | `1d20<=10` | Less-or-equal |
 | `NdN vs T` | `1d100 vs 50` | Versus (alias for `>=`) |

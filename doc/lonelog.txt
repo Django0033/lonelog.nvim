@@ -983,10 +983,11 @@ Lonelog is a structured markdown notation for solo RPG session logs
   NdN            1d20           Basic roll
   NdN+M          2d6+3          Add modifier
   NdN-M          1d20-2         Subtract modifier
-  NdN!           4d6!           Exploding (reroll max, up to 100 deep)
-  NdNkhK         2d20kh1        Keep highest (advantage)
-  NdNklK         2d20kl1        Keep lowest (disadvantage)
+   NdN!           4d6!           Exploding (reroll max, up to 100 deep)
+   NdNkhK         2d20kh1        Keep highest (advantage)
+   NdNklK         2d20kl1        Keep lowest (disadvantage)
    NdN>>T         6d6>>4         Success counting (dice >= target)
+   NdNdf         4df            Fate/Fudge dice (+, 0, -)
    NdN>=T         1d20>=15       Greater-or-equal sum vs target
    NdN<=T         1d20<=10       Less-or-equal sum vs target
    NdN vs T       1d100 vs 50    Versus (semantic alias for >=)
