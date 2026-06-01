@@ -42,9 +42,10 @@ This plugin implements the [Lonelog notation standard](https://github.com/valgur
 | **Session summary** | Per-session stats: scenes, tags, notation, progress, dice. Export to markdown |
 | **Floating results** | Colored windows with copy, paste, and insert-last result |
 
-### Add-ons (optional)
+### Add-ons (opt-in)
 
-Add-ons are bundled with the plugin but only load their commands and keymaps when enabled. All add-ons are enabled by default.
+Add-ons are bundled with the plugin but disabled by default. Enable them in
+`setup()` to load their commands and keymaps.
 
 | Add-on | Features | Enables |
 |--------|----------|---------|
@@ -74,9 +75,10 @@ Add-ons are bundled with the plugin but only load their commands and keymaps whe
 ```
 
 > [!NOTE]
-> If you use add-ons, add their commands to the `cmd` list: `"LonelogCombat"`,
-> `"LonelogDungeonStatus"`, `"LonelogRoomGo"`, `"LonelogRoomState"`,
-> `"LonelogRound"` — or remove `cmd` entirely to load everything at startup.
+> If you enable add-ons, add their commands to the `cmd` list for lazy loading:
+> `"LonelogCombat"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
+> `"LonelogRoomState"`, `"LonelogRound"`. Or remove `cmd` entirely to load
+> everything at startup.
 
 </details>
 
@@ -164,13 +166,13 @@ require("lonelog").setup({
 
 ### Add-ons
 
-Control which add-ons load. All enabled by default:
+Add-ons are disabled by default. Enable the ones you want:
 
 ```lua
 require("lonelog").setup({
   addons = {
-    combat  = true,   -- set false to disable combat blocks and round markers
-    dungeon = true,   -- set false to disable dungeon status and room features
+    combat  = true,   -- enable combat blocks and round markers
+    dungeon = true,   -- enable dungeon status and room features
   },
 })
 ```
@@ -214,7 +216,7 @@ require("lonelog").setup({
 | `:LonelogInsert` | Insert last result at cursor |
 | `:LonelogChaos` | Open chaos factor UI |
 
-**Add-on commands** (require the respective add-on to be enabled):
+**Add-on commands** (enable the add-on in `setup()` to use them):
 
 | Command | Add-on | Description |
 |---------|--------|-------------|

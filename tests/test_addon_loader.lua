@@ -111,8 +111,8 @@ end
 do
   -- Use defaults (no setup call)
   local defs = require("lonelog.config").get()
-  check("config: combat addon default enabled", defs.addons.combat, true)
-  check("config: dungeon addon default enabled", defs.addons.dungeon, true)
+  check("config: combat addon default disabled", defs.addons.combat, false)
+  check("config: dungeon addon default disabled", defs.addons.dungeon, false)
 end
 
 -- ============================================================

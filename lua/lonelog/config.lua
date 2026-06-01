@@ -79,8 +79,8 @@ local defaults = {
 	dice = { max_dice = 100, max_sides = 1000 },
 	prompt_for_scene_context = true,
 	addons = {
-		combat = true,
-		dungeon = true,
+		combat = false,
+		dungeon = false,
 	},
 }
 

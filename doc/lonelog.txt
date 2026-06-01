@@ -152,11 +152,11 @@ Call setup() with an optional table of overrides. All keys and defaults:
     -- Prompt for scene context when inserting scene markers
     prompt_for_scene_context = true,
 
-    -- Add-on system: disable optional features you don't use
-    -- All add-ons are enabled by default.
+    -- Add-on system: enable optional features you want
+    -- All add-ons are disabled by default.
     addons = {
-      combat  = true,  -- :LonelogCombat, :LonelogRound
-      dungeon = true,  -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
+      combat  = false, -- set true for :LonelogCombat, :LonelogRound
+      dungeon = false, -- set true for :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
     },
 
     -- All keymaps (see |lonelog-keymaps| for defaults)
@@ -212,15 +212,15 @@ Config key: use_telescope~
 
 Config key: addons~
   Control which optional add-on modules are loaded. Each add-on registers its
-  own commands and keymaps only when enabled. All default to true.
+  own commands and keymaps only when enabled. All default to false.
 
     addons = {
       combat  = true,   -- :LonelogCombat, :LonelogRound
       dungeon = true,   -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
     }
 
-  Set to false to disable individual add-ons and prevent their commands and
-  keymaps from being registered.
+  Set to true to enable individual add-ons. When disabled, the add-on's
+  commands and keymaps are not registered and do not appear in the picker.
 
   The add-on system uses a registration pattern. Each add-on's |init.lua|
   exports a table of commands and keymaps. The plugin loader iterates enabled
@@ -1086,11 +1086,10 @@ Insert last result~
 10. ADD-ONS (LONELOG SPEC)                              *lonelog-addons*
 
 The Lonelog standard defines three optional add-ons. lonelog.nvim implements
-the Combat and Dungeon add-ons as loadable modules that register their commands
-and keymaps only when enabled. See |lonelog-config| for the |addons| config key.
-
-The tags and notation for all three add-ons are always parseable regardless of
-which add-ons are enabled:
+the Combat and Dungeon add-ons as loadable modules — disabled by default,
+enabled via the |addons| config key (see |lonelog-config|). The tags and
+notation for all three add-ons are always parseable regardless of which
+add-ons are enabled:
 
 10.1 Combat add-on                            *lonelog-addon-combat*
 >
