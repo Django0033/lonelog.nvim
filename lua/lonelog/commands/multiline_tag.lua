@@ -22,9 +22,9 @@ function M.insert_multiline_tag(tag_key)
 		end
 
 		local row = vim.fn.line(".") - 1
-		local template = { "[" .. type_upper .. ":" .. name .. "|", "  ", "|]" }
+		local template = { "[" .. type_upper .. ":" .. name, "  | ", "]" }
 		vim.api.nvim_buf_set_text(0, row, 0, row, 0, template)
-		vim.api.nvim_win_set_cursor(0, { row + 2, 2 })
+		vim.api.nvim_win_set_cursor(0, { row + 2, 4 })
 		vim.cmd("startinsert!")
 	end)
 end

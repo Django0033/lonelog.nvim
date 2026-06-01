@@ -463,10 +463,10 @@ Config key: use_telescope~
 <
   Inserts a multi-line tag template that spans three lines:
 >
-  [N:Quest Log|
-    Step 1: description
-    Step 2: description
-  |]
+  [N:Quest Log
+    | Step 1: description
+    | Step 2: description
+  ]
 <
   The cursor is placed in insert mode on the indented content line.
   Supported types: npc, location, pc, thread, ref, foe.
@@ -620,12 +620,12 @@ Lonelog is a structured markdown notation for solo RPG session logs
     Additions         - +new_trait
     Removals          - -old_trait
 
-  Multi-line tags (|] closes the tag across lines):
+  Multi-line tags (span lines, close with ] on its own line):
 >
-  [N:Quest Log|
-    Step 1: description
-    Step 2: description
-  |]
+  [N:Quest Log
+    | Step 1: description
+    | Step 2: description
+  ]
 <
   Use <leader>lm{n,l,p,t,r,f} or |:LonelogMultiTag| to insert.
 
