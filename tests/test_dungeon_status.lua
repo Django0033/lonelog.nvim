@@ -184,26 +184,31 @@ end
 do
 	local tags = { { id = "1", raw = "[R:1|cleared]" } }
 	local lines = M.build_status_block(tags)
-	check("build: single tag", #lines, 3)
-	if #lines >= 3 then
+	check("build: single tag count", #lines, 5)
+	if #lines >= 5 then
 		check("build: header", lines[1], "=== Dungeon Status ===")
 		check("build: tag line", lines[2], "[R:1|cleared]")
-		check("build: closing", lines[3], "===")
+		check("build: map header", lines[3], "--- Map ---")
+		check("build: map line", lines[4], "R1")
+		check("build: closing", lines[5], "===")
 	end
 end
 
 do
 	local tags = {
-		{ id = "1", raw = "[R:1|cleared|looted|entry cave]" },
+		{ id = "1", raw = "[R:1|cleared,looted|entry cave]" },
 		{ id = "2", raw = "[R:2|active|barracks]" },
 	}
 	local lines = M.build_status_block(tags)
-	check("build: multiple tags", #lines, 4)
-	if #lines >= 4 then
+	check("build: multiple tags count", #lines, 7)
+	if #lines >= 7 then
 		check("build: header", lines[1], "=== Dungeon Status ===")
-		check("build: first tag", lines[2], "[R:1|cleared|looted|entry cave]")
+		check("build: first tag", lines[2], "[R:1|cleared,looted|entry cave]")
 		check("build: second tag", lines[3], "[R:2|active|barracks]")
-		check("build: closing", lines[4], "===")
+		check("build: map header", lines[4], "--- Map ---")
+		check("build: map r1", lines[5], "R1 (entry cave)")
+		check("build: map r2", lines[6], "R2 (barracks)")
+		check("build: closing", lines[7], "===")
 	end
 end
 
@@ -258,6 +263,136 @@ do
 	}
 	local n = M.find_frontmatter_end(lines)
 	check("frontmatter: unclosed returns 0", n, 0)
+end
+
+-- ============================================================
+-- get_room_info
+-- ============================================================
+
+do
+	local tags = { { id = "3", raw = "[R:3|active|almacen|exits N:R1, S:R2]" } }
+	local info = M.get_room_info(tags)
+	check("info: id lookup", info["3"] ~= nil, true)
+	if info["3"] then
+		check("info: desc", info["3"].desc, "almacen")
+		if info["3"].exits then
+			check("info: exits count", #info["3"].exits, 2)
+		end
+	end
+end
+
+do
+	local tags = { { id = "1", raw = "[R:1|cleared]" } }
+	local info = M.get_room_info(tags)
+	check("info: minimal no desc", info["1"].desc, nil)
+	check("info: minimal no exits", info["1"].exits, nil)
+end
+
+do
+	local tags = { { id = "5", raw = "[R:5|trapped|exits N:R10|HP 5]" } }
+	local info = M.get_room_info(tags)
+	check("info: exits not last field has exits", info["5"].exits ~= nil, true)
+	check("info: exits non-last desc nil", info["5"].desc, nil)
+	if info["5"].exits then
+		check("info: exits non-last count", #info["5"].exits, 1)
+	end
+end
+
+-- ============================================================
+-- build_ascii_map
+-- ============================================================
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared|entry cave|exits N:R3]" },
+		{ id = "3", raw = "[R:3|cleared|armory|exits E:R4]" },
+		{ id = "4", raw = "[R:4|unexplored|storage]" },
+	}
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: linear chain count", #map, 2)
+	if #map >= 2 then
+		check("map: linear header", map[1], "--- Map ---")
+		check("map: linear forward", map[2], "R1 (entry cave) ── N ──→ R3 (armory) ── E ──→ R4 (storage)")
+	end
+end
+
+do
+	local tags = { { id = "2", raw = "[R:2|active|barracks]" } }
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: isolated count", #map, 2)
+	if #map >= 2 then
+		check("map: isolated header", map[1], "--- Map ---")
+		check("map: isolated line", map[2], "R2 (barracks)")
+	end
+end
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared|entry cave|exits N:R3]" },
+		{ id = "3", raw = "[R:3|cleared|armory|exits S:R1]" },
+	}
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: bidirectional count", #map, 3)
+	if #map >= 3 then
+		check("map: bidirectional forward", map[2], "R1 (entry cave) ── N ──→ R3 (armory)")
+		check("map: bidirectional back-ref", map[3], "R3 ←── S ── R1 (entry cave)")
+	end
+end
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared|entry cave|exits N:R99]" },
+	}
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: missing dest count", #map, 2)
+	if #map >= 2 then
+		check("map: missing dest line", map[2], "R1 (entry cave) ── N ──→ R99 (??? not found)")
+	end
+end
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared|entry cave|exits N:R3, S:R2]" },
+		{ id = "2", raw = "[R:2|active|barracks]" },
+		{ id = "3", raw = "[R:3|cleared|armory]" },
+	}
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: branching count", #map, 3)
+	if #map >= 3 then
+		check("map: branching branch", map[2], "R1 (entry cave) ── S ──→ R2 (barracks)")
+		check("map: branching chain", map[3], "R1 (entry cave) ── N ──→ R3 (armory)")
+	end
+end
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared|entry cave|exits N:R3]" },
+		{ id = "2", raw = "[R:2|active|barracks]" },
+		{ id = "3", raw = "[R:3|cleared|armory|exits S:R1, E:R4]" },
+		{ id = "4", raw = "[R:4|unexplored|storage|exits W:R3]" },
+	}
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: mixed count", #map, 5)
+	if #map >= 5 then
+		check("map: mixed header", map[1], "--- Map ---")
+		check("map: mixed r1 forward", map[2], "R1 (entry cave) ── N ──→ R3 (armory) ── E ──→ R4 (storage)")
+		check("map: mixed r2 isolated", map[3], "R2 (barracks)")
+		check("map: mixed back-ref 1", map[4], "R3 ←── S ── R1 (entry cave)")
+		check("map: mixed back-ref 2", map[5], "R4 ←── W ── R3 (armory)")
+	end
+end
+
+do
+	local tags = {}
+	local info = M.get_room_info(tags)
+	local map = M.build_ascii_map(tags, info)
+	check("map: empty tags", #map, 0)
 end
 
 -- ============================================================
