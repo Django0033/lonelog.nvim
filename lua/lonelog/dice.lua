@@ -25,6 +25,7 @@ local function parse_notation(notation)
 		target = 0,
 		target_mode = nil,
 		operator = nil,
+		is_fate = false,
 	}
 	notation = notation:gsub("%s+", ""):upper()
 
@@ -90,7 +91,14 @@ local function parse_notation(notation)
 		p.count = tonumber(c)
 		p.sides = tonumber(s)
 	else
-		return nil
+		-- Check for Fate dice (e.g., "4df")
+		local fc = notation:match("^(%d+)[dD][Ff]")
+		if fc then
+			p.count = tonumber(fc)
+			p.is_fate = true
+		else
+			return nil
+		end
 	end
 
 	-- Extract modifier (e.g., "+3" or "-2")
@@ -128,8 +136,41 @@ function M.roll(notation)
 	if parsed.count > cfg.dice.max_dice then
 		return nil, "Too many dice (max: " .. cfg.dice.max_dice .. ")"
 	end
-	if parsed.sides > cfg.dice.max_sides then
+	if not parsed.is_fate and parsed.sides > cfg.dice.max_sides then
 		return nil, "Too many sides (max: " .. cfg.dice.max_sides .. ")"
+	end
+
+	-- Handle Fate dice (4df)
+	if parsed.is_fate then
+		local symbols = { "-", "-", "0", "0", "+", "+" }
+		local fate_rolls = {}
+		local fate_total = 0
+		for i = 1, parsed.count do
+			local r = symbols[math.random(1, 6)]
+			table.insert(fate_rolls, r)
+			if r == "+" then
+				fate_total = fate_total + 1
+			elseif r == "-" then
+				fate_total = fate_total - 1
+			end
+		end
+		fate_total = fate_total + parsed.modifier
+		local total_str = fate_total > 0 and "+" .. fate_total or tostring(fate_total)
+		local dice_str = parsed.count .. "df"
+		if parsed.modifier ~= 0 then
+			local s = parsed.modifier > 0 and "+" or ""
+			dice_str = dice_str .. s .. parsed.modifier
+		end
+		return {
+			original = notation,
+			count = parsed.count,
+			sides = 0,
+			modifier = parsed.modifier,
+			is_fate = true,
+			rolls = fate_rolls,
+			total = fate_total,
+			display = dice_str .. "[" .. table.concat(fate_rolls, ", ") .. "] = " .. total_str,
+		}
 	end
 
 	-- Roll all dice (each die may produce multiple rolls if exploding)

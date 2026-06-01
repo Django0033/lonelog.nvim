@@ -99,6 +99,11 @@ local function test(name, notation, expected_parts)
     table.insert(issues, string.format("display missing: %s", expected_parts.display_match))
     success = false
   end
+
+  if expected_parts.is_fate ~= nil and result.is_fate ~= expected_parts.is_fate then
+    table.insert(issues, string.format("is_fate: got %s, expected %s", tostring(result.is_fate), tostring(expected_parts.is_fate)))
+    success = false
+  end
   
   if success then
     print(string.format("PASS [%s] %s -> %s", name, notation, result.display))
@@ -167,6 +172,45 @@ print("--- Extended Comparison Tests ---")
 if test("gte_success", "1d20>=15", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
 if test("lte_fail", "1d20<=10", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
 if test("vs_success", "1d100 vs 50", { count = 1, sides = 100 }) then passed = passed + 1 else failed = failed + 1 end
+
+print()
+print("--- Fate Dice Tests ---")
+do
+  local result = dice.roll("4df")
+  local ok = result and result.is_fate == true
+    and type(result.display) == "string"
+    and result.display:match("%d+df%[")
+  if ok then
+    print("PASS [fate: 4df basic] " .. result.display)
+    passed = passed + 1
+  else
+    print("FAIL [fate: 4df basic] got nil or invalid")
+    failed = failed + 1
+  end
+end
+do
+  local result = dice.roll("4df+1")
+  local ok = result and result.modifier == 1 and result.is_fate == true
+  if ok then
+    print("PASS [fate: 4df with modifier] " .. result.display)
+    passed = passed + 1
+  else
+    print("FAIL [fate: 4df with modifier]")
+    failed = failed + 1
+  end
+end
+do
+  local result = dice.roll("2df")
+  local ok = result and result.count == 2 and result.is_fate == true
+    and (result.display:match("^2df%[") ~= nil)
+  if ok then
+    print("PASS [fate: 2df count] " .. result.display)
+    passed = passed + 1
+  else
+    print("FAIL [fate: 2df count]")
+    failed = failed + 1
+  end
+end
 
 print()
 print("--- Error Cases ---")
