@@ -29,7 +29,7 @@ local function parse_tbl_line(line)
 end
 
 local function extract_d_notation(line)
-	return line:match("^%s*d:%s*([%w%+%-%>%%%!%#]+)")
+	return line:match("^%s*d:%s*([%w%+%-%>%%%!%#%<%=\040%s]+)")
 end
 
 local function extract_label_notation(line)
