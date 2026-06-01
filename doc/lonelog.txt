@@ -456,6 +456,21 @@ Config key: use_telescope~
   (nota: esta escena se sintió tensa)
 <
 
+4.13 Multi-line tags                             *:LonelogMultiTag*
+                                                  *lonelog-command-mltag*
+>
+  :LonelogMultiTag {type}    " Insert a multi-line tag
+<
+  Inserts a multi-line tag template that spans three lines:
+>
+  [N:Quest Log|
+    Step 1: description
+    Step 2: description
+  |]
+<
+  The cursor is placed in insert mode on the indented content line.
+  Supported types: npc, location, pc, thread, ref, foe.
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -498,6 +513,15 @@ Normal mode keymaps~
   <leader>ltt    Insert thread tag             [Thread:|Open]
   <leader>ltr    Insert reference tag          [#N:|]
   <leader>ltf    Insert foe tag                [F:|]
+
+  Multi-line tags (lm-)~
+  Key            Action                        Command ~
+  <leader>lmn    Insert multi-line NPC tag     :LonelogMultiTag npc
+  <leader>lml    Insert multi-line location    :LonelogMultiTag location
+  <leader>lmp    Insert multi-line PC tag      :LonelogMultiTag pc
+  <leader>lmt    Insert multi-line thread      :LonelogMultiTag thread
+  <leader>lmr    Insert multi-line reference   :LonelogMultiTag ref
+  <leader>lmf    Insert multi-line foe tag     :LonelogMultiTag foe
 
   Group 4: Progress elements~
   Key            Action                        Command ~
@@ -595,6 +619,15 @@ Lonelog is a structured markdown notation for solo RPG session logs
     Changes           - trait1 → trait2  (uses Unicode RIGHTWARDS ARROW)
     Additions         - +new_trait
     Removals          - -old_trait
+
+  Multi-line tags (|] closes the tag across lines):
+>
+  [N:Quest Log|
+    Step 1: description
+    Step 2: description
+  |]
+<
+  Use <leader>lm{n,l,p,t,r,f} or |:LonelogMultiTag| to insert.
 
 6.3 Progress elements                        *lonelog-notation-progress*
 >

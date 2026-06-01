@@ -36,6 +36,14 @@ local defaults = {
 		tag_ref = "<leader>ltr",
 		tag_foe = "<leader>ltf",
 
+		-- Multi-line tags
+		mltag_npc = "<leader>lmn",
+		mltag_location = "<leader>lml",
+		mltag_pc = "<leader>lmp",
+		mltag_thread = "<leader>lmt",
+		mltag_ref = "<leader>lmr",
+		mltag_foe = "<leader>lmf",
+
 		-- Progress elements
 		progress_clock = "<leader>lpc",
 		progress_track = "<leader>lpt",

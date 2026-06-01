@@ -171,6 +171,23 @@ local function setup_keymaps()
 	end, { desc = "Insert foe tag" })
 
 	-- ================================================================
+	-- Multi-line tags (lm-)
+	-- ================================================================
+
+	local function insert_mltag(tag_key)
+		return function()
+			require("lonelog.commands.multiline_tag").insert_multiline_tag(tag_key)
+		end
+	end
+
+	map("n", cfg.get().keymaps.mltag_npc, insert_mltag("npc"), { desc = "Insert multi-line NPC tag" })
+	map("n", cfg.get().keymaps.mltag_location, insert_mltag("location"), { desc = "Insert multi-line location tag" })
+	map("n", cfg.get().keymaps.mltag_pc, insert_mltag("pc"), { desc = "Insert multi-line PC tag" })
+	map("n", cfg.get().keymaps.mltag_thread, insert_mltag("thread"), { desc = "Insert multi-line thread tag" })
+	map("n", cfg.get().keymaps.mltag_ref, insert_mltag("ref"), { desc = "Insert multi-line reference tag" })
+	map("n", cfg.get().keymaps.mltag_foe, insert_mltag("foe"), { desc = "Insert multi-line foe tag" })
+
+	-- ================================================================
 	-- Group 4: Progress elements (lp-)
 	-- ================================================================
 
@@ -452,6 +469,16 @@ end, { nargs = 0, desc = "Insert narrative block" })
 vim.api.nvim_create_user_command("LonelogNote", function()
 	require("lonelog.commands.note").insert_note()
 end, { nargs = 0, desc = "Insert meta note" })
+
+vim.api.nvim_create_user_command("LonelogMultiTag", function(o)
+	require("lonelog.commands.multiline_tag").insert_multiline_tag(o.args)
+end, {
+	nargs = 1,
+	complete = function()
+		return { "npc", "location", "pc", "thread", "ref", "foe" }
+	end,
+	desc = "Insert multi-line tag",
+})
 
 -- Scene navigation commands
 vim.api.nvim_create_user_command("LonelogScenePrev", function()

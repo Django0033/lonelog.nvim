@@ -60,6 +60,17 @@ syn region lonelogNota matchgroup=lonelogNotaParen
   \ end='\v\)'
   \ keepend
 
+" === Multi-line tags [TYPE:Name| ... |] ===
+syn region lonelogTagML
+  \ start='\v\[(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|R|F|TAG|#N):[^]]*\|$'
+  \ end='\v^\s*\|\]'
+  \ contains=lonelogTagMLBracket,lonelogTagMLType,lonelogTagMLContent
+  \ keepend
+
+syn match lonelogTagMLBracket '\v\[|\|\]' contained
+syn match lonelogTagMLType '\v(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|R|F|TAG|#N):' contained
+syn match lonelogTagMLContent '.*' contained contains=lonelogModArrow,lonelogModPlus,lonelogModMinus,lonelogProgressNum
+
 " === Block delimiters [COMBAT] [/COMBAT] ===
 syn match lonelogBlock '\v\[/?[A-Z]+\]'
 
@@ -98,3 +109,7 @@ hi def link lonelogNotaParen Comment
 hi def link lonelogBlock WarningMsg
 hi def link lonelogRound Constant
 hi def link lonelogNarrativeDelim Comment
+hi def link lonelogTagML Normal
+hi def link lonelogTagMLBracket Delimiter
+hi def link lonelogTagMLType Type
+hi def link lonelogTagMLContent String
