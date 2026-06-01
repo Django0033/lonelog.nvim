@@ -63,10 +63,59 @@ function M.find_existing_block(lines)
 	return nil, nil
 end
 
+function M.parse_tag_info(raw_tag)
+	local inner = raw_tag:match("^%[R:(.*)%]$")
+	if not inner then
+		return nil
+	end
+	local fields = {}
+	for field in inner:gmatch("([^|]+)") do
+		table.insert(fields, field)
+	end
+	local info = { id = fields[1] or "" }
+	if fields[3] and not fields[3]:match("^exits") then
+		info.desc = fields[3]
+	end
+	for _, field in ipairs(fields) do
+		local exits_str = field:match("^exits%s+(.+)$")
+		if exits_str then
+			info.exits = {}
+			for pair in exits_str:gmatch("([^,]+)") do
+				local dir, id = pair:match("^%s*(%a+)%s*:%s*R?(.-)%s*$")
+				if dir and id and id ~= "" then
+					table.insert(info.exits, { dir = dir:upper(), id = id })
+				end
+			end
+		end
+	end
+	return info
+end
+
+function M.build_annotation(raw_tag, desc_by_id)
+	local info = M.parse_tag_info(raw_tag)
+	if not info or not info.exits or #info.exits == 0 then
+		return ""
+	end
+	local parts = {}
+	for _, exit in ipairs(info.exits) do
+		local dest_desc = desc_by_id[exit.id] or "?"
+		table.insert(parts, exit.dir .. " → R" .. exit.id .. " (" .. dest_desc .. ")")
+	end
+	return "  → " .. table.concat(parts, " │ ")
+end
+
 function M.build_status_block(room_tags)
+	local desc_by_id = {}
+	for _, tag in ipairs(room_tags) do
+		local info = M.parse_tag_info(tag.raw)
+		if info and info.desc then
+			desc_by_id[info.id] = info.desc
+		end
+	end
 	local lines = { "=== Dungeon Status ===" }
 	for _, tag in ipairs(room_tags) do
-		table.insert(lines, tag.raw)
+		local annotation = M.build_annotation(tag.raw, desc_by_id)
+		table.insert(lines, tag.raw .. annotation)
 	end
 	table.insert(lines, "===")
 	return lines

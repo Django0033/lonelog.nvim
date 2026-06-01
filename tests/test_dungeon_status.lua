@@ -261,6 +261,127 @@ do
 end
 
 -- ============================================================
+-- parse_tag_info
+-- ============================================================
+
+do
+	local info = M.parse_tag_info("[R:3|active|almacen|exits N:R1, S:R2]")
+	check("parse: basic id", info.id, "3")
+	check("parse: basic desc", info.desc, "almacen")
+	if info.exits then
+		check("parse: exits count", #info.exits, 2)
+		if #info.exits >= 2 then
+			check("parse: exit 1 dir", info.exits[1].dir, "N")
+			check("parse: exit 1 id", info.exits[1].id, "1")
+			check("parse: exit 2 dir", info.exits[2].dir, "S")
+			check("parse: exit 2 id", info.exits[2].id, "2")
+		end
+	end
+end
+
+do
+	local info = M.parse_tag_info("[R:1|cleared]")
+	check("parse: no desc or exits id", info.id, "1")
+	check("parse: no desc", info.desc, nil)
+	check("parse: no exits", info.exits, nil)
+end
+
+do
+	local info = M.parse_tag_info("[R:5|trapped|exits N:R10|HP 5]")
+	check("parse: exits not last field id", info.id, "5")
+	if info.exits then
+		check("parse: exits non-last count", #info.exits, 1)
+		if #info.exits >= 1 then
+			check("parse: exit dir non-last", info.exits[1].dir, "N")
+			check("parse: exit id non-last", info.exits[1].id, "10")
+		end
+	end
+end
+
+do
+	local info = M.parse_tag_info("[R:3|active|exits NE:R1, SW:R2]")
+	check("parse: compound dirs id", info.id, "3")
+	check("parse: compound dirs desc nil", info.desc, nil)
+	if info.exits then
+		check("parse: compound dirs count", #info.exits, 2)
+		if #info.exits >= 2 then
+			check("parse: NE dir", info.exits[1].dir, "NE")
+			check("parse: SW dir", info.exits[2].dir, "SW")
+		end
+	end
+end
+
+-- ============================================================
+-- build_annotation
+-- ============================================================
+
+do
+	local raw = "[R:3|active|almacen|exits N:R1, S:R2]"
+	local desc_by_id = { ["1"] = "entry cave", ["2"] = "barracks" }
+	local annotation = M.build_annotation(raw, desc_by_id)
+	check("annot: basic", annotation, "  → N → R1 (entry cave) │ S → R2 (barracks)")
+end
+
+do
+	local raw = "[R:2|active|barracks]"
+	local annotation = M.build_annotation(raw, {})
+	check("annot: no exits", annotation, "")
+end
+
+do
+	local raw = "[R:3|active|exits N:R5]"
+	local annotation = M.build_annotation(raw, {})
+	check("annot: dest not found", annotation, "  → N → R5 (?)")
+end
+
+do
+	local raw = "[R:1|cleared|entry cave|exits N:R2, E:R3, W:R4]"
+	local desc_by_id = { ["2"] = "barracks", ["3"] = "armory", ["4"] = "storage" }
+	local annotation = M.build_annotation(raw, desc_by_id)
+	check("annot: three exits", annotation, "  → N → R2 (barracks) │ E → R3 (armory) │ W → R4 (storage)")
+end
+
+-- ============================================================
+-- build_status_block (with annotations)
+-- ============================================================
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared|entry cave|exits N:R3]" },
+		{ id = "2", raw = "[R:2|active|barracks]" },
+		{ id = "3", raw = "[R:3|cleared|armory|exits S:R1]" },
+	}
+	local lines = M.build_status_block(tags)
+	check("build: annotated count", #lines, 5)
+	if #lines >= 5 then
+		check("build: annotated header", lines[1], "=== Dungeon Status ===")
+		check("build: annotated r1", lines[2], "[R:1|cleared|entry cave|exits N:R3]  → N → R3 (armory)")
+		check("build: annotated r2", lines[3], "[R:2|active|barracks]")
+		check("build: annotated r3", lines[4], "[R:3|cleared|armory|exits S:R1]  → S → R1 (entry cave)")
+		check("build: annotated closing", lines[5], "===")
+	end
+end
+
+do
+	local tags = {
+		{ id = "1", raw = "[R:1|cleared]" },
+		{ id = "2", raw = "[R:2|active]" },
+	}
+	local lines = M.build_status_block(tags)
+	check("build: no exits unchanged", #lines, 4)
+	if #lines >= 4 then
+		check("build: no exits line 1", lines[2], "[R:1|cleared]")
+		check("build: no exits line 2", lines[3], "[R:2|active]")
+	end
+end
+
+do
+	local tags = {}
+	local lines = M.build_status_block(tags)
+	check("build: empty no annotation issues", #lines, 2)
+end
+
+-- ============================================================
 
 print()
 print(string.format("RESULTS: %d passed, %d failed", passed, failed))

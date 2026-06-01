@@ -54,3 +54,6 @@ doc/tags
 # Personal notes
 docs/todos/
 
+# Brainstorm session files
+.superpowers/
+
