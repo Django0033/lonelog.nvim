@@ -43,6 +43,12 @@ syn match lonelogDicePrefix '^d:\s'
 " === Dice notation (inline) ===
 syn match lonelogDiceNotation '\v<\d+d\d+([+-]\d+)?(!)?(kh\d+)?(kl\d+)?(>>\d+)?(>\d+)?'
 
+" === Roll context tags inside d: lines ===
+syn region lonelogDiceContext matchgroup=lonelogDiceContextBracket
+  \ start='\v(^d:\s.{-})\zs\['
+  \ end='\v\]'
+  \ keepend
+
 " === Result arrows (magic mode: -> and => are literal) ===
 syn match lonelogArrow '->'
 syn match lonelogArrow '=>'
@@ -101,6 +107,8 @@ hi def link lonelogAction Function
 hi def link lonelogActor Function
 hi def link lonelogQuestion Question
 hi def link lonelogDicePrefix PreProc
+hi def link lonelogDiceContext Identifier
+hi def link lonelogDiceContextBracket Delimiter
 hi def link lonelogDiceNotation Number
 hi def link lonelogArrow Operator
 hi def link lonelogTableRef String
