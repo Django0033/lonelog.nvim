@@ -131,6 +131,7 @@ require("lonelog").setup({
     insert_action   = "<leader>lia",
     insert_question = "<leader>liq",
     insert_dice     = "<leader>lid",
+    insert_note     = "<leader>lin",
     insert_arrow    = "<leader>li-",
     insert_conseq   = "<leader>li=",
     actor_action    = "<leader>liN",
@@ -406,6 +407,7 @@ Dice and oracle results open in a floating window:
 | `:LonelogSceneMarker` | Insert auto-numbered scene marker |
 | `:LonelogSession` | Insert auto-numbered session header |
 | `:LonelogNarrative` | Insert narrative excerpt block |
+| `:LonelogNote` | Insert meta note annotation |
 | `:LonelogScenePrev` | Go to previous scene |
 | `:LonelogSceneNext` | Go to next scene |
 | `:LonelogTags` | Browse Lonelog tags |

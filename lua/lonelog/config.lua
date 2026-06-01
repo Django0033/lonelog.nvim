@@ -21,6 +21,7 @@ local defaults = {
 		insert_action = "<leader>lia",
 		insert_question = "<leader>liq",
 		insert_dice = "<leader>lid",
+		insert_note = "<leader>lin",
 		insert_arrow = "<leader>li-",
 		insert_conseq = "<leader>li=",
 		actor_action = "<leader>liN",

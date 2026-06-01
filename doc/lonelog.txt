@@ -18,6 +18,7 @@ CONTENTS                                                *lonelog-contents*
     4.9 Session headers .................................. |lonelog-command-session|
   4.10 Scene navigation ................................. |lonelog-command-scene-nav|
   4.11 Narrative blocks ................................. |lonelog-command-narrative|
+  4.12 Meta notes ........................................ |lonelog-command-note|
   5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
@@ -436,6 +437,25 @@ Config key: use_telescope~
   separating in-fiction prose from mechanical notation. Use them for
   found documents, memorable dialogue, or atmospheric descriptions.
 
+4.12 Meta notes                                  *:LonelogNote*
+                                                  *lonelog-command-note*
+>
+  :LonelogNote          " Insert a meta note
+<
+  Inserts "(note: )" at the cursor position with the cursor placed
+  after the colon, ready for typing the note content. Works both for
+  inline annotations and as the start of a line.
+
+  Meta notes are out-of-character asides: reflections, house-rules,
+  reminders, or clarifications. Use them sparingly — the game is the
+  thing, and meta notes are just occasional margin comments.
+
+  Both English and Spanish prefixes are supported:
+>
+  (note: testing alternate stealth rule)
+  (nota: esta escena se sintió tensa)
+<
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -463,6 +483,7 @@ Normal mode keymaps~
   <leader>lia    Insert action marker          @
   <leader>liq    Insert oracle question        ?
   <leader>lid    Insert dice prefix            d:
+  <leader>lin    Insert meta note              (note:)
   <leader>li-    Insert result arrow           ->
   <leader>li=    Insert consequence            =>
   <leader>liN    Insert actor action            @(Name)
@@ -537,13 +558,15 @@ Lonelog is a structured markdown notation for solo RPG session logs
   d:          - Dice roll / resolution
   ->          - Result (from oracle or dice)
   =>          - Narrative consequence
-  (nota: ...) - Meta notes and reminders
+  (nota: ...) - Meta notes and reminders (use both languages)
+  (note: ...) - English meta note alias
 
   Insert via keymaps:
     <leader>lia / <C-l>a   - @ (generic action)
     <leader>liN / <C-l>N   - @(Name) (actor action, cursor on name)
     <leader>liq / <C-l>q   - ?
     <leader>lid / <C-l>d   - d:
+    <leader>lin / <C-l>n   - (note:) / (nota:)
     <leader>li- / <C-l>-   - ->
     <leader>li= / <C-l>=   = =>
 <

@@ -54,9 +54,9 @@ syn region lonelogTableRef matchgroup=lonelogTableBracket
 " === Generator headers ===
 syn match lonelogGen '\v^gen:'
 
-" === Meta notes (nota: ...) ===
+" === Meta notes (note: ... / nota: ...) ===
 syn region lonelogNota matchgroup=lonelogNotaParen
-  \ start='\v\(nota:'
+  \ start='\v\((nota|note):'
   \ end='\v\)'
   \ keepend
 
