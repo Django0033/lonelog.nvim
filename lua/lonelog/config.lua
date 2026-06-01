@@ -19,6 +19,7 @@ local defaults = {
 		campaign_header = "<leader>lA",
 		combat_block = "<leader>lB",
 		dungeon_status = "<leader>lK",
+		room_go = "<leader>lG",
 		insert_round = "<leader>lr",
 		session_summary = "<leader>lE",
 
