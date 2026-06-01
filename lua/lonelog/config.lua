@@ -16,6 +16,7 @@ local defaults = {
 		scene_prev = "<leader>l[",
 		scene_next = "<leader>l]",
 		roll_line = "<leader>lR",
+		campaign_header = "<leader>lA",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",

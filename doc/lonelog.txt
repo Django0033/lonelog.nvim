@@ -18,8 +18,10 @@ CONTENTS                                                *lonelog-contents*
     4.9 Session headers .................................. |lonelog-command-session|
   4.10 Scene navigation ................................. |lonelog-command-scene-nav|
   4.11 Narrative blocks ................................. |lonelog-command-narrative|
-  4.12 Meta notes ........................................ |lonelog-command-note|
-  5. Keymaps ............................................. |lonelog-keymaps|
+   4.12 Meta notes ........................................ |lonelog-command-note|
+   4.13 Multi-line tags ................................... |lonelog-command-mltag|
+   4.14 Campaign header ................................... |lonelog-command-campaign|
+   5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
     6.2 Tag format ....................................... |lonelog-notation-tags|
@@ -471,6 +473,38 @@ Config key: use_telescope~
   The cursor is placed in insert mode on the indented content line.
   Supported types: npc, location, pc, thread, ref, foe.
 
+4.14 Campaign header                            *:LonelogCampaign*
+                                                  *lonelog-command-campaign*
+>
+  :LonelogCampaign    " Insert campaign header YAML frontmatter
+<
+  Inserts a YAML frontmatter block at the top of the buffer with
+  campaign metadata fields (title, ruleset, genre, player, PCs,
+  dates, tools, themes, tone, notes). Prompts for the campaign title;
+  remaining fields default to blank or today's date.
+
+  Refuses to insert if the buffer already begins with `---` (i.e.,
+  a campaign header already exists).
+>
+  ---
+  title: Clearview Mystery
+  ruleset:
+  genre:
+  player:
+  pcs:
+  start_date: 2026-05-31
+  last_update: 2026-05-31
+  tools:
+  themes:
+  tone:
+  notes:
+  ---
+
+  # Clearview Mystery
+<
+  The cursor is placed on the `ruleset:` line for immediate editing.
+  See |lonelog-notation| §6 for field descriptions.
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -492,6 +526,7 @@ Normal mode keymaps~
   <leader>l]     Go to next scene              :LonelogSceneNext
   <leader>lN     Insert narrative block         :LonelogNarrative
   <leader>lR     Roll current line             :LonelogRollLine
+  <leader>lA     Insert campaign header         :LonelogCampaign
 
   Group 2: Insert notation symbols~
   Key            Action                        Command ~

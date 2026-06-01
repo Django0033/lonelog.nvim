@@ -110,6 +110,9 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.roll_line, function()
 		require("lonelog.roll_line").roll_current_line()
 	end, { desc = "Lonelog roll on current line" })
+	map("n", cfg.get().keymaps.campaign_header, function()
+		require("lonelog.commands.campaign").insert_campaign_header()
+	end, { desc = "Insert campaign header" })
 
 	-- ================================================================
 	-- Group 2: Insert notation symbols (li-)
@@ -456,6 +459,11 @@ end, { nargs = "?", desc = "Insert or decrement timer" })
 vim.api.nvim_create_user_command("LonelogSceneMarker", function()
 	insert_scene_marker()
 end, { nargs = 0, desc = "Insert auto-numbered scene marker" })
+
+-- Campaign header command
+vim.api.nvim_create_user_command("LonelogCampaign", function()
+	require("lonelog.commands.campaign").insert_campaign_header()
+end, { nargs = 0, desc = "Insert campaign header YAML frontmatter" })
 
 -- Session header command
 vim.api.nvim_create_user_command("LonelogSession", function()
