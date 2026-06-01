@@ -124,30 +124,6 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.campaign_header, function()
 		require("lonelog.commands.campaign").insert_campaign_header()
 	end, { desc = "Insert campaign header" })
-	map("n", cfg.get().keymaps.combat_block, function()
-		require("lonelog.commands.combat").insert_combat_block()
-	end, { desc = "Insert combat block" })
-	map("n", cfg.get().keymaps.dungeon_status, function()
-		require("lonelog.commands.dungeon_status").insert_status_block()
-	end, { desc = "Insert/update dungeon status block" })
-	map("n", cfg.get().keymaps.room_go, function()
-		require("lonelog.commands.room_nav").navigate_to_room()
-	end, { desc = "Navigate to connected room" })
-	map("n", cfg.get().keymaps.room_state, function()
-		require("lonelog.commands.room_state").edit_room_state()
-	end, { desc = "Toggle room state" })
-	map("n", cfg.get().keymaps.insert_round, function()
-		local round = require("lonelog.commands.round")
-		vim.ui.select({ "Simple round", "Round with roster" }, {
-			prompt = "Insert round marker:",
-		}, function(choice)
-			if choice == "Simple round" then
-				round.insert_round(false)
-			elseif choice == "Round with roster" then
-				round.insert_round(true)
-			end
-		end)
-	end, { desc = "Insert round marker" })
 	map("n", cfg.get().keymaps.session_summary, function()
 		require("lonelog.commands.summary").show_session_summary()
 	end, { desc = "Session summary" })
@@ -495,35 +471,6 @@ vim.api.nvim_create_user_command("LonelogNarrative", function()
 	require("lonelog.commands.narrative").insert_narrative_block()
 end, { nargs = 0, desc = "Insert narrative block" })
 
-vim.api.nvim_create_user_command("LonelogCombat", function()
-	require("lonelog.commands.combat").insert_combat_block()
-end, { nargs = 0, desc = "Insert combat block" })
-
-vim.api.nvim_create_user_command("LonelogDungeonStatus", function()
-	require("lonelog.commands.dungeon_status").insert_status_block()
-end, { nargs = 0, desc = "Insert/update dungeon status block" })
-
-vim.api.nvim_create_user_command("LonelogRoomGo", function()
-	require("lonelog.commands.room_nav").navigate_to_room()
-end, { nargs = 0, desc = "Navigate to a connected room" })
-
-vim.api.nvim_create_user_command("LonelogRoomState", function()
-	require("lonelog.commands.room_state").edit_room_state()
-end, { nargs = 0, desc = "Toggle room state" })
-
-vim.api.nvim_create_user_command("LonelogRound", function()
-	local round = require("lonelog.commands.round")
-	vim.ui.select({ "Simple round", "Round with roster" }, {
-		prompt = "Insert round marker:",
-	}, function(choice)
-		if choice == "Simple round" then
-			round.insert_round(false)
-		elseif choice == "Round with roster" then
-			round.insert_round(true)
-		end
-	end)
-end, { nargs = 0, desc = "Insert round marker" })
-
 vim.api.nvim_create_user_command("LonelogNote", function()
 	require("lonelog.commands.note").insert_note()
 end, { nargs = 0, desc = "Insert meta note" })
@@ -555,8 +502,55 @@ vim.api.nvim_create_user_command("LonelogSceneNext", function()
 	require("lonelog.parsers.scenes").navigate_scene(1)
 end, { nargs = 0, desc = "Go to next scene" })
 
+-- ================================================================
+-- Addon loader: iterates enabled addons, registers commands and
+-- collects keymap definitions. Keymaps are deferred because they
+-- depend on user config which may not be merged yet.
+-- ================================================================
+
+local addon_keymaps = {}
+
+local function load_addons()
+	local config = require("lonelog.config")
+	local addons_config = config.get().addons or {}
+	for name, enabled in pairs(addons_config) do
+		if enabled then
+			local ok, addon = pcall(require, "lonelog.addons." .. name)
+			if ok and addon then
+				for _, cmd in ipairs(addon.commands or {}) do
+					vim.api.nvim_create_user_command(cmd.name, cmd.command, cmd.opts)
+				end
+				for _, km in ipairs(addon.keymaps or {}) do
+					table.insert(addon_keymaps, km)
+				end
+				if addon.setup then
+					addon.setup(addons_config[name] or {})
+				end
+			end
+		end
+	end
+end
+
+local function setup_addon_keymaps()
+	local cfg = require("lonelog.config").get()
+	for _, km in ipairs(addon_keymaps) do
+		local lhs = cfg.keymaps[km.key]
+		if lhs then
+			vim.keymap.set(km.mode, lhs, km.rhs, km.opts)
+		end
+	end
+end
+
+load_addons()
+
 -- Set up keymaps after plugin loads
-vim.api.nvim_create_autocmd("User", { pattern = "LonelogLoaded", callback = setup_keymaps })
+vim.api.nvim_create_autocmd("User", {
+	pattern = "LonelogLoaded",
+	callback = function()
+		setup_keymaps()
+		setup_addon_keymaps()
+	end,
+})
 vim.defer_fn(function()
 	vim.api.nvim_exec_autocmds("User", { pattern = "LonelogLoaded" })
 end, 0)

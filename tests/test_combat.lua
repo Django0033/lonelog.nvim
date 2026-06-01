@@ -10,7 +10,7 @@ vim = {
 }
 
 package.path = package.path .. ";./lua/?.lua"
-local M = require("lonelog.commands.combat")
+local M = require("lonelog.addons.combat.combat")
 
 local passed, failed = 0, 0
 

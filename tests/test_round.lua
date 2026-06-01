@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 
 package.path = package.path .. ";./lua/?.lua"
-local M = require("lonelog.commands.round")
+local M = require("lonelog.addons.combat.round")
 
 local passed, failed = 0, 0
 

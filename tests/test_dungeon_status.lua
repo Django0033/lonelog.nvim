@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 
 package.path = package.path .. ";./lua/?.lua"
-local M = require("lonelog.commands.dungeon_status")
+local M = require("lonelog.addons.dungeon.dungeon_status")
 
 local passed, failed = 0, 0
 
