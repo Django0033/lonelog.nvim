@@ -52,14 +52,12 @@ end
 function M.find_existing_block(lines)
 	for i = 1, #lines do
 		if lines[i]:match("^=== Dungeon Status ===$") then
-			local block_end = i
 			for j = i + 1, #lines do
-				if lines[j]:match("^===") then
-					break
+				if lines[j]:match("^===%s*$") then
+					return i, j
 				end
-				block_end = j
 			end
-			return i, block_end
+			return i, i
 		end
 	end
 	return nil, nil
@@ -70,6 +68,7 @@ function M.build_status_block(room_tags)
 	for _, tag in ipairs(room_tags) do
 		table.insert(lines, tag.raw)
 	end
+	table.insert(lines, "===")
 	return lines
 end
 

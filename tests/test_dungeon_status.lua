@@ -128,12 +128,13 @@ do
 		"=== Dungeon Status ===",
 		"[R:1|cleared]",
 		"[R:2|active]",
+		"===",
 	}
 	local s, e = M.find_existing_block(lines)
 	check("find: block exists", s ~= nil, true)
 	if s then
 		check("find: header at line 1", s, 1)
-		check("find: last content at line 3", e, 3)
+		check("find: closing at line 4", e, 4)
 	end
 end
 
@@ -142,13 +143,14 @@ do
 		"text",
 		"=== Dungeon Status ===",
 		"[R:1|cleared]",
+		"===",
 		"=== Session 5 ===",
 	}
 	local s, e = M.find_existing_block(lines)
 	check("find: block before next section", s ~= nil, true)
 	if s then
 		check("find: header at line 2", s, 2)
-		check("find: content until before ===", e, 3)
+		check("find: closing at line 4", e, 4)
 	end
 end
 
@@ -182,10 +184,11 @@ end
 do
 	local tags = { { id = "1", raw = "[R:1|cleared]" } }
 	local lines = M.build_status_block(tags)
-	check("build: single tag", #lines, 2)
-	if #lines >= 2 then
+	check("build: single tag", #lines, 3)
+	if #lines >= 3 then
 		check("build: header", lines[1], "=== Dungeon Status ===")
 		check("build: tag line", lines[2], "[R:1|cleared]")
+		check("build: closing", lines[3], "===")
 	end
 end
 
@@ -195,20 +198,22 @@ do
 		{ id = "2", raw = "[R:2|active|barracks]" },
 	}
 	local lines = M.build_status_block(tags)
-	check("build: multiple tags", #lines, 3)
-	if #lines >= 3 then
+	check("build: multiple tags", #lines, 4)
+	if #lines >= 4 then
 		check("build: header", lines[1], "=== Dungeon Status ===")
 		check("build: first tag", lines[2], "[R:1|cleared|looted|entry cave]")
 		check("build: second tag", lines[3], "[R:2|active|barracks]")
+		check("build: closing", lines[4], "===")
 	end
 end
 
 do
 	local tags = {}
 	local lines = M.build_status_block(tags)
-	check("build: empty tags", #lines, 1)
-	if #lines >= 1 then
+	check("build: empty tags", #lines, 2)
+	if #lines >= 2 then
 		check("build: only header", lines[1], "=== Dungeon Status ===")
+		check("build: closing", lines[2], "===")
 	end
 end
 
