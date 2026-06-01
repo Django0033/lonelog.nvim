@@ -1,7 +1,4 @@
 local M = {}
-local should_use_telescope = function()
-	return require("lonelog.config").should_use_telescope()
-end
 
 -- Map tag type keys to human-readable names
 local TAG_TYPES = {
@@ -214,7 +211,7 @@ function M.show_tags_picker()
 	end)
 
 	-- Use native sidebar if Telescope is disabled
-	if not should_use_telescope() then
+	if not require("lonelog.config").should_use_telescope() then
 		M.show_tags_picker_native(file_tags)
 		return
 	end

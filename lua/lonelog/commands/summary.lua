@@ -421,6 +421,28 @@ function M.export_summary(summary)
 	return table.concat(out, "\n")
 end
 
+-- Build label items for the session picker (shared by show and export)
+local function build_session_items(sessions)
+	local items = {}
+	for _, s in ipairs(sessions) do
+		local label = "Session " .. s.number
+		if s.date then
+			label = label .. " (" .. s.date .. ")"
+		end
+		table.insert(items, { label = label, session = s })
+	end
+	return items
+end
+
+-- Get current buffer data needed for session operations
+local function get_current_buffer_data()
+	return {
+		lines = vim.api.nvim_buf_get_lines(vim.api.nvim_get_current_buf(), 0, -1, false),
+		tags = require("lonelog.parsers.tags").parse_tags(),
+		scenes = require("lonelog.parsers.scenes").parse_scenes(),
+	}
+end
+
 -- Show session summary in floating window
 function M.show_session_summary()
 	local sessions = M.parse_all_sessions()
@@ -429,16 +451,12 @@ function M.show_session_summary()
 		return
 	end
 
-	local all_lines = vim.api.nvim_buf_get_lines(vim.api.nvim_get_current_buf(), 0, -1, false)
-	local all_tags = require("lonelog.parsers.tags").parse_tags()
-	local all_scenes = require("lonelog.parsers.scenes").parse_scenes()
+	local data = get_current_buffer_data()
 
 	local function display_summary(session)
-		local summary = M.build_session_summary(session, all_lines, all_tags, all_scenes)
+		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes)
 		local lines = M.format_summary(summary)
 		local float = require("lonelog.ui.floating")
-
-		-- Build export content for copy/insert
 		local export_text = M.export_summary(summary)
 
 		float.open(lines, {
@@ -453,18 +471,9 @@ function M.show_session_summary()
 		return
 	end
 
-	-- Multiple sessions: show picker
-	local items = {}
-	for _, s in ipairs(sessions) do
-		local label = "Session " .. s.number
-		if s.date then
-			label = label .. " (" .. s.date .. ")"
-		end
-		table.insert(items, { label = label, session = s })
-	end
 	require("lonelog.ui").pick({
 		title = "Select Session",
-		items = items,
+		items = build_session_items(sessions),
 		format_item = function(i)
 			return i.label
 		end,
@@ -482,12 +491,10 @@ function M.export_session_summary()
 		return
 	end
 
-	local all_lines = vim.api.nvim_buf_get_lines(vim.api.nvim_get_current_buf(), 0, -1, false)
-	local all_tags = require("lonelog.parsers.tags").parse_tags()
-	local all_scenes = require("lonelog.parsers.scenes").parse_scenes()
+	local data = get_current_buffer_data()
 
 	local function do_export(session)
-		local summary = M.build_session_summary(session, all_lines, all_tags, all_scenes)
+		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes)
 		local export_text = M.export_summary(summary)
 		local default_name = "session-" .. session.number .. "-summary.md"
 
@@ -513,17 +520,9 @@ function M.export_session_summary()
 		return
 	end
 
-	local items = {}
-	for _, s in ipairs(sessions) do
-		local label = "Session " .. s.number
-		if s.date then
-			label = label .. " (" .. s.date .. ")"
-		end
-		table.insert(items, { label = label, session = s })
-	end
 	require("lonelog.ui").pick({
 		title = "Select Session to Export",
-		items = items,
+		items = build_session_items(sessions),
 		format_item = function(i)
 			return i.label
 		end,

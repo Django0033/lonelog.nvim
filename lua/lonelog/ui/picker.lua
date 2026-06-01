@@ -1,6 +1,4 @@
 local M = {}
-local sidebar = require("lonelog.ui.sidebar")
-local config = require("lonelog.config")
 
 -- Pick items using sidebar or vim.ui.select
 ---@param options table {items, format_items, on_select, title}

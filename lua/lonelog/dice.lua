@@ -1,8 +1,5 @@
 local M = {}
 
--- Quick dice available
-M.quick_dice = { "d4", "d6", "d8", "d10", "d12", "d20", "d100" }
-
 -- Seed random number generator with current time
 function M.setup()
 	math.randomseed(os.time())

@@ -1,7 +1,4 @@
 local M = {}
-local should_use_telescope = function()
-	return require("lonelog.config").should_use_telescope()
-end
 
 -- Map scene type keys to labels
 local SCENE_TYPES = { main = "Main", flashback = "Flashback", sub = "Sub-scene", thread = "Thread" }
@@ -221,7 +218,7 @@ function M.show_scenes_picker()
 		return a.sort_key < b.sort_key
 	end)
 
-	if not should_use_telescope() then
+	if not require("lonelog.config").should_use_telescope() then
 		M.show_scenes_picker_native(scenes)
 		return
 	end

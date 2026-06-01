@@ -97,11 +97,36 @@ Each function appeared twice - once as a stub returning `nil`, and once with the
 
 ---
 
+---
+
+### 7. Dead Code Cleanup & Consolidation (2026-06-01)
+
+**Unused Exports Removed:**
+- `dice.lua` — `M.quick_dice` (never accessed internally)
+- `ui.lua` — 6 unused backward-compat aliases (`show_result`, `show_colored_result`, `copy_result`, `can_insert_here`, `open`, `close`)
+
+**Unused Imports Removed:**
+- `picker.lua` — Unused `sidebar` and `config` local requires
+
+**Duplicate Consolidation:**
+- `tags.lua` + `scenes.lua` — Identical `should_use_telescope` local replaced with direct calls
+- `plugin/lonelog.lua` — Quick dice data unified into a single `QUICK_DICE` table (eliminated duplicate definition for commands)
+- `summary.lua` — Session picker logic extracted into shared helpers
+
+**Result:** 8 files modified, 71 lines removed, 52 added, 19 net reduction (includes oracle.lua consolidation)
+
 ## Tests
 
-All existing tests continue to pass:
+All tests passing (173 total):
 - dice: 19/19
-- tags: 14/14
-- scenes: 8/8
-- integration: 17/17
-- **Total: 58/58**
+- oracle: 10/10
+- tags: 22/22
+- scenes: 14/14
+- note: 2/2
+- progress: 28/28
+- summary: 24/24
+- session: 3/3
+- narrative: 5/5
+- roll_line: 31/31
+- integration: 20/20
+- tables: 27/27

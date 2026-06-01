@@ -102,19 +102,21 @@ function M.save_chaos()
 	end
 end
 
-function M.show_chaos_ui()
-	local chaos = M.get_chaos()
-	local content = {
+local function build_chaos_content(chaos)
+	return {
 		"",
 		"  Chaos Factor: " .. chaos,
-		"  Rango: 1-9",
+		"  Range: 1-9",
 		"",
 		"  [-] Decrease [+] Increase",
 		"  [Enter] Confirm [q] Close",
 	}
+end
 
+function M.show_chaos_ui()
+	local chaos = M.get_chaos()
 	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, build_chaos_content(chaos))
 
 	local win = vim.api.nvim_open_win(buf, true, {
 		relative = "editor",
@@ -127,48 +129,39 @@ function M.show_chaos_ui()
 		title = " Mythic Chaos Factor ",
 	})
 
-	-- Keybindings
-	vim.keymap.set("n", "q", function()
+	-- Helper to update buffer and close window
+	local function close_win()
 		vim.api.nvim_win_close(win, true)
-	end, { buffer = buf, nowait = true, silent = true })
+	end
+
+	local function update_buffer()
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, build_chaos_content(chaos))
+	end
+
+	-- Keybindings
+	vim.keymap.set("n", "q", close_win, { buffer = buf, nowait = true, silent = true })
 
 	vim.keymap.set("n", "+", function()
 		if chaos < 9 then
 			chaos = chaos + 1
-			vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-				"",
-				"  Chaos Factor: " .. chaos,
-				"  Range: 1-9",
-				"",
-				"  [-] Decrease [+] Increase",
-				"  [Enter] Confirm [q] Close",
-			})
+			update_buffer()
 		end
 	end, { buffer = buf, nowait = true, silent = true })
 
 	vim.keymap.set("n", "-", function()
 		if chaos > 1 then
 			chaos = chaos - 1
-			vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-				"",
-				"  Chaos Factor: " .. chaos,
-				"  Range: 1-9",
-				"",
-				"  [-] Decrease [+] Increase",
-				"  [Enter] Confirm [q] Close",
-			})
+			update_buffer()
 		end
 	end, { buffer = buf, nowait = true, silent = true })
 
-	vim.keymap.set("n", "<CR>", function()
+	local function confirm_and_close()
 		M.set_chaos(chaos)
-		vim.api.nvim_win_close(win, true)
-	end, { buffer = buf, nowait = true, silent = true })
+		close_win()
+	end
 
-	vim.keymap.set("n", "<Enter>", function()
-		M.set_chaos(chaos)
-		vim.api.nvim_win_close(win, true)
-	end, { buffer = buf, nowait = true, silent = true })
+	vim.keymap.set("n", "<CR>", confirm_and_close, { buffer = buf, nowait = true, silent = true })
+	vim.keymap.set("n", "<Enter>", confirm_and_close, { buffer = buf, nowait = true, silent = true })
 end
 
 -- Roll Mythic oracle using 2d10 + chaos modifier
