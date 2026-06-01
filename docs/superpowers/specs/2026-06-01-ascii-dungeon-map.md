@@ -21,8 +21,8 @@ Between the room tag list and the closing `===`:
 [R:4|unexplored|storage|exits W:R3]
 
 --- Map ---
-R1 (entry cave) ── N ──→ R3 (armory) ── E ──→ R4 (storage)
-R3 ←── S ── R1
+R1 (entry cave) -- N --> R3 (armory) -- E --> R4 (storage)
+R3 <-- S -- R1
 R2 (barracks)
 ===
 ```
@@ -37,16 +37,16 @@ iterating rooms in numeric ID order.
 3. For each room (in order):
    - If not placed and has no outgoing exits → single line: `R2 (barracks)`
    - If not placed and has exits → walk forward through unvisited destinations:
-     `R1 ── N ──→ R3 ── E ──→ R4`
+     `R1 -- N --> R3 -- E --> R4`
    - For each exit whose destination is already placed → emit a back-ref line:
-     `R3 ←── S ── R1`
+     `R3 <-- S -- R1`
 
 ### Forward walk
 
 For a room being rendered for the first time:
 - Print `R<N> (<desc>)`
 - For each exit in order:
-  - If destination is not placed → print ` ── <dir> ──→ R<dest> (<dest-desc>)`
+  - If destination is not placed → print ` -- <dir> --> R<dest> (<dest-desc>)`
     and mark destination as placed. Recurse into destination's own exits
     (continue the forward walk).
   - If destination is already placed → collect as a back-ref (see below).
@@ -54,7 +54,7 @@ For a room being rendered for the first time:
 ### Back-ref lines
 
 After the forward walk is done, emit one line per back-ref:
-`R<source> ←── <dir> ── R<dest> (<dest-desc>)`
+`R<source> <-- <dir> -- R<dest> (<dest-desc>)`
 
 ### Isolated rooms
 
@@ -68,7 +68,7 @@ print as:
 ### Missing destinations
 
 If an exit references a room ID not found in the buffer:
-`R<N> (<desc>) ── <dir> ──→ ??? (R<dest> not found)`
+`R<N> (<desc>) -- <dir> --> ??? (R<dest> not found)`
 
 ## Module Changes
 
@@ -107,7 +107,7 @@ insert_status_block()
 - Single room with exits → forward walk renders it; no back-refs
 - Deep chain (R1→R2→R3→...→R10) → single long line
 - Branching (R1→R2, R1→R3) → R1's first exit determines the forward walk;
-  the other exit becomes a separate root line `R1 ── <dir> ──→ R<dest>`
+  the other exit becomes a separate root line `R1 -- <dir> --> R<dest>`
 
 ## Testing
 

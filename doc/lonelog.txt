@@ -631,13 +631,28 @@ Config key: use_telescope~
    Reference tags (|[#R:ID]|) and other tag types (|[N:]|, |[F:]|, etc.)
    are ignored.
 
-   Example - after inserting in a buffer with R: tags scattered
-   throughout: >
+   If any room tag has an |exits| field (e.g. |exits N:R3, S:R2|), the
+   block is extended with a |--- Map ---| section that renders the room
+   graph as ASCII arrows. Each room appears once, with forward chains
+   on one line and back-references on separate lines.
+
+   Arrow format:
+     forward: --<dir>--> R<id> (<desc>)
+     back:    R<id> <--<dir>-- R<id> (<desc>)
+
+   Example - after inserting in a buffer with interconnected rooms: >
 
     === Dungeon Status ===
-    [R:1|cleared,looted|entry cave]
+    [R:1|cleared|entry cave|exits N:R3]
     [R:2|active|barracks]
-    [R:3|unexplored]
+    [R:3|cleared|armory|exits S:R1, E:R4]
+    [R:4|unexplored|storage|exits W:R3]
+
+    --- Map ---
+    R1 (entry cave) --N--> R3 (armory) --E--> R4 (storage)
+    R2 (barracks)
+    R3 <--S-- R1 (entry cave)
+    R4 <--W-- R3 (armory)
 <
 
 4.19 Room Navigation                              *:LonelogRoomGo*

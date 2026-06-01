@@ -106,11 +106,11 @@ local function walk_forward(id, line_parts, placed, room_info, root_lines, back_
 		if placed[exit.id] then
 			local dest_info = room_info[exit.id]
 			local dest_name = dest_info and dest_info.desc or "?"
-			table.insert(back_lines, "R" .. id .. " ←── " .. exit.dir .. " ── R" .. exit.id .. " (" .. dest_name .. ")")
+			table.insert(back_lines, "R" .. id .. " <--" .. exit.dir .. "-- R" .. exit.id .. " (" .. dest_name .. ")")
 		else
 			placed[exit.id] = true
 			local dest_info = room_info[exit.id]
-			local arrow = " ── " .. exit.dir .. " ──→ R" .. exit.id
+			local arrow = " --" .. exit.dir .. "--> R" .. exit.id
 			if dest_info and dest_info.desc then
 				arrow = arrow .. " (" .. dest_info.desc .. ")"
 			elseif not dest_info then

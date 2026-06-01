@@ -313,7 +313,7 @@ do
 	check("map: linear chain count", #map, 2)
 	if #map >= 2 then
 		check("map: linear header", map[1], "--- Map ---")
-		check("map: linear forward", map[2], "R1 (entry cave) ── N ──→ R3 (armory) ── E ──→ R4 (storage)")
+		check("map: linear forward", map[2], "R1 (entry cave) --N--> R3 (armory) --E--> R4 (storage)")
 	end
 end
 
@@ -337,8 +337,8 @@ do
 	local map = M.build_ascii_map(tags, info)
 	check("map: bidirectional count", #map, 3)
 	if #map >= 3 then
-		check("map: bidirectional forward", map[2], "R1 (entry cave) ── N ──→ R3 (armory)")
-		check("map: bidirectional back-ref", map[3], "R3 ←── S ── R1 (entry cave)")
+		check("map: bidirectional forward", map[2], "R1 (entry cave) --N--> R3 (armory)")
+		check("map: bidirectional back-ref", map[3], "R3 <--S-- R1 (entry cave)")
 	end
 end
 
@@ -350,7 +350,7 @@ do
 	local map = M.build_ascii_map(tags, info)
 	check("map: missing dest count", #map, 2)
 	if #map >= 2 then
-		check("map: missing dest line", map[2], "R1 (entry cave) ── N ──→ R99 (??? not found)")
+		check("map: missing dest line", map[2], "R1 (entry cave) --N--> R99 (??? not found)")
 	end
 end
 
@@ -364,8 +364,8 @@ do
 	local map = M.build_ascii_map(tags, info)
 	check("map: branching count", #map, 3)
 	if #map >= 3 then
-		check("map: branching branch", map[2], "R1 (entry cave) ── S ──→ R2 (barracks)")
-		check("map: branching chain", map[3], "R1 (entry cave) ── N ──→ R3 (armory)")
+		check("map: branching branch", map[2], "R1 (entry cave) --S--> R2 (barracks)")
+		check("map: branching chain", map[3], "R1 (entry cave) --N--> R3 (armory)")
 	end
 end
 
@@ -381,10 +381,10 @@ do
 	check("map: mixed count", #map, 5)
 	if #map >= 5 then
 		check("map: mixed header", map[1], "--- Map ---")
-		check("map: mixed r1 forward", map[2], "R1 (entry cave) ── N ──→ R3 (armory) ── E ──→ R4 (storage)")
+		check("map: mixed r1 forward", map[2], "R1 (entry cave) --N--> R3 (armory) --E--> R4 (storage)")
 		check("map: mixed r2 isolated", map[3], "R2 (barracks)")
-		check("map: mixed back-ref 1", map[4], "R3 ←── S ── R1 (entry cave)")
-		check("map: mixed back-ref 2", map[5], "R4 ←── W ── R3 (armory)")
+		check("map: mixed back-ref 1", map[4], "R3 <--S-- R1 (entry cave)")
+		check("map: mixed back-ref 2", map[5], "R4 <--W-- R3 (armory)")
 	end
 end
 
