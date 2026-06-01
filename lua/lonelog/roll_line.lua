@@ -18,7 +18,7 @@ end
 local function parse_tbl_line(line)
 	local T = tp()
 	local header = T.parse_header(line)
-	if header and header.dice then
+	if header then
 		return header
 	end
 	local rolled = T.parse_roll_line(line)
@@ -57,8 +57,17 @@ function M.process_line(line, tables)
 
 	if lower:match("^tbl:") then
 		local info = parse_tbl_line(line)
-		if not info or not info.dice then
+		if not info then
 			return nil
+		end
+
+		if not info.dice then
+			local table_def = tables and tables[info.name:lower()]
+			if table_def and table_def.dice then
+				info.dice = table_def.dice
+			else
+				return nil
+			end
 		end
 
 		local table_def = tables and tables[info.name:lower()]

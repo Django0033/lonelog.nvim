@@ -171,6 +171,18 @@ do
 end
 
 do
+	local r = tables.parse_tables({ "tbl: Single [Only]" })
+	local t = r["single"]
+	local ok = t and #t.entries == 1 and t.dice == "d1"
+		and t.entries[1].text == "Only" and t.entries[1].min == 1
+	if test("bracket single element", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
 	local r = tables.parse_tables({ "tbl: Empty (d6)" })
 	local t = r["empty"]
 	if test("no entries", t and #t.entries == 0) then

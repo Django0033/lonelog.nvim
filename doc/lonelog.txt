@@ -661,10 +661,15 @@ Lonelog is a structured markdown notation for solo RPG session logs
 >
   tbl: Weather [Sunny, Cloudy, Rain, Storm]
 <
-  Rolls d4, assigns each option one value.
+  Rolls d4, assigns each option one value. Also called filtered option
+  sets — each option gets exactly one face of the die.
 
   Rolling a tbl: line appends:  d6=4 -> A deer crosses.
 
+  A tbl: line without dice uses the table's defined dice:
+>
+  tbl: Forest          rolls d6, same as tbl: Forest (d6)
+<
   Duplicate table names are ignored (first definition wins).
 
 6.7 Generator blocks                              *lonelog-notation-gen*

@@ -98,6 +98,25 @@ do
 end
 
 do
+	local r = roll_line.process_line("tbl: Forest", test_tables)
+	local ok = r ~= nil and r:match("tbl: Forest d6=4") and r:match("-> Deer")
+	if test("bare name falls back to table dice", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("tbl: Unknown", test_tables)
+	if test("bare unknown table returns nil", r == nil) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
 	local r = roll_line.process_line("tbl: Unknown (d6)", test_tables)
 	if test("unknown table returns nil", r == nil) then
 		passed = passed + 1
