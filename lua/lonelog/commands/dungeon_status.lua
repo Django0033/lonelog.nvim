@@ -36,6 +36,19 @@ function M.collect_room_tags(lines)
 	return result
 end
 
+function M.find_frontmatter_end(lines)
+	for i = 1, #lines do
+		if lines[i]:match("^---%s*$") then
+			for j = i + 1, #lines do
+				if lines[j]:match("^---%s*$") then
+					return j
+				end
+			end
+		end
+	end
+	return 0
+end
+
 function M.find_existing_block(lines)
 	for i = 1, #lines do
 		if lines[i]:match("^=== Dungeon Status ===$") then
@@ -69,7 +82,8 @@ function M.insert_status_block()
 	if start_line then
 		vim.api.nvim_buf_set_lines(buf, start_line - 1, end_line, false, new_lines)
 	else
-		vim.api.nvim_buf_set_lines(buf, 0, 0, false, new_lines)
+		local insert_at = M.find_frontmatter_end(lines)
+		vim.api.nvim_buf_set_lines(buf, insert_at, insert_at, false, new_lines)
 	end
 end
 

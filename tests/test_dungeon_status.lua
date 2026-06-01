@@ -213,6 +213,49 @@ do
 end
 
 -- ============================================================
+-- find_frontmatter_end
+-- ============================================================
+
+do
+	local lines = { "some text", "no frontmatter" }
+	local n = M.find_frontmatter_end(lines)
+	check("frontmatter: no frontmatter returns 0", n, 0)
+end
+
+do
+	local lines = {
+		"---",
+		"campaign: test",
+		"---",
+		"[R:1|cleared]",
+	}
+	local n = M.find_frontmatter_end(lines)
+	check("frontmatter: returns closing --- line number", n, 3)
+end
+
+do
+	local lines = {
+		"---",
+		"campaign: test",
+		"date: 2024-01-01",
+		"---",
+		"",
+		"# Session 1",
+	}
+	local n = M.find_frontmatter_end(lines)
+	check("frontmatter: multi-line yaml", n, 4)
+end
+
+do
+	local lines = {
+		"---",
+		"opened but never closed",
+	}
+	local n = M.find_frontmatter_end(lines)
+	check("frontmatter: unclosed returns 0", n, 0)
+end
+
+-- ============================================================
 
 print()
 print(string.format("RESULTS: %d passed, %d failed", passed, failed))
