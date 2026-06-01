@@ -152,6 +152,13 @@ Call setup() with an optional table of overrides. All keys and defaults:
     -- Prompt for scene context when inserting scene markers
     prompt_for_scene_context = true,
 
+    -- Add-on system: disable optional features you don't use
+    -- All add-ons are enabled by default.
+    addons = {
+      combat  = true,  -- :LonelogCombat, :LonelogRound
+      dungeon = true,  -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
+    },
+
     -- All keymaps (see |lonelog-keymaps| for defaults)
     keymaps = {
       -- Main features
@@ -202,6 +209,23 @@ Config key: use_telescope~
   "auto"  - Use Telescope if the plugin is installed, native sidebar otherwise.
   true    - Always use Telescope (error if not installed).
   false   - Always use the built-in sidebar picker.
+
+Config key: addons~
+  Control which optional add-on modules are loaded. Each add-on registers its
+  own commands and keymaps only when enabled. All default to true.
+
+    addons = {
+      combat  = true,   -- :LonelogCombat, :LonelogRound
+      dungeon = true,   -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
+    }
+
+  Set to false to disable individual add-ons and prevent their commands and
+  keymaps from being registered.
+
+  The add-on system uses a registration pattern. Each add-on's |init.lua|
+  exports a table of commands and keymaps. The plugin loader iterates enabled
+  add-ons and registers them automatically. Add-on keymaps are deferred until
+  after |setup()| completes, so user keymap overrides are respected.
 
 ==============================================================================
 4. COMMANDS                                              *lonelog-commands*
@@ -730,15 +754,17 @@ Normal mode keymaps~
   <leader>lM     Insert scene marker           :LonelogSceneMarker
   <leader>l[     Go to previous scene          :LonelogScenePrev
   <leader>l]     Go to next scene              :LonelogSceneNext
-   <leader>lN     Insert narrative block         :LonelogNarrative
-    <leader>lB     Insert combat block            :LonelogCombat
-    <leader>lK     Insert/update dungeon status   :LonelogDungeonStatus
-    <leader>lG     Navigate to connected room     :LonelogRoomGo
-    <leader>lJ     Toggle room state             :LonelogRoomState
-    <leader>lr     Insert round marker            :LonelogRound
-   <leader>lR     Roll current line             :LonelogRollLine
-    <leader>lA     Insert campaign header         :LonelogCampaign
-    <leader>lE     Session summary                :LonelogSessionSummary
+  <leader>lN     Insert narrative block         :LonelogNarrative
+  <leader>lB     Insert combat block (*)        :LonelogCombat
+  <leader>lK     Insert/update dungeon status (*) :LonelogDungeonStatus
+  <leader>lG     Navigate to connected room (*) :LonelogRoomGo
+  <leader>lJ     Toggle room state (*)          :LonelogRoomState
+  <leader>lr     Insert round marker (*)        :LonelogRound
+  <leader>lR     Roll current line             :LonelogRollLine
+  <leader>lA     Insert campaign header         :LonelogCampaign
+  <leader>lE     Session summary                :LonelogSessionSummary
+
+  (*) Requires the respective add-on to be enabled (see |lonelog-config|).
 
   Group 2: Insert notation symbols~
   Key            Action                        Command ~
@@ -1059,8 +1085,12 @@ Insert last result~
 ==============================================================================
 10. ADD-ONS (LONELOG SPEC)                              *lonelog-addons*
 
-The Lonelog standard defines three optional add-ons. The tags and notation
-for all three are parseable by lonelog.nvim:
+The Lonelog standard defines three optional add-ons. lonelog.nvim implements
+the Combat and Dungeon add-ons as loadable modules that register their commands
+and keymaps only when enabled. See |lonelog-config| for the |addons| config key.
+
+The tags and notation for all three add-ons are always parseable regardless of
+which add-ons are enabled:
 
 10.1 Combat add-on                            *lonelog-addon-combat*
 >
