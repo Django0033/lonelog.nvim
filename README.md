@@ -33,6 +33,7 @@ Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, and
 - **Campaign YAML** — Structured frontmatter with title, ruleset, genre, dates, themes
 - **Narrative blocks** — `\---` / `---\` delimiters for in-fiction prose
 - **Combat blocks** — `[COMBAT]` / `[/COMBAT]` tactical encounter delimiters with `R#` round markers and auto-roster that excludes dead combatants
+- **Dungeon status** — `=== Dungeon Status ===` block with auto-collected room tags, insert or update at `<leader>lK`
 - **Multi-line tags** — `[TYPE:Name\n  | content\n]` for detailed descriptions
 - **Meta notes** — `(note: ...)` / `(nota: ...)` inline annotations
 - **Session summary** — Per-session stats: scenes, tags, notation, progress, dice. Export to markdown
@@ -53,7 +54,8 @@ Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, and
 {
   "Django0033/lonelog.nvim",
   cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
-          "LonelogScenes", "LonelogRollLine", "LonelogCombat" },
+          "LonelogScenes", "LonelogRollLine", "LonelogCombat",
+          "LonelogDungeonStatus" },
   config = function()
     require("lonelog").setup()
   end,
@@ -142,6 +144,7 @@ Open a markdown file and press any of these:
 | `<leader>lM` | Insert scene marker with auto-numbering |
 | `<leader>lE` | Show session summary / export to markdown |
 | `<leader>lH` | Insert session header with date |
+| `<leader>lK` | Insert/update dungeon status block |
 | `<leader>lT` | Browse all Lonelog tags |
 | `<leader>lS` | Browse all scenes |
 | `<leader>lC` | Adjust Mythic chaos factor |
@@ -337,6 +340,7 @@ gen: Generate NPC
 | `:LonelogSession` | Insert session header |
 | `:LonelogNarrative` | Insert narrative excerpt block |
 | `:LonelogCombat` | Insert combat block `[COMBAT]` / `[/COMBAT]` |
+| `:LonelogDungeonStatus` | Insert/update `=== Dungeon Status ===` block with room tags |
 | `:LonelogRound` | Insert round marker with optional auto-roster (excludes dead combatants) |
 | `:LonelogNote` | Insert meta note |
 | `:LonelogCampaign` | Insert campaign header |

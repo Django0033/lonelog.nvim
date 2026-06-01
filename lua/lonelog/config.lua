@@ -18,6 +18,7 @@ local defaults = {
 		roll_line = "<leader>lR",
 		campaign_header = "<leader>lA",
 		combat_block = "<leader>lB",
+		dungeon_status = "<leader>lK",
 		insert_round = "<leader>lr",
 		session_summary = "<leader>lE",
 
