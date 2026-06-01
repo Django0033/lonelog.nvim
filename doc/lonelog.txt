@@ -89,13 +89,15 @@ lazy.nvim~
   {
     "Django0033/lonelog.nvim",
     cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
-            "LonelogScenes", "LonelogRollLine", "LonelogCombat",
-            "LonelogDungeonStatus", "LonelogRoomGo", "LonelogRoomState" },
+            "LonelogScenes", "LonelogRollLine" },
     config = function()
       require("lonelog").setup()
     end,
   }
 <
+  If you enable add-ons via |lonelog-config|, add their commands to cmd:
+  "LonelogCombat", "LonelogRound", "LonelogDungeonStatus",
+  "LonelogRoomGo", "LonelogRoomState".
 
 packer.nvim~
 >

@@ -8,53 +8,25 @@
 ![Lua](https://img.shields.io/badge/Lua-blue.svg?style=flat-square&logo=lua)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Django0033/lonelog.nvim/pulls)
 
-Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, session management, and add-ons.
+Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, tags, scenes, and session management.
 
-[Install](#installation) • [Quick start](#quick-start) • [Configuration](#configuration) • [Addon system](#addon-system) • [Commands](#commands) • [API](#api) • [:help](#documentation)
+[Installation](#installation) • [Quick start](#quick-start) • [Configuration](#configuration) • [Add-ons](#add-ons) • [Commands](#commands) • [Documentation](#documentation)
 
 </div>
 
-This plugin implements the [Lonelog notation standard](https://github.com/valgur/lonelog) (v1.4.1), a structured markdown format for solo RPG session logs. All features are pure Lua — zero external dependencies.
+lonelog.nvim implements the [Lonelog notation standard](https://github.com/valgur/lonelog) (v1.4.1), a structured markdown format for solo RPG session logs. All features are pure Lua — zero external dependencies.
 
 > [!TIP]
-> After installing, open a `.md` file and run `:Lonelog` to get started. See `:help lonelog` for the full reference.
+> Open a `.md` file, press `<leader>lO` to roll an oracle, then `<leader>lM` to insert a scene marker. See `:help lonelog` for the full reference.
 
----
-
-## Features
-
-### Core
-
-| | |
-|---|---|
-| **Dice engine** | `2d6+3`, `2d20kh1` (advantage), `4d6!` (exploding), `6d6>>4` (success counting), `2d6>7` (sum vs target). Configurable safety limits |
-| **Oracles** | Fate (7 weighted outcomes), Binary (50/50), Mythic (2d10 + chaos factor). Persistent chaos factor with +/- UI |
-| **Tag management** | NPCs `[N:]`, Locations `[L:]`, PCs `[PC:]`, Threads `[Thread:]`, Foes `[F:]`, Rooms `[R:]`, Inventory `[Inv:]`. Browse, filter, jump |
-| **Tag autocomplete** | Suggestions when typing `[TYPE:` with relevance sorting. Triggered on `TextChangedI` |
-| **Scene navigation** | Main scenes `S1`, flashbacks `S5a`, sub-scenes `S7.1`, thread scenes `T1-S5`. Chronological ordering, prev/next commands |
-| **Inline tables** | Define tables with range entries or bracket shorthand `[A, B, C]`. Roll directly on the line |
-| **Generator blocks** | Batch-process indented sub-lines under a `gen:` header |
-| **Inline rolling** | `d:`, `tbl:`, `label:`, bare dice. Single line or visual selection |
-| **Progress elements** | Clocks, tracks, timers with smart insert-or-increment logic |
-| **Session headers** | Auto-numbered `## Session N` with date, Recap, Goals |
-| **Scene markers** | Auto-numbered `### S3 *context*` with smart ID progression |
-| **Campaign YAML** | Structured frontmatter with title, ruleset, genre, dates, themes |
-| **Session summary** | Per-session stats: scenes, tags, notation, progress, dice. Export to markdown |
-| **Floating results** | Colored windows with copy, paste, and insert-last result |
-
-### Add-ons (opt-in)
-
-Add-ons are bundled with the plugin but disabled by default. Enable them in
-`setup()` to load their commands and keymaps.
-
-| Add-on | Features | Enables |
-|--------|----------|---------|
-| **Combat** | `[COMBAT]` / `[/COMBAT]` tactical encounter delimiters. Auto-numbered `R#` round markers with auto-roster that excludes dead combatants | `:LonelogCombat`, `:LonelogRound` |
-| **Dungeon** | `=== Dungeon Status ===` block with auto-collected room tags and ASCII exit map. Room navigation via exit picker. Room state toggling (cleared, looted, trapped, etc.) | `:LonelogDungeonStatus`, `:LonelogRoomGo`, `:LonelogRoomState` |
-
-### Syntax highlighting
-
-29 highlight groups covering all Lonelog elements: tags, dice notation, scenes, dialogue, progress elements, narrative blocks, and more. Loaded automatically in markdown buffers.
+```markdown
+### S1 *Entering the forest*
+@ Follow the trail
+? Is it safe?
+d: 2d6+3 -> 9  [N:Elara|waiting]
+=> The path is clear, but you hear wolves in the distance.
+[E:Wolf Encounter 1/4]
+```
 
 ---
 
@@ -75,9 +47,9 @@ Add-ons are bundled with the plugin but disabled by default. Enable them in
 ```
 
 > [!NOTE]
-> If you enable add-ons, add their commands to the `cmd` list for lazy loading:
-> `"LonelogCombat"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
-> `"LonelogRoomState"`, `"LonelogRound"`. Or remove `cmd` entirely to load
+> If you enable add-ons (combat, dungeon), add their commands to `cmd`:
+> `"LonelogCombat"`, `"LonelogRound"`, `"LonelogDungeonStatus"`,
+> `"LonelogRoomGo"`, `"LonelogRoomState"`. Or remove `cmd` entirely to load
 > everything at startup.
 
 </details>
@@ -115,25 +87,57 @@ require("lonelog").setup()
 
 ## Quick start
 
+Press `<leader>` followed by a key sequence to trigger actions. All keymaps
+are customizable — set any to `false` to disable it (see [Configuration](#configuration)).
+
+### Core actions
+
 | Key | Action |
 |-----|--------|
 | `<leader>lO` | Roll an oracle (fate, binary, mythic) |
 | `<leader>lD` | Interactive dice roller |
 | `<leader>lR` | Roll dice/table on current line |
 | `<leader>lM` | Insert scene marker with auto-numbering |
-| `<leader>lE` | Show session summary / export |
-| `<leader>lH` | Insert session header |
-| `<leader>lT` | Browse all Lonelog tags |
+| `<leader>lH` | Insert session header with date |
+| `<leader>lT` | Browse all tags |
 | `<leader>lS` | Browse all scenes |
 | `<leader>lC` | Adjust Mythic chaos factor |
+| `<leader>lE` | Show or export session summary |
 
-See `:help lonelog-keymaps` for the complete keymap reference.
+### Notation symbols (insert)
+
+| Normal | Insert | Inserts | Description |
+|--------|--------|---------|-------------|
+| `<leader>lia` | `<C-l>a` | `@ ` | Action marker |
+| `<leader>liq` | `<C-l>q` | `? ` | Oracle question |
+| `<leader>lid` | `<C-l>d` | `d: ` | Dice prefix |
+| `<leader>lin` | — | `(note:)` | Meta note |
+| `<leader>li-` | `<C-l>-` | ` -> ` | Result arrow |
+| `<leader>li=` | `<C-l>=` | `=> ` | Consequence |
+| `<leader>liN` | `<C-l>N` | `@(Name) ` | Actor action |
+
+### Entity tags
+
+| Normal | Insert | Result |
+|--------|--------|--------|
+| `<leader>ltn` | `<C-l>n` | `[N:\|]` — NPC |
+| `<leader>ltl` | `<C-l>l` | `[L:\|]` — Location |
+| `<leader>ltp` | `<C-l>p` | `[PC:\|]` — Player character |
+| `<leader>ltt` | `<C-l>h` | `[Thread:\|Open]` |
+| `<leader>ltr` | `<C-l>r` | `[#N:\|]` — Reference |
+| `<leader>ltf` | `<C-l>f` | `[F:\|]` — Foe |
+
+### Progress elements
+
+| Keymap | Element | Format |
+|--------|---------|--------|
+| `<leader>lpc` | Clock | `[E:Name 0/5]` |
+| `<leader>lpt` | Track | `[Track:Name 0/5]` |
+| `<leader>lpi` | Timer | `[Timer:Name 0]` |
 
 ---
 
 ## Configuration
-
-`require("lonelog").setup(opts)` — all keys optional, defaults shown:
 
 ```lua
 require("lonelog").setup({
@@ -143,7 +147,7 @@ require("lonelog").setup({
 
   float = {
     border = "rounded",
-    height = 0.4,                   -- fraction of editor height
+    height = 0.4,                    -- fraction of editor height
     width  = 0.6,
   },
 
@@ -154,91 +158,58 @@ require("lonelog").setup({
   },
 
   dice = {
-    max_dice  = 100,                -- safety limits
+    max_dice  = 100,
     max_sides = 1000,
   },
 
   prompt_for_scene_context = true,
 
   keymaps = { /* see :help lonelog-keymaps */ },
+})
+```
 
 > [!TIP]
-> Set any keymap to `false` to disable it without overriding:
+> Set any keymap to `false` to disable it, or to a string to rebind:
 > ```lua
-> keymaps = { oracle = false }  -- disable oracle keymap
+> keymaps = {
+>   oracle = false,             -- disable
+>   scene_marker = "<leader>z", -- rebind
+> }
 > ```
-> Set it to a string to rebind:
-> ```lua
-> keymaps = { oracle = "<leader>zo" }
-> ```
-})
-```
-
-### Add-ons
-
-Add-ons are disabled by default. Enable the ones you want:
-
-```lua
-require("lonelog").setup({
-  addons = {
-    combat  = true,   -- enable combat blocks and round markers
-    dungeon = true,   -- enable dungeon status and room features
-  },
-})
-```
 
 > [!TIP]
 > Set `use_telescope = "auto"` (default) to use Telescope when installed,
 > falling back to the native sidebar. Use `true` to require Telescope or
-> `false` to always use the sidebar.
+> `false` to always use the built-in sidebar.
 
 ---
 
-## Commands
+## Add-ons
 
-| Command | Description |
-|---------|-------------|
-| `:Lonelog` | Open main action picker |
-| `:LonelogOracle [table]` | Roll oracle (fate/binary/mythic) |
-| `:LonelogDice` | Interactive dice roller |
-| `:LonelogDiceRoll <notation>` | Roll specific dice notation |
-| `:LonelogD4` — `:LonelogD100` | Quick roll 1dN |
-| `:LonelogSymbol <symbol>` | Insert notation symbol |
-| `:LonelogActionSequence` | Insert 3-line action template |
-| `:LonelogOracleSequence` | Insert 3-line oracle template |
-| `:LonelogTag <type>` | Insert tag snippet |
-| `:LonelogMultiTag <type>` | Insert multi-line tag |
-| `:LonelogInsertClock [name]` | Insert or increment clock |
-| `:LonelogInsertTrack [name]` | Insert or increment track |
-| `:LonelogInsertTimer [name]` | Insert or decrement timer |
-| `:LonelogSceneMarker` | Insert auto-numbered scene |
-| `:LonelogScenePrev` / `:LonelogSceneNext` | Scene navigation |
-| `:LonelogSession` | Insert session header |
-| `:LonelogNarrative` | Insert narrative excerpt block |
-| `:LonelogNote` | Insert meta note |
-| `:LonelogCampaign` | Insert campaign header |
-| `:LonelogSessionSummary` | Show session summary |
-| `:LonelogExportSummary` | Export session summary to file |
-| `:LonelogTags` | Browse tags |
-| `:LonelogScenes` | Browse scenes |
-| `:LonelogRollLine` | Roll dice/table on current line |
-| `:LonelogCompleteTag` | Trigger tag autocomplete |
-| `:LonelogInsert` | Insert last result at cursor |
-| `:LonelogChaos` | Open chaos factor UI |
+Add-ons provide optional features for combat and dungeon crawling. They are
+bundled but disabled by default — enable the ones you need:
 
-**Add-on commands** (enable the add-on in `setup()` to use them):
+```lua
+require("lonelog").setup({
+  addons = {
+    combat  = true,   -- combat blocks and round markers
+    dungeon = true,   -- dungeon status, room navigation, room states
+  },
+})
+```
 
-| Command | Add-on | Description |
-|---------|--------|-------------|
-| `:LonelogCombat` | combat | Insert `[COMBAT]` / `[/COMBAT]` block |
-| `:LonelogRound` | combat | Insert round marker with optional roster |
-| `:LonelogDungeonStatus` | dungeon | Insert/update dungeon status block with ASCII map |
-| `:LonelogRoomGo` | dungeon | Navigate to a connected room |
-| `:LonelogRoomState` | dungeon | Toggle room state |
+When disabled, the add-on's commands and keymaps are not registered.
+
+| Add-on | Commands | Features |
+|--------|----------|----------|
+| **Combat** | `:LonelogCombat`, `:LonelogRound` | `[COMBAT]` / `[/COMBAT]` delimiters, `R#` round markers, auto-roster that excludes dead combatants |
+| **Dungeon** | `:LonelogDungeonStatus`, `:LonelogRoomGo`, `:LonelogRoomState` | Auto-collected room tags with ASCII exit map, navigation via picker, state toggling (cleared, looted, trapped, etc.) |
 
 ---
 
-## Dice notation
+## Features
+
+### Dice engine
 
 | Notation | Example | Description |
 |----------|---------|-------------|
@@ -251,21 +222,21 @@ require("lonelog").setup({
 | `NdN>>T` | `6d6>>4` | Success counting |
 | `NdN>T` | `2d6>7` | Sum vs target |
 
----
+```vim
+:help lonelog-notation-dice
+```
 
-## Oracles
+### Oracles
 
 | Oracle | Outcomes | Command |
 |--------|----------|---------|
-| Fate | Exceptional Yes, Yes, Yes but..., Maybe, No but..., No, Exceptional No | `:LonelogOracle` |
-| Binary | Yes / No (50/50) | `:LonelogOracle binary` |
-| Mythic | 2d10 + chaos factor (1-9) | `:LonelogOracle mythic` |
+| **Fate** | Exceptional Yes, Yes, Yes but..., Maybe, No but..., No, Exceptional No | `:LonelogOracle` |
+| **Binary** | Yes / No (50/50) | `:LonelogOracle binary` |
+| **Mythic** | 2d10 + chaos factor (1-9) | `:LonelogOracle mythic` |
 
-Results display in colored floating windows.
-
----
-
-## Tags and notation
+```vim
+:help lonelog-oracle
+```
 
 ### Tags
 
@@ -306,6 +277,58 @@ gen: Generate NPC
   tbl: Equipment (d6)
 ```
 
+```vim
+:help lonelog-notation
+```
+
+---
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `:Lonelog` | Open main action picker |
+| `:LonelogOracle [table]` | Roll oracle (fate/binary/mythic) |
+| `:LonelogDice` | Interactive dice roller |
+| `:LonelogDiceRoll <notation>` | Roll specific dice notation |
+| `:LonelogD4` — `:LonelogD100` | Quick roll 1dN |
+| `:LonelogSymbol <symbol>` | Insert notation symbol |
+| `:LonelogActionSequence` | Insert 3-line action template |
+| `:LonelogOracleSequence` | Insert 3-line oracle template |
+| `:LonelogTag <type>` | Insert tag snippet |
+| `:LonelogMultiTag <type>` | Insert multi-line tag |
+| `:LonelogInsertClock [name]` | Insert or increment clock |
+| `:LonelogInsertTrack [name]` | Insert or increment track |
+| `:LonelogInsertTimer [name]` | Insert or decrement timer |
+| `:LonelogSceneMarker` | Insert auto-numbered scene |
+| `:LonelogScenePrev` / `:LonelogSceneNext` | Scene navigation |
+| `:LonelogSession` | Insert session header |
+| `:LonelogNarrative` | Insert narrative excerpt block |
+| `:LonelogNote` | Insert meta note |
+| `:LonelogCampaign` | Insert campaign YAML header |
+| `:LonelogSessionSummary` | Show session summary |
+| `:LonelogExportSummary` | Export session summary to file |
+| `:LonelogTags` | Browse tags |
+| `:LonelogScenes` | Browse scenes |
+| `:LonelogRollLine` | Roll dice/table on current line |
+| `:LonelogCompleteTag` | Trigger tag autocomplete |
+| `:LonelogInsert` | Insert last result at cursor |
+| `:LonelogChaos` | Open chaos factor UI |
+
+**Add-on commands** (require the add-on to be enabled in `setup()`):
+
+| Command | Add-on | Description |
+|---------|--------|-------------|
+| `:LonelogCombat` | combat | Insert `[COMBAT]` / `[/COMBAT]` block |
+| `:LonelogRound` | combat | Insert round marker with optional roster |
+| `:LonelogDungeonStatus` | dungeon | Insert/update dungeon status block |
+| `:LonelogRoomGo` | dungeon | Navigate to a connected room |
+| `:LonelogRoomState` | dungeon | Toggle room state |
+
+```vim
+:help lonelog-commands
+```
+
 ---
 
 ## API
@@ -329,23 +352,21 @@ ln.oracle.set_chaos(7)    -- boolean
 -- Parsers
 local tags   = ln.parsers.parse_tags()
 local scenes = ln.parsers.parse_scenes()
-local summary = ln.parsers.tags_summary(tags)
 
 -- Inline rolling
-local modified = require("lonelog.roll_line").process_line(line, tbls)
 require("lonelog.roll_line").roll_current_line()
 
 -- Tag completion
-local comp = require("lonelog.completion")
-comp.refresh_completions()
-comp.complete_tag()
+require("lonelog.completion").complete_tag()
+```
+
+```vim
+:help lonelog-api
 ```
 
 ---
 
 ## Documentation
-
-For the complete reference, run:
 
 ```vim
 :help lonelog
@@ -355,7 +376,7 @@ The help file covers:
 - All keymaps (normal, insert, floating window, sidebar)
 - Notation format: tags, dice, scenes, tables, progress elements
 - Oracle probabilities and chaos factor system
-- Tag autocomplete and completion sorting
+- Tag autocomplete with relevance sorting
 - Floating window keybindings
 - Add-on system configuration
 - Session workflow tips
