@@ -90,6 +90,16 @@ local function test(name, notation, expected_parts)
     success = false
   end
   
+  if expected_parts.operator and result.operator ~= expected_parts.operator then
+    table.insert(issues, string.format("operator: got %s, expected %s", tostring(result.operator), tostring(expected_parts.operator)))
+    success = false
+  end
+  
+  if expected_parts.display_match and not result.display:find(expected_parts.display_match, 1, true) then
+    table.insert(issues, string.format("display missing: %s", expected_parts.display_match))
+    success = false
+  end
+  
   if success then
     print(string.format("PASS [%s] %s -> %s", name, notation, result.display))
   else
@@ -151,6 +161,12 @@ if test("sum_vs_target", "2d6>7", { count = 2, sides = 6 }) then passed = passed
 if test("sum_vs_target_fail", "1d20>15", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
 if test("sum_vs_target_with_mod", "2d6+3>7", { count = 2, sides = 6 }) then passed = passed + 1 else failed = failed + 1 end
 if test("sum_vs_target_neg_mod", "2d6-1>8", { count = 2, sides = 6 }) then passed = passed + 1 else failed = failed + 1 end
+
+print()
+print("--- Extended Comparison Tests ---")
+if test("gte_success", "1d20>=15", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
+if test("lte_fail", "1d20<=10", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
+if test("vs_success", "1d100 vs 50", { count = 1, sides = 100 }) then passed = passed + 1 else failed = failed + 1 end
 
 print()
 print("--- Error Cases ---")

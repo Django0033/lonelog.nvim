@@ -24,6 +24,7 @@ local function parse_notation(notation)
 		exploding = false,
 		target = 0,
 		target_mode = nil,
+		operator = nil,
 	}
 	notation = notation:gsub("%s+", ""):upper()
 
@@ -41,12 +42,46 @@ local function parse_notation(notation)
 		notation = notation:gsub(">>%d+", "")
 	end
 
-	-- Check for sum vs target mode (e.g., "2d6>7")
-	mt = notation:match(">%d+")
-	if mt then
-		p.target = tonumber(mt:sub(2))
-		p.target_mode = "sum"
-		notation = notation:gsub(">%d+", "")
+	-- Check for sum vs target operators (order matters: multi-char before single-char)
+	if not p.target_mode then
+		mt = notation:match(">=%d+")
+		if mt then
+			p.operator = ">="
+			p.target = tonumber(mt:sub(3))
+			p.target_mode = "sum"
+			notation = notation:gsub(">=%d+", "")
+		end
+	end
+
+	if not p.target_mode then
+		mt = notation:match("<=%d+")
+		if mt then
+			p.operator = "<="
+			p.target = tonumber(mt:sub(3))
+			p.target_mode = "sum"
+			notation = notation:gsub("<=%d+", "")
+		end
+	end
+
+	if not p.target_mode then
+		mt = notation:match(">%d+")
+		if mt then
+			p.operator = ">"
+			p.target = tonumber(mt:sub(2))
+			p.target_mode = "sum"
+			notation = notation:gsub(">%d+", "")
+		end
+	end
+
+	if not p.target_mode then
+		-- 'vs' check after whitespace stripped, so no space between vs and number
+		mt = notation:match("VS%d+")
+		if mt then
+			p.operator = "vs"
+			p.target = tonumber(mt:match("%d+"))
+			p.target_mode = "sum"
+			notation = notation:gsub("vs%d+", "")
+		end
 	end
 
 	-- Extract dice count and sides (e.g., "2d6")
@@ -156,7 +191,7 @@ function M.roll(notation)
 			local s = parsed.modifier > 0 and "+" or ""
 			dice_str = dice_str .. s .. parsed.modifier
 		end
-		dice_str = dice_str .. (parsed.target_mode == "successes" and ">>" or ">") .. parsed.target
+		dice_str = dice_str .. (parsed.target_mode == "successes" and ">>" or parsed.operator) .. parsed.target
 	elseif parsed.modifier ~= 0 then
 		local s = parsed.modifier > 0 and "+" or ""
 		dice_str = dice_str .. s .. parsed.modifier
@@ -173,9 +208,13 @@ function M.roll(notation)
 				sum = sum + r
 			end
 			sum = sum + parsed.modifier
+			local op = parsed.operator or ">"
+			local ok = op == "<=" and sum <= parsed.target
+				or (op == ">" and sum > parsed.target)
+				or (sum >= parsed.target)
 			table.insert(
 				parts,
-				string.format(" = %d vs %d -> %s", sum, parsed.target, sum >= parsed.target and "Success" or "Fail")
+				string.format(" = %d %s %d -> %s", sum, op, parsed.target, ok and "Success" or "Fail")
 			)
 			total = sum
 		end
@@ -194,6 +233,7 @@ function M.roll(notation)
 		modifier = parsed.modifier,
 		target = parsed.target,
 		exploding = parsed.exploding,
+		operator = parsed.operator,
 		total = total,
 		display = table.concat(parts, ""),
 	}
