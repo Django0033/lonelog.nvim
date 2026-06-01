@@ -425,6 +425,9 @@ Config key: addons~
     d:        - Roll dice notation, append result.
                 Before:  d: 2d6+3
                 After:   d: 2d6+3[4, 2] = 10
+                Multiple notations can be comma-separated:
+                Before:  d: 2d6, 1d8
+                After:   d: 2d6[4, 2] = 6, 1d8[7] = 7
 
     tbl:      - Roll the table's dice and resolve the entry.
                 Before:  tbl: Forest (d6)
@@ -988,6 +991,7 @@ Lonelog is a structured markdown notation for solo RPG session logs
    NdN<=T         1d20<=10       Less-or-equal sum vs target
    NdN vs T       1d100 vs 50    Versus (semantic alias for >=)
    NdN>T          2d6>7          Sum vs target
+   NdN,NdN       2d6, 1d8       Multiple rolls on one d: line (comma-separated)
 <
   Safety limits (configurable): max 100 dice, max 1000 sides.
 
