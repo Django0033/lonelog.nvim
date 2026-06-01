@@ -21,7 +21,7 @@ end
 local function deep_equal(a, b)
   if #a ~= #b then return false end
   for i = 1, #a do
-    if a[i].type ~= b[i].type or a[i].name ~= b[i].name or a[i].hp ~= b[i].hp then
+    if a[i].type ~= b[i].type or a[i].name ~= b[i].name or a[i].field ~= b[i].field then
       return false
     end
   end
@@ -154,9 +154,9 @@ do
   if #roster >= 2 then
     check("roster: first foe name", roster[1].name, "Jefe")
     check("roster: first foe type", roster[1].type, "F")
-    check("roster: first foe HP", roster[1].hp, 12)
+    check("roster: first foe field", roster[1].field, "HP 12")
     check("roster: second foe name", roster[2].name, "Matón")
-    check("roster: second foe HP", roster[2].hp, 3)
+    check("roster: second foe field", roster[2].field, "HP 3")
   end
 end
 
@@ -170,7 +170,7 @@ do
   if #roster >= 1 then
     check("roster: PC name", roster[1].name, "Kael")
     check("roster: PC type", roster[1].type, "PC")
-    check("roster: PC HP", roster[1].hp, 8)
+    check("roster: PC field", roster[1].field, "HP 8")
   end
 end
 
@@ -197,6 +197,20 @@ end
 do
   local lines = {
     "R1",
+    "[PC:django|guapo]",
+    "[F:arana|fea]",
+  }
+  local roster = M.collect_roster(lines, 1, 3)
+  check("roster: descriptive fields without HP", #roster, 2)
+  if #roster >= 2 then
+    check("roster: PC descriptive field", roster[1].field, "guapo")
+    check("roster: F descriptive field", roster[2].field, "fea")
+  end
+end
+
+do
+  local lines = {
+    "R1",
     "d: -> [N:Guardia|alerta] [F:Jefe|HP 10]",
   }
   local roster = M.collect_roster(lines, 1, 2)
@@ -212,8 +226,8 @@ end
 
 do
   local roster = {
-    { type = "PC", name = "Kael", hp = 8 },
-    { type = "F", name = "Jefe", hp = 12 },
+    { type = "PC", name = "Kael", field = "HP 8" },
+    { type = "F", name = "Jefe", field = "HP 12" },
   }
   local line = M.build_roster_line(2, roster)
   local expected = "R2 Roster: [PC:Kael|HP 8] [F:Jefe|HP 12]"
@@ -223,6 +237,16 @@ end
 do
   local line = M.build_roster_line(5, {})
   check("roster line: empty roster", line, "R5 Roster: ")
+end
+
+do
+  local roster = {
+    { type = "PC", name = "django", field = "guapo" },
+    { type = "F", name = "arana", field = "fea" },
+  }
+  local line = M.build_roster_line(2, roster)
+  local expected = "R2 Roster: [PC:django|guapo] [F:arana|fea]"
+  check("roster line: descriptive fields without HP", line, expected)
 end
 
 -- ============================================================

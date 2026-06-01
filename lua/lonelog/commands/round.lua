@@ -37,14 +37,14 @@ function M.collect_roster(lines, start, finish)
 	local roster = {}
 
 	for i = start, finish do
-		local pc_name, pc_hp = lines[i]:match("%[PC:([^|]+)%|HP (%d+)")
+		local pc_name, pc_field = lines[i]:match("%[PC:([^|]+)%|([^|%]]+)")
 		if pc_name then
-			table.insert(roster, { type = "PC", name = pc_name, hp = tonumber(pc_hp) })
+			table.insert(roster, { type = "PC", name = pc_name, field = pc_field })
 		end
 
-		local foe_name, foe_hp = lines[i]:match("%[F:([^|]+)%|HP (%d+)")
+		local foe_name, foe_field = lines[i]:match("%[F:([^|]+)%|([^|%]]+)")
 		if foe_name then
-			table.insert(roster, { type = "F", name = foe_name, hp = tonumber(foe_hp) })
+			table.insert(roster, { type = "F", name = foe_name, field = foe_field })
 		end
 	end
 
@@ -54,7 +54,7 @@ end
 function M.build_roster_line(round_num, roster)
 	local parts = {}
 	for _, entry in ipairs(roster) do
-		table.insert(parts, string.format("[%s:%s|HP %d]", entry.type, entry.name, entry.hp))
+		table.insert(parts, string.format("[%s:%s|%s]", entry.type, entry.name, entry.field))
 	end
 
 	local tags_str = table.concat(parts, " ")
