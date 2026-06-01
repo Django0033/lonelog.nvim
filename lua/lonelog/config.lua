@@ -3,26 +3,30 @@ local M = {}
 -- Default configuration values
 local defaults = {
 	keymaps = {
-		-- Main actions (uppercase)
+		-- Core actions (uppercase)
 		oracle = "<leader>lO",
 		dice = "<leader>lD",
 		tags = "<leader>lT",
 		scenes = "<leader>lS",
 		chaos = "<leader>lC",
-		session_header = "<leader>lH",
-		narrative_block = "<leader>lN",
 		insert_result = "<leader>lI",
-		scene_marker = "<leader>lM",
+		roll_line = "<leader>lR",
+
+		-- Session structure (ls-)
+		session_header = "<leader>lsh",
+		campaign_header = "<leader>lsc",
+		scene_marker = "<leader>lsm",
+		narrative_block = "<leader>lsn",
+		session_summary = "<leader>lss",
 		scene_prev = "<leader>l[",
 		scene_next = "<leader>l]",
-		roll_line = "<leader>lR",
-		campaign_header = "<leader>lA",
-		combat_block = "<leader>lB",
-		dungeon_status = "<leader>lK",
-		room_go = "<leader>lG",
-		room_state = "<leader>lJ",
-		insert_round = "<leader>lr",
-		session_summary = "<leader>lE",
+
+		-- Addons (lx-)
+		combat_block = "<leader>lxc",
+		dungeon_status = "<leader>lxd",
+		room_go = "<leader>lxg",
+		room_state = "<leader>lxs",
+		insert_round = "<leader>lxr",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",
@@ -60,9 +64,9 @@ local defaults = {
 		d4 = "<leader>ld4",
 		d6 = "<leader>ld6",
 		d8 = "<leader>ld8",
-		d10 = "<leader>lda",
-		d12 = "<leader>ldb",
-		d20 = "<leader>ldw",
+		d10 = "<leader>ldx",
+		d12 = "<leader>ldz",
+		d20 = "<leader>ldt",
 		d100 = "<leader>ldc",
 
 		-- Tag completion (insert mode)

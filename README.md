@@ -97,12 +97,21 @@ are customizable — set any to `false` to disable it (see [Configuration](#conf
 | `<leader>lO` | Roll an oracle (fate, binary, mythic) |
 | `<leader>lD` | Interactive dice roller |
 | `<leader>lR` | Roll dice/table on current line |
-| `<leader>lM` | Insert scene marker with auto-numbering |
-| `<leader>lH` | Insert session header with date |
 | `<leader>lT` | Browse all tags |
 | `<leader>lS` | Browse all scenes |
 | `<leader>lC` | Adjust Mythic chaos factor |
-| `<leader>lE` | Show or export session summary |
+| `<leader>lI` | Insert last result from floating window |
+
+### Session structure
+
+| Key | Action |
+|-----|--------|
+| `<leader>lsh` | Insert session header with date |
+| `<leader>lsc` | Insert campaign YAML header |
+| `<leader>lsm` | Insert scene marker with auto-numbering |
+| `<leader>lsn` | Insert narrative excerpt block |
+| `<leader>lss` | Show or export session summary |
+| `<leader>l[` / `<leader>l]` | Previous / next scene |
 
 ### Notation symbols (insert)
 

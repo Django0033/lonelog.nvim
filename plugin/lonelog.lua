@@ -69,7 +69,7 @@ local function setup_keymaps()
 	end
 
 	-- ================================================================
-	-- Group 1: Main actions (uppercase)
+	-- Group 1: Core actions (l<UPPER>)
 	-- ================================================================
 
 	map("n", cfg.get().keymaps.oracle, function()
@@ -97,12 +97,6 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.chaos, function()
 		solo.oracle.show_chaos_ui()
 	end, { desc = "Chaos Factor UI" })
-	map("n", cfg.get().keymaps.session_header, function()
-		require("lonelog.commands.session").insert_session_header()
-	end, { desc = "Insert session header" })
-	map("n", cfg.get().keymaps.narrative_block, function()
-		require("lonelog.commands.narrative").insert_narrative_block()
-	end, { desc = "Insert narrative block" })
 	map("n", cfg.get().keymaps.insert_result, function()
 		local w, c = solo.ui.get_latest_content()
 		if c then
@@ -111,24 +105,35 @@ local function setup_keymaps()
 			vim.notify("lonelog: No result to insert", vim.log.levels.WARN)
 		end
 	end, { desc = "Insert result" })
-	map("n", cfg.get().keymaps.scene_marker, function()
-		insert_scene_marker()
-	end, { desc = "Insert auto-numbered scene" })
-	map("n", cfg.get().keymaps.scene_prev, function()
-		require("lonelog.parsers.scenes").navigate_scene(-1)
-	end, { desc = "Previous scene" })
-	map("n", cfg.get().keymaps.scene_next, function()
-		require("lonelog.parsers.scenes").navigate_scene(1)
-	end, { desc = "Next scene" })
 	map("n", cfg.get().keymaps.roll_line, function()
 		require("lonelog.roll_line").roll_current_line()
 	end, { desc = "Lonelog roll on current line" })
+
+	-- ================================================================
+	-- Group 2: Session structure (ls-)
+	-- ================================================================
+
+	map("n", cfg.get().keymaps.session_header, function()
+		require("lonelog.commands.session").insert_session_header()
+	end, { desc = "Insert session header" })
+	map("n", cfg.get().keymaps.narrative_block, function()
+		require("lonelog.commands.narrative").insert_narrative_block()
+	end, { desc = "Insert narrative block" })
+	map("n", cfg.get().keymaps.scene_marker, function()
+		insert_scene_marker()
+	end, { desc = "Insert auto-numbered scene" })
 	map("n", cfg.get().keymaps.campaign_header, function()
 		require("lonelog.commands.campaign").insert_campaign_header()
 	end, { desc = "Insert campaign header" })
 	map("n", cfg.get().keymaps.session_summary, function()
 		require("lonelog.commands.summary").show_session_summary()
 	end, { desc = "Session summary" })
+	map("n", cfg.get().keymaps.scene_prev, function()
+		require("lonelog.parsers.scenes").navigate_scene(-1)
+	end, { desc = "Previous scene" })
+	map("n", cfg.get().keymaps.scene_next, function()
+		require("lonelog.parsers.scenes").navigate_scene(1)
+	end, { desc = "Next scene" })
 
 	-- ================================================================
 	-- Group 2: Insert notation symbols (li-)
