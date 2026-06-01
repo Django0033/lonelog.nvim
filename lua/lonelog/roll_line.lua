@@ -29,7 +29,7 @@ local function parse_tbl_line(line)
 end
 
 local function extract_d_notation(line)
-	return line:match("^%s*d:%s*([%w%+%-%>%%%!%#%<%=\040%s]+)")
+	return line:match("^%s*d:%s*([%w%+%-%>%%%!%#%<%=\040%s,]+)")
 end
 
 local function extract_label_notation(line)
@@ -92,19 +92,24 @@ function M.process_line(line, tables)
 	end
 
 	if lower:match("^d:") then
-		local notation = extract_d_notation(line)
-		if not notation then
+		local raw = extract_d_notation(line)
+		if not raw then
 			return nil
 		end
 
 		local dice = require("lonelog.dice")
-		local result, err = dice.roll(notation)
-		if not result then
-			return nil, err
+		local parts = {}
+		for token in raw:gmatch("[^,]+") do
+			local notation = token:match("^%s*(.-)%s*$")
+			local result, err = dice.roll(notation)
+			if not result then
+				return nil, err
+			end
+			table.insert(parts, result.display)
 		end
 
 		local indent = line:match("^(%s*)")
-		return indent .. "d: " .. result.display
+		return indent .. "d: " .. table.concat(parts, ", ")
 	end
 
 	local label_info = extract_label_notation(line)

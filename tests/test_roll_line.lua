@@ -166,6 +166,27 @@ do
 	end
 end
 
+do
+	local r = roll_line.process_line("d: 2d6, 1d8", test_tables)
+	local ok = r ~= nil and r:match("^d:") and r ~= "d: "
+	local has_two = r and select(2, r:gsub("=", "")) >= 2
+	if test("d: multi-roll two notations", ok and has_two) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
+do
+	local r = roll_line.process_line("d: 2d6+3, 1d20", test_tables)
+	local ok = r ~= nil and r:match("2d6%+3") and r:match("1d20")
+	if test("d: multi-roll with modifier", ok) then
+		passed = passed + 1
+	else
+		failed = failed + 1
+	end
+end
+
 print()
 print("=== process_line (label: notation patterns) ===")
 
