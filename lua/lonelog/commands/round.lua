@@ -1,5 +1,14 @@
 local M = {}
 
+local function is_dead(field)
+	local lower = field:lower()
+	if lower:match("^dead") then
+		return true
+	end
+	local n = lower:match("^hp (%-?%d+)")
+	return n and tonumber(n) <= 0
+end
+
 function M.find_combat_block(lines, cursor_row)
 	local start_line, end_line
 
@@ -38,12 +47,12 @@ function M.collect_roster(lines, start, finish)
 
 	for i = start, finish do
 		local pc_name, pc_field = lines[i]:match("%[PC:([^|]+)%|([^|%]]+)")
-		if pc_name then
+		if pc_name and not is_dead(pc_field) then
 			table.insert(roster, { type = "PC", name = pc_name, field = pc_field })
 		end
 
 		local foe_name, foe_field = lines[i]:match("%[F:([^|]+)%|([^|%]]+)")
-		if foe_name then
+		if foe_name and not is_dead(foe_field) then
 			table.insert(roster, { type = "F", name = foe_name, field = foe_field })
 		end
 	end

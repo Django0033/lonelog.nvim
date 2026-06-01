@@ -221,6 +221,92 @@ do
 end
 
 -- ============================================================
+-- is_dead (death detection in collect_roster)
+-- ============================================================
+
+do
+  local lines = {
+    "R1",
+    "[F:arana|dead]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: descriptive 'dead' excluded", #roster, 0)
+end
+
+do
+  local lines = {
+    "R1",
+    "[F:Jefe|Dead]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: case-insensitive 'Dead' excluded", #roster, 0)
+end
+
+do
+  local lines = {
+    "R1",
+    "[PC:Kael|HP 0]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: HP 0 excluded", #roster, 0)
+end
+
+do
+  local lines = {
+    "R1",
+    "[F:Goblin|HP -2]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: HP negative excluded", #roster, 0)
+end
+
+do
+  local lines = {
+    "R1",
+    "[PC:django|guapo]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: descriptive alive included", #roster, 1)
+  if #roster >= 1 then
+    check("dead: alive name preserved", roster[1].name, "django")
+  end
+end
+
+do
+  local lines = {
+    "R1",
+    "[F:Jefe|HP 12]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: HP positive included", #roster, 1)
+end
+
+do
+  local lines = {
+    "R1",
+    "[PC:Kael|HP 8]",
+    "[F:Jefe|HP 12]",
+    "[F:arana|dead]",
+    "[F:Goblin|HP 0]",
+  }
+  local roster = M.collect_roster(lines, 1, 4)
+  check("dead: mixed — only alive in roster", #roster, 2)
+  if #roster >= 2 then
+    check("dead: first survivor is PC", roster[1].type, "PC")
+    check("dead: second survivor is F", roster[2].type, "F")
+  end
+end
+
+do
+  local lines = {
+    "R1",
+    "[F:spider|deadly poison]",
+  }
+  local roster = M.collect_roster(lines, 1, 2)
+  check("dead: 'deadly poison' excluded (starts with dead)", #roster, 0)
+end
+
+-- ============================================================
 -- build_roster_line
 -- ============================================================
 
