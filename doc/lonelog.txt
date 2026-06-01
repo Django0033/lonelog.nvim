@@ -584,6 +584,11 @@ Config key: use_telescope~
    R3 Roster: [PC:Kael|HP 8] [F:Jefe|HP 12]
 <
 
+   The roster automatically excludes dead combatants. A combatant is
+   considered dead when its field starts with "dead" (case-insensitive,
+   e.g. |dead|, |Dead|) or when its HP value is ≤ 0 (e.g. |HP 0|,
+   |HP -3|). Edit the tag directly to mark a combatant as dead.
+
    If the cursor is not inside a [COMBAT] block, a warning is shown.
 >
    :LonelogCombat    " Insert combat encounter block
