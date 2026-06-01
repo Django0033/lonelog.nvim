@@ -146,6 +146,7 @@ Open a markdown file and press any of these:
 | `<leader>lH` | Insert session header with date |
 | `<leader>lK` | Insert/update dungeon status block |
 | `<leader>lG` | Navigate to connected room |
+| `<leader>lJ` | Toggle room state |
 | `<leader>lT` | Browse all Lonelog tags |
 | `<leader>lS` | Browse all scenes |
 | `<leader>lC` | Adjust Mythic chaos factor |
@@ -343,6 +344,7 @@ gen: Generate NPC
 | `:LonelogCombat` | Insert combat block `[COMBAT]` / `[/COMBAT]` |
 | `:LonelogDungeonStatus` | Insert/update `=== Dungeon Status ===` block with room tags |
 | `:LonelogRoomGo` | Navigate to a connected room via exit picker |
+| `:LonelogRoomState` | Toggle room states via picker |
 | `:LonelogRound` | Insert round marker with optional auto-roster (excludes dead combatants) |
 | `:LonelogNote` | Insert meta note |
 | `:LonelogCampaign` | Insert campaign header |

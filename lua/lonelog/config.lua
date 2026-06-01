@@ -20,6 +20,7 @@ local defaults = {
 		combat_block = "<leader>lB",
 		dungeon_status = "<leader>lK",
 		room_go = "<leader>lG",
+		room_state = "<leader>lJ",
 		insert_round = "<leader>lr",
 		session_summary = "<leader>lE",
 

@@ -26,6 +26,7 @@ CONTENTS                                                *lonelog-contents*
      4.17 Round markers ...................................... |lonelog-command-round|
      4.18 Dungeon Status Block ............................... |lonelog-command-dungeon-status|
      4.19 Room Navigation .................................... |lonelog-command-room-nav|
+     4.20 Room State Editor .................................. |lonelog-command-room-state|
       5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
@@ -89,7 +90,7 @@ lazy.nvim~
     "Django0033/lonelog.nvim",
     cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
             "LonelogScenes", "LonelogRollLine", "LonelogCombat",
-            "LonelogDungeonStatus", "LonelogRoomGo" },
+            "LonelogDungeonStatus", "LonelogRoomGo", "LonelogRoomState" },
     config = function()
       require("lonelog").setup()
     end,
@@ -180,6 +181,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
        combat_block    = "<leader>lB",
         dungeon_status  = "<leader>lK",
         room_go         = "<leader>lG",
+        room_state      = "<leader>lJ",
         insert_round    = "<leader>lr",
        session_summary = "<leader>lE",
        insert_result = "<leader>lI",
@@ -662,6 +664,38 @@ Config key: use_telescope~
    If the destination room tag is not found in the buffer, a warning is
    shown and the cursor stays in place.
 
+4.20 Room State Editor                             *:LonelogRoomState*
+                                                      *lonelog-command-room-state*
+
+   :LonelogRoomState " Toggle states on a room tag
+
+   Opens a picker showing all 8 dungeon states with checkmarks for the
+   currently active ones. Selecting a state toggles it on or off.
+
+   States: |unexplored|, |active|, |cleared|, |looted|, |locked|,
+   |trapped|, |safe|, |collapsed|.
+
+   Example - cursor on a line containing: >
+
+     [R:3|cleared,looted|almacen]
+
+   <
+   Running |:LonelogRoomState| shows:
+   >
+     [X] cleared
+     [X] looted
+     [ ] active
+     [ ] unexplored
+     ...
+
+   <
+   Selecting |active| updates the tag to:
+   >
+     [R:3|cleared,looted,active|almacen]
+
+   <
+   If the current line has no room tag, a notice is shown.
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -685,6 +719,7 @@ Normal mode keymaps~
     <leader>lB     Insert combat block            :LonelogCombat
     <leader>lK     Insert/update dungeon status   :LonelogDungeonStatus
     <leader>lG     Navigate to connected room     :LonelogRoomGo
+    <leader>lJ     Toggle room state             :LonelogRoomState
     <leader>lr     Insert round marker            :LonelogRound
    <leader>lR     Roll current line             :LonelogRollLine
     <leader>lA     Insert campaign header         :LonelogCampaign
