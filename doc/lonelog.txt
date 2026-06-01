@@ -23,6 +23,7 @@ CONTENTS                                                *lonelog-contents*
     4.14 Campaign header ................................... |lonelog-command-campaign|
     4.15 Session summary .................................. |lonelog-command-summary|
     4.16 Combat block ...................................... |lonelog-command-combat|
+    4.17 Round markers ...................................... |lonelog-command-round|
      5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
@@ -173,6 +174,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
       tag_foe      = "<leader>ltf",
        -- Other
        combat_block    = "<leader>lB",
+       insert_round    = "<leader>lr",
        session_summary = "<leader>lE",
        insert_result = "<leader>lI",
        scene_marker  = "<leader>lm",
@@ -546,6 +548,43 @@ Config key: use_telescope~
 
 4.16 Combat block                                  *:LonelogCombat*
                                                     *lonelog-command-combat*
+
+   :LonelogCombat    " Insert combat encounter block
+
+   Inserts a combat block delimited by [COMBAT] and [/COMBAT], placing
+   the cursor on the blank middle line in insert mode for immediate
+   combat notation entry.
+
+>
+   [COMBAT]
+
+   [/COMBAT]
+<
+
+4.17 Round markers                                 *:LonelogRound*
+                                                    *lonelog-command-round*
+
+   :LonelogRound     " Insert round marker with optional roster
+
+   Inserts an auto-incremented round marker inside the current
+   |lonelog-command-combat| block. Prompts for the type of marker:
+
+   "Ronda simple" — inserts R{N+1} where N is the highest existing
+   round number found within the enclosing [COMBAT] block.
+
+>
+   R3
+<
+
+   "Ronda con roster" — inserts R{N+1} Roster: followed by all
+   [PC:Name|HP N] and [F:Name|HP N] tags found in the current
+   combat block, providing a compact round-by-round status summary.
+
+>
+   R3 Roster: [PC:Kael|HP 8] [F:Jefe|HP 12]
+<
+
+   If the cursor is not inside a [COMBAT] block, a warning is shown.
 >
    :LonelogCombat    " Insert combat encounter block
 <
@@ -580,6 +619,7 @@ Normal mode keymaps~
   <leader>l]     Go to next scene              :LonelogSceneNext
    <leader>lN     Insert narrative block         :LonelogNarrative
    <leader>lB     Insert combat block            :LonelogCombat
+   <leader>lr     Insert round marker            :LonelogRound
    <leader>lR     Roll current line             :LonelogRollLine
     <leader>lA     Insert campaign header         :LonelogCampaign
     <leader>lE     Session summary                :LonelogSessionSummary

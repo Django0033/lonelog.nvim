@@ -127,6 +127,18 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.combat_block, function()
 		require("lonelog.commands.combat").insert_combat_block()
 	end, { desc = "Insert combat block" })
+	map("n", cfg.get().keymaps.insert_round, function()
+		local round = require("lonelog.commands.round")
+		vim.ui.select({ "Ronda simple", "Ronda con roster" }, {
+			prompt = "Insert round marker:",
+		}, function(choice)
+			if choice == "Ronda simple" then
+				round.insert_round(false)
+			elseif choice == "Ronda con roster" then
+				round.insert_round(true)
+			end
+		end)
+	end, { desc = "Insert round marker" })
 	map("n", cfg.get().keymaps.session_summary, function()
 		require("lonelog.commands.summary").show_session_summary()
 	end, { desc = "Session summary" })
@@ -477,6 +489,19 @@ end, { nargs = 0, desc = "Insert narrative block" })
 vim.api.nvim_create_user_command("LonelogCombat", function()
 	require("lonelog.commands.combat").insert_combat_block()
 end, { nargs = 0, desc = "Insert combat block" })
+
+vim.api.nvim_create_user_command("LonelogRound", function()
+	local round = require("lonelog.commands.round")
+	vim.ui.select({ "Ronda simple", "Ronda con roster" }, {
+		prompt = "Insert round marker:",
+	}, function(choice)
+		if choice == "Ronda simple" then
+			round.insert_round(false)
+		elseif choice == "Ronda con roster" then
+			round.insert_round(true)
+		end
+	end)
+end, { nargs = 0, desc = "Insert round marker" })
 
 vim.api.nvim_create_user_command("LonelogNote", function()
 	require("lonelog.commands.note").insert_note()

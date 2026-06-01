@@ -18,6 +18,7 @@ local defaults = {
 		roll_line = "<leader>lR",
 		campaign_header = "<leader>lA",
 		combat_block = "<leader>lB",
+		insert_round = "<leader>lr",
 		session_summary = "<leader>lE",
 
 		-- Insert notation symbols
