@@ -113,6 +113,9 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.campaign_header, function()
 		require("lonelog.commands.campaign").insert_campaign_header()
 	end, { desc = "Insert campaign header" })
+	map("n", cfg.get().keymaps.session_summary, function()
+		require("lonelog.commands.summary").show_session_summary()
+	end, { desc = "Session summary" })
 
 	-- ================================================================
 	-- Group 2: Insert notation symbols (li-)
@@ -477,6 +480,14 @@ end, { nargs = 0, desc = "Insert narrative block" })
 vim.api.nvim_create_user_command("LonelogNote", function()
 	require("lonelog.commands.note").insert_note()
 end, { nargs = 0, desc = "Insert meta note" })
+
+vim.api.nvim_create_user_command("LonelogSessionSummary", function()
+	require("lonelog.commands.summary").show_session_summary()
+end, { nargs = 0, desc = "Show session summary" })
+
+vim.api.nvim_create_user_command("LonelogExportSummary", function()
+	require("lonelog.commands.summary").export_session_summary()
+end, { nargs = 0, desc = "Export session summary to file" })
 
 vim.api.nvim_create_user_command("LonelogMultiTag", function(o)
 	require("lonelog.commands.multiline_tag").insert_multiline_tag(o.args)

@@ -20,8 +20,9 @@ CONTENTS                                                *lonelog-contents*
   4.11 Narrative blocks ................................. |lonelog-command-narrative|
    4.12 Meta notes ........................................ |lonelog-command-note|
    4.13 Multi-line tags ................................... |lonelog-command-mltag|
-   4.14 Campaign header ................................... |lonelog-command-campaign|
-   5. Keymaps ............................................. |lonelog-keymaps|
+    4.14 Campaign header ................................... |lonelog-command-campaign|
+    4.15 Session summary .................................. |lonelog-command-summary|
+    5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
     6.2 Tag format ....................................... |lonelog-notation-tags|
@@ -172,9 +173,10 @@ Call setup() with an optional table of overrides. All keys and defaults:
       tag_track    = "<leader>ltk",
       tag_timer    = "<leader>lti",
 
-      -- Other
-      insert_result = "<leader>lI",
-      scene_marker  = "<leader>lm",
+       -- Other
+       session_summary = "<leader>lE",
+       insert_result = "<leader>lI",
+       scene_marker  = "<leader>lm",
       roll_line     = "<leader>lr",
       complete_tag  = "<C-l>c",
 
@@ -508,8 +510,40 @@ Config key: use_telescope~
 
   # Clearview Mystery
 <
-  The cursor is placed on the `ruleset:` line for immediate editing.
-  See |lonelog-notation| §6 for field descriptions.
+   The cursor is placed on the `ruleset:` line for immediate editing.
+   See |lonelog-notation| §6 for field descriptions.
+
+4.15 Session summary                   *:LonelogSessionSummary* *:LonelogExportSummary*
+                                         *lonelog-command-summary*
+>
+   :LonelogSessionSummary
+   :LonelogExportSummary
+<
+   Session Summary shows a statistical overview of a session's content in a
+   floating window, or exports it as a standalone markdown file.
+
+   :LonelogSessionSummary - Analyse the current buffer for session headers
+     (## Session N) and display a summary with scenes, tags, notation counts,
+     progress elements, and dice statistics in a floating window. When there
+     are multiple sessions, a picker asks which session to summarise.
+     When there is exactly one session, the summary appears immediately.
+
+   :LonelogExportSummary - Same analysis but writes the output to a markdown
+     file. Prompts for the filename (default: session-N-summary.md) via
+     |vim.ui.input|, then saves to the buffer's directory.
+
+   Summary contents:
+     - Session number, date, line/word counts
+     - Scenes list with context
+     - Tags grouped by type (NPCs, locations, threads, etc.)
+     - Notation counts: actions, questions, dice, notes, dialogues
+     - Progress elements: clocks, tracks, timers
+     - Dice statistics: total rolls, sum of totals, average per roll
+     - Complete dice breakdown with each notation and result
+
+   Results include all data needed for session recaps, campaign logs,
+   or sharing play reports. The floating window supports standard
+   copy/insert keybindings (q, y, <CR>, |<leader>lI|).
 
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
@@ -532,7 +566,8 @@ Normal mode keymaps~
   <leader>l]     Go to next scene              :LonelogSceneNext
   <leader>lN     Insert narrative block         :LonelogNarrative
   <leader>lR     Roll current line             :LonelogRollLine
-  <leader>lA     Insert campaign header         :LonelogCampaign
+   <leader>lA     Insert campaign header         :LonelogCampaign
+   <leader>lE     Session summary                :LonelogSessionSummary
 
   Group 2: Insert notation symbols~
   Key            Action                        Command ~
@@ -962,10 +997,27 @@ Usage dice~
   require("lonelog.roll_line").roll_current_line()
   local modified = require("lonelog.roll_line").process_line(line, tables)
 
-  -- Tag completion
-  local comp = require("lonelog.completion")
-  comp.refresh_completions()
-  comp.complete_tag()
+   -- Session summary
+   local sessions = require("lonelog.commands.summary").parse_all_sessions()
+   -- -> { number, date, start_line, end_line }[]
+
+   local summary_data = require("lonelog.commands.summary")
+     .build_session_summary(session, all_lines, all_tags, all_scenes)
+   -- -> { session, lines_count, words_count, notation, dice, progress,
+   --      tags, scenes, tag_counts, scene_counts }
+
+   local display_lines = require("lonelog.commands.summary")
+     .format_summary(summary_data)
+   -- -> string[] for floating window
+
+   local export_md = require("lonelog.commands.summary")
+     .export_summary(summary_data)
+   -- -> string markdown
+
+   -- Tag completion
+   local comp = require("lonelog.completion")
+   comp.refresh_completions()
+   comp.complete_tag()
 <
   Dice result structure~
 >

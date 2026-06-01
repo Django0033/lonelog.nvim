@@ -34,6 +34,7 @@ Solo tabletop RPG toolkit for Neovim — oracles, dice, structured notation, and
 - **Narrative blocks** — `\---` / `---\` delimiters for in-fiction prose
 - **Multi-line tags** — `[TYPE:Name\n  | content\n]` for detailed descriptions
 - **Meta notes** — `(note: ...)` / `(nota: ...)` inline annotations
+- **Session summary** — Per-session stats: scenes, tags, notation, progress, dice. Export to markdown
 - **Actor markers** — `@(Name)` for NPC/ally actions
 - **Floating results** — Colored windows with copy (`y`), paste (`<CR>`), insert last (`<leader>lI`)
 - **Syntax highlighting** — 29 highlight groups for all Lonelog elements (tags, dice, scenes, dialogue, progress, etc.)
@@ -138,6 +139,7 @@ Open a markdown file and press any of these:
 | `<leader>lD` | Interactive dice roller |
 | `<leader>lR` | Roll dice/table on current line |
 | `<leader>lM` | Insert scene marker with auto-numbering |
+| `<leader>lE` | Show session summary / export to markdown |
 | `<leader>lH` | Insert session header with date |
 | `<leader>lT` | Browse all Lonelog tags |
 | `<leader>lS` | Browse all scenes |
@@ -335,6 +337,8 @@ gen: Generate NPC
 | `:LonelogNarrative` | Insert narrative excerpt block |
 | `:LonelogNote` | Insert meta note |
 | `:LonelogCampaign` | Insert campaign header |
+| `:LonelogSessionSummary` | Show session summary in floating window |
+| `:LonelogExportSummary` | Export session summary to markdown file |
 | `:LonelogTags` | Browse tags |
 | `:LonelogScenes` | Browse scenes |
 | `:LonelogRollLine` | Roll dice/table on current line |
