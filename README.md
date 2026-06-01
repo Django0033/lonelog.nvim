@@ -6,38 +6,43 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Django0033/lonelog.nvim/pulls)
 
-> Solo tabletop RPG toolkit for Neovim — oracles, dice, notation, and session navigation.
+Solo tabletop RPG toolkit for Neovim — oracles, dice, notation, and session management.
 
 [Features](#features) • [Installation](#installation) • [Configuration](#configuration) • [Usage](#usage) • [Commands](#commands) • [API](#api) • [:help lonelog](#documentation)
 
 </div>
 
-Solo RPG players can run full sessions directly in Neovim using this plugin. It implements the [Lonelog notation standard](https://github.com/valgur/lonelog) (v1.4.1), a structured markdown format for solo roleplaying session logs.
-
-All features are written in pure Lua with zero external dependencies. [Telescope](https://github.com/nvim-telescope/telescope.nvim) is optionally supported and auto-detected.
+Run solo RPG sessions directly in Neovim. This plugin implements the [Lonelog notation standard](https://github.com/valgur/lonelog) (v1.4.1), a structured markdown format for solo roleplaying session logs. All features are written in pure Lua with zero external dependencies.
 
 > [!TIP]
-> New to [Lonelog notation](https://github.com/valgur/lonelog)? It's a set of conventions for tracking actions, dice rolls, oracles, NPCs, scenes, and progress in a markdown journal. The plugin inserts symbols, manages tags, and rolls dice for you.
+> New to [Lonelog notation](https://github.com/valgur/lonelog)? It's a set of conventions for tracking actions, dice rolls, oracles, NPCs, scenes, and progress in a markdown journal. This plugin inserts symbols, manages tags, rolls dice, and highlights everything for you.
+
+---
 
 ## Features
 
 - **Dice engine** — `2d6+3`, `2d20kh1` (advantage), `4d6!` (exploding), `6d6>>4` (success counting), `2d6>7` (sum vs target)
-- **Oracle system** — Fate (7 weighted outcomes), Binary (50/50), Mythic (2d10 + chaos factor). Chaos factor persists across sessions
-- **Progress elements** — Smart insert-or-increment for clocks (`[E:Name 0/5]`), tracks (`[Track:Name 0/5]`), and timers (`[Timer:Name 0]`). Interactive mode prompts only when a fresh insert is needed
-- **Tag navigation** — Browse NPCs, locations, threads, PCs, foes, rooms, and inventory. Filter by type, jump to any tag
-- **Tag autocomplete** — Automatic suggestions when typing `[TYPE:` with relevance sorting (exact match > prefix > alphabetical). Per-buffer cache
-- **Scene navigation** — Navigate main scenes (`S1`), flashbacks (`S5a`), sub-scenes (`S7.1`), and thread scenes (`T1-S5`) with chronological ordering
-- **Auto-numbered session headers** — Insert `## Session 1` with date, recap, and goals sections. Auto-increments from the last session in buffer
-- **Narrative excerpt blocks** — Insert `\---` / `---\` delimiters for in-fiction prose with syntax highlighting
-- **Auto-numbered scene markers** — Insert `### S1 *Tavern*` with automatic ID generation. Prompts for context via `vim.fn.input()` (configurable)
-- **Syntax highlighting** — Automatic highlighting for all lonelog notation in markdown buffers (scene IDs, tags, progress, dice, actor markers, arrows, and more)
+- **Oracle system** — Fate (7 weighted outcomes), Binary (50/50), Mythic (2d10 + chaos factor). Persistent chaos factor
+- **Tag management** — Browse, filter, and jump to NPCs (`[N:]`), locations (`[L:]`), PCs (`[PC:]`), threads (`[Thread:]`), foes (`[F:]`), rooms (`[R:]`), inventory (`[Inv:]`)
+- **Tag autocomplete** — Automatic suggestions when typing `[TYPE:` with relevance sorting. Per-buffer cache
+- **Scene navigation** — Navigate main scenes (`S1`), flashbacks (`S5a`), sub-scenes (`S7.1`), and thread scenes (`T1-S5`) with chronological ordering. Previous/next commands
+- **Auto-numbered session headers** — Insert `## Session N` with date, recap, and goals. Auto-increments
+- **Auto-numbered scene markers** — Insert `### S1 *context*` with automatic ID generation from last scene
+- **Campaign YAML frontmatter** — Insert structured campaign metadata (title, ruleset, genre, dates, themes)
+- **Progress elements** — Smart insert-or-increment for clocks (`[E:Name 0/5]`), tracks, and timers. Interactive mode prompts only on fresh insert
 - **Inline tables** — Define tables inline (`tbl: Name (d6)`) with range entries or bracket shorthand (`[A, B, C]`). Roll directly on the line
-- **Generator blocks** — Batch-roll indented sub-lines under a `gen:` header with label-to-table resolution
-- **Inline rolling** — Roll `d:`, `tbl:`, `label:` and bare dice notation on any line. Works in visual mode
-- **Notation insertion** — Insert `@`, `?`, `d:`, `->`, `=>` and full action/oracle sequences with a single keymap
-- **Tag snippets** — Insert `[N:Name|]`, `[L:Name|]`, `[PC:Name|]`, `[Thread:Name|Open]`, `[#N:Name]`, `[F:Name|]` with cursor at the right position
-- **Floating results** — Colored floating windows for dice and oracle results. Copy with `y`, paste into buffer with `<CR>`
-- **Zero dependencies** — Pure Lua. Neovim 0.8+ required. Telescope optional
+- **Generator blocks** — Batch-roll indented sub-lines under a `gen:` header
+- **Inline rolling** — Roll `d:`, `tbl:`, `label:`, and bare dice on any line. Works in visual mode
+- **Narrative excerpt blocks** — Insert `\---` / `---\` delimiters for in-fiction prose
+- **Multi-line tags** — Insert `[TYPE:Name\n  | content\n]` blocks for detailed entity descriptions
+- **Meta notes** — Insert `(note: ...)` or `(nota: ...)` annotations
+- **Actor markers** — Insert `@(Name)` for actions by NPCs or allies
+- **Floating results** — Colored windows for dice and oracle results. Copy with `y`, paste with `<CR>`
+- **Syntax highlighting** — 24+ highlight groups for all lonelog notation (tags, scenes, dice, dialogue, progress, etc.)
+- **Telescope integration** — Optional, auto-detected
+- **Zero dependencies** — Pure Lua. Neovim 0.8+ required
+
+---
 
 ## Installation
 
@@ -47,7 +52,8 @@ All features are written in pure Lua with zero external dependencies. [Telescope
 ```lua
 {
   "Django0033/lonelog.nvim",
-  cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags", "LonelogScenes", "LonelogRollLine" },
+  cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
+          "LonelogScenes", "LonelogRollLine" },
   config = function()
     require("lonelog").setup()
   end,
@@ -84,9 +90,11 @@ require("lonelog").setup()
 
 After installing, open a `.md` file and run `:Lonelog` to see the main action picker. Run `:help lonelog` for the full reference.
 
+---
+
 ## Configuration
 
-`require("lonelog").setup()` accepts a table. All keys are optional; defaults shown below:
+`require("lonelog").setup()` accepts an optional table. All keys are optional; defaults shown below:
 
 ```lua
 require("lonelog").setup({
@@ -99,75 +107,36 @@ require("lonelog").setup({
   },
 
   dice = {
-    max_dice = 100,                  -- maximum dice per roll
-    max_sides = 1000,                -- maximum sides per die
+    max_dice = 100,                  -- safety limit
+    max_sides = 1000,
   },
 
-  sidebar = { width = 50 },          -- native sidebar width
+  sidebar = { width = 50 },
+
   float = {
     border = "rounded",
     height = 0.4,                    -- fraction of editor height
-    width  = 0.6,                    -- fraction of editor width
+    width  = 0.6,
   },
 
   prompt_for_scene_context = true,   -- prompt for context on <leader>lM
 
   keymaps = {
-    -- Main actions (uppercase)
-    oracle    = "<leader>lO",
-    dice      = "<leader>lD",
-    tags      = "<leader>lT",
-    scenes    = "<leader>lS",
-    chaos     = "<leader>lC",
-    session_header = "<leader>lH",
-    narrative_block = "<leader>lN",
-    insert_result = "<leader>lI",
-    scene_marker  = "<leader>lM",
-    scene_prev    = "<leader>l[",
-    scene_next    = "<leader>l]",
-    roll_line     = "<leader>lR",
-
-    -- Insert notation symbols
-    insert_action   = "<leader>lia",
-    insert_question = "<leader>liq",
-    insert_dice     = "<leader>lid",
-    insert_note     = "<leader>lin",
-    insert_arrow    = "<leader>li-",
-    insert_conseq   = "<leader>li=",
-    actor_action    = "<leader>liN",
-    action_seq      = "<leader>liA",
-    oracle_seq      = "<leader>liQ",
-
-    -- Entity tags
-    tag_npc      = "<leader>ltn",
-    tag_location = "<leader>ltl",
-    tag_pc       = "<leader>ltp",
-    tag_thread   = "<leader>ltt",
-    tag_ref      = "<leader>ltr",
-    tag_foe      = "<leader>ltf",
-
-    -- Progress elements
-    progress_clock = "<leader>lpc",
-    progress_track = "<leader>lpt",
-    progress_timer = "<leader>lpi",
-
-    -- Quick dice
-    d4   = "<leader>ld4",   d6  = "<leader>ld6",
-    d8   = "<leader>ld8",   d10 = "<leader>lda",
-    d12  = "<leader>ldb",   d20 = "<leader>ldw",
-    d100 = "<leader>ldc",
-
-    -- Tag completion (insert mode)
-    complete_tag  = "<C-l>c",
+    -- See :help lonelog-keymaps for the full keymap table
   },
 })
 ```
 
+The `use_telescope` option:
+- `"auto"` — Use Telescope if installed, native sidebar otherwise
+- `true` — Always use Telescope (errors if not installed)
+- `false` — Always use built-in sidebar picker
+
+---
+
 ## Usage
 
 ### Notation insertion
-
-Lonelog uses a structured notation for solo RPG session logs. Insert symbols from normal or insert mode:
 
 | Normal mode | Insert mode | Inserts |
 |---|---|---|
@@ -177,41 +146,126 @@ Lonelog uses a structured notation for solo RPG session logs. Insert symbols fro
 | `<leader>li-` | `<C-l>-` | ` -> ` — result arrow |
 | `<leader>li=` | `<C-l>=` | `=> ` — consequence |
 | `<leader>liN` | `<C-l>N` | `@(Name) ` — actor action |
-| `<leader>liA` | | 3-line action sequence (`@ [action]` / `d: [roll] -> [outcome]` / `=> [consequence]`) |
-| `<leader>liQ` | | 3-line oracle sequence (`? [question]` / `-> [answer]` / `=> [consequence]`) |
+| `<leader>lin` | — | `(note: )` — meta note |
+| `<leader>liA` | — | 3-line action sequence |
+| `<leader>liQ` | — | 3-line oracle sequence |
 
 ### Tag snippets
 
-| Keymap (Normal) | Keymap (Insert) | Inserts |
+| Normal | Insert | Result |
 |---|---|---|
 | `<leader>ltn` | `<C-l>n` | `[N:\|]` — NPC |
 | `<leader>ltl` | `<C-l>l` | `[L:\|]` — Location |
-| `<leader>ltp` | `<C-l>p` | `[PC:\|]` — Player character |
-| `<leader>ltt` | `<C-l>h` | `[Thread:\|Open]` — Thread |
+| `<leader>ltp` | `<C-l>p` | `[PC:\|]` — PC |
+| `<leader>ltt` | `<C-l>h` | `[Thread:\|Open]` |
 | `<leader>ltr` | `<C-l>r` | `[#N:\|]` — Reference |
 | `<leader>ltf` | `<C-l>f` | `[F:\|]` — Foe |
 
-```
-:LonelogTag npc
-:LonelogTag thread
-```
+### Multi-line tags
+
+| Normal | Result |
+|---|---|
+| `<leader>lmn` | `[N:Name\n  \| ...\n]` |
+| `<leader>lml` | `[L:Name\n  \| ...\n]` |
+| `<leader>lmp` | `[PC:Name\n  \| ...\n]` |
+| `<leader>lmt` | `[Thread:Name\n  \| ...\n]` |
+| `<leader>lmr` | `[#N:Name\n  \| ...\n]` |
+| `<leader>lmf` | `[F:Name\n  \| ...\n]` |
 
 ### Progress elements
 
-Clocks, tracks, and timers use smart insert-or-increment logic. On first use, you are prompted for the element name and (for clocks and tracks) the max value (default 5). On subsequent uses, if an incomplete tag exists, it is incremented in-place. If the tag is complete or missing, a fresh one is inserted.
+Clocks, tracks, and timers use smart insert-or-increment logic. If an incomplete tag exists, it increments in place. If complete or missing, a fresh tag is inserted.
+
+| Keymap | Element | Format |
+|---|---|---|
+| `<leader>lpc` | Clock | `[E:Name current/max]` |
+| `<leader>lpt` | Track | `[Track:Name current/max]` |
+| `<leader>lpi` | Timer | `[Timer:Name current]` |
+
+Timers decrement toward 0; clocks and tracks increment toward max.
+
+### Session headers
 
 ```
-<leader>lpc   — insert or increment clock   [E:Name 0/5]
-<leader>lpt   — insert or increment track   [Track:Name 0/5]
-<leader>lpi   — insert or decrement timer   [Timer:Name 0]
+<leader>lH    :LonelogSession
 ```
 
-Timers always decrement toward 0 and never prompt for max (no max field).
+Inserts an auto-numbered `## Session N` with today's date, Recap, and Goals sections. The cursor lands on the Recap bullet.
 
 ```
-:LonelogInsertClock           " prompts for name and max (on fresh insert)
-:LonelogInsertClock Alarm     " uses "Alarm" as name, prompts for max if needed
-:LonelogInsertTrack Escape 8  " uses "Escape" with max 8 directly
+## Session 3
+2026-05-31
+
+### Recap
+-
+
+### Goals
+-
+```
+
+### Scene markers
+
+```
+<leader>lM    :LonelogSceneMarker
+```
+
+Inserts `### S3 *context*` with auto-numbering:
+- `S1` → `S2`, `S5a` → `S5b`, `S7.1` → `S7.2`
+- `T1-S5` → `T1-S6`, `S5z` → `S6a`
+- Empty buffer → `S1`
+
+Prompts for context text (configurable via `prompt_for_scene_context`).
+
+### Scene navigation
+
+```
+<leader>lS    :LonelogScenes    — browse all scenes
+<leader>l[    :LonelogScenePrev — go to previous scene
+<leader>l]    :LonelogSceneNext — go to next scene
+```
+
+### Narrative blocks
+
+```
+<leader>lN    :LonelogNarrative
+```
+
+Inserts `\---` / `---\` delimiters for in-fiction prose, with cursor in insert mode between them.
+
+### Campaign header
+
+```
+<leader>lA    :LonelogCampaign
+```
+
+Inserts YAML frontmatter at the top of the buffer with campaign metadata fields. Prompts for the title. Refuses if a header already exists (`---` at line 1).
+
+```yaml
+---
+title: My Campaign
+ruleset:
+genre:
+player:
+pcs:
+start_date: 2026-05-31
+last_update: 2026-05-31
+tools:
+themes:
+tone:
+notes:
+---
+```
+
+### Meta notes
+
+```
+<leader>lin    :LonelogNote
+```
+
+Inserts `(note: )` at cursor. Both English and Spanish prefixes are recognized:
+```
+(note: testing alternate stealth rule)
+(nota: esta escena se sintió tensa)
 ```
 
 ### Dice rolling
@@ -220,115 +274,34 @@ Timers always decrement toward 0 and never prompt for max (no max field).
 |---|---|---|
 | `NdN` | `1d20` | Basic roll |
 | `NdN+M` | `2d6+3` | With modifier |
-| `NdN!` | `4d6!` | Exploding dice (reroll on max) |
-| `NdNkhK` | `2d20kh1` | Advantage (keep highest K) |
-| `NdNklK` | `2d20kl1` | Disadvantage (keep lowest K) |
-| `NdN>>T` | `6d6>>4` | Success counting (count dice >= T) |
+| `NdN-M` | `1d20-2` | Subtract modifier |
+| `NdN!` | `4d6!` | Exploding dice |
+| `NdNkhK` | `2d20kh1` | Advantage |
+| `NdNklK` | `2d20kl1` | Disadvantage |
+| `NdN>>T` | `6d6>>4` | Success counting |
 | `NdN>T` | `2d6>7` | Sum vs target |
 
 ```
-<leader>lD             " interactive prompt
-:LonelogDiceRoll 2d6+3
-:LonelogD20            " quick roll 1d20
+<leader>lD             :LonelogDice         — interactive prompt
+:LonelogDiceRoll 2d6+3                     — direct roll
+:LonelogD20                                — quick roll 1d20
+:LonelogD4  :LonelogD6  :LonelogD8         — quick dice
+:LonelogD10 :LonelogD12 :LonelogD100
 ```
 
 ### Oracles
 
-| Oracle | Outcomes | Roll |
+| Oracle | Outcomes | Usage |
 |---|---|---|
-| Fate | Exceptional Yes, Yes, Yes but..., Maybe, No but..., No, Exceptional No | `<leader>lO` |
-| Binary | Yes / No | `:LonelogOracle binary` |
+| Fate | Exceptional Yes, Yes, Yes but..., Maybe, No but..., No, Exceptional No | `<leader>lO` or `:LonelogOracle` |
+| Binary | Yes / No (50/50) | `:LonelogOracle binary` |
 | Mythic | 2d10 + chaos factor (1-9) | `:LonelogOracle mythic` |
 
 Results display in colored floating windows. Adjust the Mythic chaos factor interactively with `<leader>lC`.
 
-### Tag navigation
-
-Browse all entities in your session log. Filter by type and jump directly to any tag.
-
-```
-[N:Jonah|friendly|wounded]          — NPC
-[L:Library|dark|quiet]              — Location
-[PC:Alex|HP 8]                      — Player character
-[Thread:Main Quest|Open]            — Thread
-[E:Alert 2/6]                       — Event/clock
-[F:Matón|HP 6]                      — Foe
-[R:3|cleared|biblioteca]            — Room
-[Inv:Antorcha|3]                    — Inventory
-```
-
-```
-<leader>lT    " browse tags by type
-:LonelogTags
-```
-
-### Tag autocomplete
-
-When typing after `[TYPE:` in a markdown buffer, matching entity names are suggested automatically.
-
-```
-<C-l>c        " manual trigger (insert mode)
-:LonelogCompleteTag
-```
-
-### Session headers
-
-Insert an auto-numbered session header above the current line. Each session includes today's date, a recap section, and a goals section. Session numbers auto-increment from the last `## Session N` in the buffer.
-
-```
-<leader>lH    " insert session header
-:LonelogSession
-
-  ## Session 3
-  2026-05-31
-
-  ### Recap
-  -
-
-  ### Goals
-  -
-```
-
-### Narrative excerpt blocks
-
-Insert a pair of `\---` / `---\` delimiters around a blank line, with the cursor placed in insert mode. Use this for in-fiction prose: found documents, atmospheric descriptions, or memorable dialogue.
-
-```
-<leader>lN    " insert narrative block
-:LonelogNarrative
-
-  \---
-  Your prose here...
-  ---\
-```
-### Scene navigation
-
-Scenes are identified by ID (main, flashback, sub-scene, thread) and sorted chronologically.
-
-```
-<leader>lS    " browse scenes
-<leader>l[    " go to previous scene
-<leader>l]    " go to next scene
-:LonelogScenes
-:LonelogScenePrev
-:LonelogSceneNext
-```
-
-### Auto-numbered scene markers
-
-Insert a scene marker with the next ID automatically computed from the last scene in the buffer. When `prompt_for_scene_context` is enabled (default), you are prompted for a context description. If left empty, no context is added.
-
-```
-<leader>lM    " insert scene marker (with context prompt if enabled)
-:LonelogSceneMarker
-
-  S1 -> S2     S5a -> S5b     S7.1 -> S7.2
-  T1-S5 -> T1-S6   S5z -> S6a   (none) -> S1
-```
-
 ### Inline tables
 
-Define random tables inline and roll them directly:
+Define random tables and roll them directly:
 
 ```markdown
 tbl: Forest Encounter (d6)
@@ -337,15 +310,15 @@ tbl: Forest Encounter (d6)
   6: Bandit ambush!
 ```
 
-Or use bracket shorthand for equal-probability options:
+Bracket shorthand for equal-probability options:
 
 ```markdown
 tbl: Weather [Sunny, Cloudy, Rain, Storm]
 ```
 
-Place the cursor on any `tbl:`, `d:`, or bare dice line and press `<leader>lR`:
+Place cursor on any `tbl:`/`d:`/bare dice line and press `<leader>lR`:
 
-```
+```markdown
 Before:  tbl: Forest Encounter (d6)
 After:   tbl: Forest Encounter d6=4 -> A deer crosses
 
@@ -357,8 +330,6 @@ After:   Apariencia: d3=2 -> Normal
 ```
 
 ### Generator blocks
-
-Batch-roll entire sections with a `gen:` header. Place cursor on the `gen:` line and press `<leader>lR`:
 
 ```markdown
 Before:
@@ -374,48 +345,79 @@ gen: Generate NPC
   tbl: Equipment d6=3 -> Rusty sword
 ```
 
-All indented sub-lines are processed independently. Non-indented lines and empty lines act as delimiters.
+### Tag navigation
+
+```
+<leader>lT    :LonelogTags
+```
+
+Browse all tags in the buffer. Filter by type, press Enter to jump.
+
+```
+[N:Jonah|friendly|wounded]           — NPC
+[L:Library|dark|quiet]               — Location
+[PC:Alex|HP 8]                       — PC
+[Thread:Main Quest|Open]             — Thread
+[E:Alert 2/6]                        — Event/clock
+[F:Matón|HP 6]                       — Foe
+[R:3|cleared|library]                — Room
+[Inv:Torch|3]                        — Inventory
+```
+
+### Tag autocomplete
+
+When typing after `[TYPE:` in a markdown buffer, matching entity names are suggested automatically. Manual trigger:
+
+```
+<C-l>c        :LonelogCompleteTag
+```
 
 ### Floating results
 
-Dice and oracle results open in a floating window:
+Dice and oracle results appear in a floating window:
 
 | Key | Action |
 |---|---|
 | `q` | Close window |
 | `y` / `Y` | Copy to system clipboard |
-| `<CR>` | Paste result into target `.md` buffer |
+| `<CR>` | Paste into `.md` buffer |
 
 `<leader>lI` inserts the most recent result at the cursor.
+
+---
 
 ## Commands
 
 | Command | Description |
 |---|---|
 | `:Lonelog` | Open main action picker |
-| `:LonelogOracle [table]` | Roll an oracle (fate / binary / mythic) |
+| `:LonelogOracle [table]` | Roll oracle (fate/binary/mythic) |
 | `:LonelogDice` | Interactive dice roller |
 | `:LonelogDiceRoll <notation>` | Roll specific dice notation |
-| `:LonelogD4` through `:LonelogD100` | Quick roll 1dN |
-| `:LonelogSymbol <symbol>` | Insert notation symbol (@ ? d arrow conseq) |
+| `:LonelogD4` – `:LonelogD100` | Quick roll 1dN |
+| `:LonelogSymbol <symbol>` | Insert notation symbol |
 | `:LonelogActionSequence` | Insert 3-line action template |
 | `:LonelogOracleSequence` | Insert 3-line oracle template |
-| `:LonelogTag <type>` | Insert tag snippet (npc/location/pc/thread/ref/foe) |
+| `:LonelogTag <type>` | Insert tag snippet |
+| `:LonelogMultiTag <type>` | Insert multi-line tag |
 | `:LonelogInsertClock [name]` | Insert or increment clock |
 | `:LonelogInsertTrack [name]` | Insert or increment track |
 | `:LonelogInsertTimer [name]` | Insert or decrement timer |
-| `:LonelogSceneMarker` | Insert auto-numbered scene marker |
-| `:LonelogSession` | Insert auto-numbered session header |
-| `:LonelogNarrative` | Insert narrative excerpt block |
-| `:LonelogNote` | Insert meta note annotation |
+| `:LonelogSceneMarker` | Insert auto-numbered scene |
 | `:LonelogScenePrev` | Go to previous scene |
 | `:LonelogSceneNext` | Go to next scene |
-| `:LonelogTags` | Browse Lonelog tags |
-| `:LonelogScenes` | Browse Lonelog scenes |
+| `:LonelogSession` | Insert auto-numbered session header |
+| `:LonelogNarrative` | Insert narrative excerpt block |
+| `:LonelogNote` | Insert meta note |
+| `:LonelogCampaign` | Insert campaign header |
+| `:LonelogTags` | Browse tags |
+| `:LonelogScenes` | Browse scenes |
 | `:LonelogRollLine` | Roll dice/table on current line |
 | `:LonelogCompleteTag` | Trigger tag autocomplete |
 | `:LonelogInsert` | Insert last result at cursor |
-| `:LonelogChaos` | Open chaos factor UI |
+| `:LonelogChaos` | Chaos factor UI |
+
+---
 
 ## API
 
@@ -424,16 +426,18 @@ local ln = require("lonelog")
 
 -- Dice
 local result, err = ln.dice.roll("2d6+3")
-print(result.display)     -- "2d6+3[4, 2] + 3 = 9"
+print(result.display)     -- "2d6+3[4, 2] = 9"
 print(result.total)       -- 9
 
 -- Oracle
 local oracle = ln.oracle.roll("fate")
 print(oracle.display)     -- "Yes, but..."
+
+-- Chaos factor
 print(ln.oracle.get_chaos())  -- number (1-9)
 ln.oracle.set_chaos(7)        -- boolean
 
--- Parse current buffer
+-- Parsers
 local tags   = ln.parsers.parse_tags()
 local scenes = ln.parsers.parse_scenes()
 local summary = ln.parsers.tags_summary(tags)
@@ -442,21 +446,34 @@ local summary = ln.parsers.tags_summary(tags)
 local tbls = require("lonelog.parsers.tables").parse_tables(lines)
 local entry = require("lonelog.parsers.tables").resolve_entry(tbl, value)
 
+-- Inline rolling
+local modified = require("lonelog.roll_line").process_line(line, tbls)
+require("lonelog.roll_line").roll_current_line()
+
 -- Tag completion
 local comp = require("lonelog.completion")
 comp.refresh_completions()
 comp.complete_tag()
-
--- Inline rolling
-local modified = require("lonelog.roll_line").process_line(line, tbls)
-require("lonelog.roll_line").roll_current_line()
 ```
+
+---
 
 ## Documentation
 
-See `:help lonelog` for the complete reference including all keymaps, tag formats, dice notation grammar, oracle probabilities, progress element behavior, and the Lonelog spec add-ons (combat, dungeons, resources).
+See `:help lonelog` for the complete reference including:
+- All keymaps (normal, insert, floating window)
+- Tag format and multi-line tag syntax
+- Dice notation grammar
+- Oracle probabilities and chaos factor system
+- Progress element behavior
+- Syntax highlighting groups (24+)
+- Lonelog spec add-ons (combat, dungeons, resources)
+- Session workflow tips
+
+---
 
 ## Requirements
 
-- Neovim **0.8+**
+- Neovim **0.8+** (requires `vim.ui.input`, `vim.ui.select`, `nvim_open_win`)
 - (Optional) [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) for enhanced picker
+- No external dependencies (pure Lua)
