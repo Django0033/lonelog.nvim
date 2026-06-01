@@ -46,6 +46,7 @@ local defaults = {
 		tag_thread = "<leader>ltt",
 		tag_ref = "<leader>ltr",
 		tag_foe = "<leader>ltf",
+		tag_room = "<leader>ltm",
 
 		-- Multi-line tags
 		mltag_npc = "<leader>lmn",

@@ -3,6 +3,12 @@ local M = {}
 M.name = "dungeon"
 M.description = "Dungeon status block, room navigation, and room state editor"
 
+local function insert_room_tag()
+	vim.api.nvim_put({ "[R:|]" }, "c", true, true)
+	local row, col = vim.fn.line("."), vim.fn.col(".")
+	vim.api.nvim_win_set_cursor(0, { row, col - 2 })
+end
+
 M.commands = {
 	{
 		name = "LonelogDungeonStatus",
@@ -35,6 +41,8 @@ M.keymaps = {
 		opts = { silent = true, desc = "Navigate to connected room" } },
 	{ mode = "n", key = "room_state", rhs = ":LonelogRoomState<CR>",
 		opts = { silent = true, desc = "Toggle room state" } },
+	{ mode = "n", key = "tag_room", rhs = insert_room_tag,
+		opts = { silent = true, desc = "Insert room tag [R:]" } },
 }
 
 M.requires = {}
