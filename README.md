@@ -28,6 +28,7 @@ All features are written in pure Lua with zero external dependencies. [Telescope
 - **Tag autocomplete** — Automatic suggestions when typing `[TYPE:` with relevance sorting (exact match > prefix > alphabetical). Per-buffer cache
 - **Scene navigation** — Navigate main scenes (`S1`), flashbacks (`S5a`), sub-scenes (`S7.1`), and thread scenes (`T1-S5`) with chronological ordering
 - **Auto-numbered session headers** — Insert `## Session 1` with date, recap, and goals sections. Auto-increments from the last session in buffer
+- **Narrative excerpt blocks** — Insert `\---` / `---\` delimiters for in-fiction prose with syntax highlighting
 - **Auto-numbered scene markers** — Insert `### S1 *Tavern*` with automatic ID generation. Prompts for context via `vim.fn.input()` (configurable)
 - **Syntax highlighting** — Automatic highlighting for all lonelog notation in markdown buffers (scene IDs, tags, progress, dice, actor markers, arrows, and more)
 - **Inline tables** — Define tables inline (`tbl: Name (d6)`) with range entries or bracket shorthand (`[A, B, C]`). Roll directly on the line
@@ -119,6 +120,7 @@ require("lonelog").setup({
     scenes    = "<leader>lS",
     chaos     = "<leader>lC",
     session_header = "<leader>lH",
+    narrative_block = "<leader>lN",
     insert_result = "<leader>lI",
     scene_marker  = "<leader>lM",
     scene_prev    = "<leader>l[",
@@ -286,6 +288,18 @@ Insert an auto-numbered session header above the current line. Each session incl
   -
 ```
 
+### Narrative excerpt blocks
+
+Insert a pair of `\---` / `---\` delimiters around a blank line, with the cursor placed in insert mode. Use this for in-fiction prose: found documents, atmospheric descriptions, or memorable dialogue.
+
+```
+<leader>lN    " insert narrative block
+:LonelogNarrative
+
+  \---
+  Your prose here...
+  ---\
+```
 ### Scene navigation
 
 Scenes are identified by ID (main, flashback, sub-scene, thread) and sorted chronologically.
@@ -391,6 +405,7 @@ Dice and oracle results open in a floating window:
 | `:LonelogInsertTimer [name]` | Insert or decrement timer |
 | `:LonelogSceneMarker` | Insert auto-numbered scene marker |
 | `:LonelogSession` | Insert auto-numbered session header |
+| `:LonelogNarrative` | Insert narrative excerpt block |
 | `:LonelogScenePrev` | Go to previous scene |
 | `:LonelogSceneNext` | Go to next scene |
 | `:LonelogTags` | Browse Lonelog tags |

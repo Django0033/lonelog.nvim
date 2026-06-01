@@ -17,6 +17,7 @@ CONTENTS                                                *lonelog-contents*
     4.8 Inline rolling ................................... |lonelog-command-roll|
     4.9 Session headers .................................. |lonelog-command-session|
   4.10 Scene navigation ................................. |lonelog-command-scene-nav|
+  4.11 Narrative blocks ................................. |lonelog-command-narrative|
   5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
@@ -27,6 +28,7 @@ CONTENTS                                                *lonelog-contents*
     6.6 Inline tables .................................... |lonelog-notation-tables|
     6.7 Generator blocks ................................. |lonelog-notation-gen|
     6.8 Session headers .................................. |lonelog-notation-session|
+  6.9 Narrative excerpts ................................ |lonelog-notation-narrative|
   7. Oracle system ........................................ |lonelog-oracle|
   8. Tag autocomplete ..................................... |lonelog-completion|
   9. Floating results ..................................... |lonelog-float|
@@ -416,6 +418,24 @@ Config key: use_telescope~
     - Cursor inside a scene: jumps to the previous/next scene in ID order
     - At the first/last scene: notifies "Already at first/last scene"
 
+4.11 Narrative blocks                           *:LonelogNarrative*
+                                                  *lonelog-command-narrative*
+>
+  :LonelogNarrative     " Insert a narrative excerpt block
+<
+  Inserts a pair of delimiters for in-fiction narrative content:
+>
+  \---
+  [cursor here, insert mode]
+  ---\
+<
+  The cursor is placed on the blank line between delimiters in insert
+  mode, ready for typing.
+
+  Narrative blocks follow the Lonelog v1.6.0 spec convention for
+  separating in-fiction prose from mechanical notation. Use them for
+  found documents, memorable dialogue, or atmospheric descriptions.
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -435,6 +455,7 @@ Normal mode keymaps~
   <leader>lM     Insert scene marker           :LonelogSceneMarker
   <leader>l[     Go to previous scene          :LonelogScenePrev
   <leader>l]     Go to next scene              :LonelogSceneNext
+  <leader>lN     Insert narrative block         :LonelogNarrative
   <leader>lR     Roll current line             :LonelogRollLine
 
   Group 2: Insert notation symbols~
@@ -644,7 +665,21 @@ Lonelog is a structured markdown notation for solo RPG session logs
   Auto-numbered session headers are inserted with |:LonelogSession| or
   <leader>lH. The header includes today's date, a Recap section for
   summarizing the previous session, and a Goals section for current
-  objectives. The cursor is placed at the Recap bullet for immediate typing.
+  objectives.   The cursor is placed at the Recap bullet for immediate typing.
+
+6.9 Narrative excerpts                          *lonelog-notation-narrative*
+>
+  \---
+  [narrative prose...]
+  ---\
+<
+  Narrative excerpt blocks wrap in-fiction prose between delimiters.
+  Insert with |:LonelogNarrative| or <leader>lN. The cursor is
+  placed on the blank line in insert mode, ready for typing.
+
+  Use narrative blocks for found documents, memorable dialogue,
+  atmospheric descriptions, or any prose that deserves emphasis
+  separate from the mechanical notation.
 
 ==============================================================================
 7. ORACLE SYSTEM                                        *lonelog-oracle*

@@ -66,6 +66,10 @@ syn match lonelogBlock '\v\[/?[A-Z]+\]'
 " === Round markers (R1, R2, etc.) ===
 syn match lonelogRound '\v^R\d+\s'
 
+" === Narrative block delimiters (\--- and ---\) ===
+syn match lonelogNarrativeDelim '\v^\\---$'
+syn match lonelogNarrativeDelim '\v^---\\$'
+
 " ============================================================
 " Highlight links (default to standard groups for colorscheme compatibility)
 " ============================================================
@@ -93,3 +97,4 @@ hi def link lonelogNota Comment
 hi def link lonelogNotaParen Comment
 hi def link lonelogBlock WarningMsg
 hi def link lonelogRound Constant
+hi def link lonelogNarrativeDelim Comment

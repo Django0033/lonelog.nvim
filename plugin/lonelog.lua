@@ -87,6 +87,9 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.session_header, function()
 		require("lonelog.commands.session").insert_session_header()
 	end, { desc = "Insert session header" })
+	map("n", cfg.get().keymaps.narrative_block, function()
+		require("lonelog.commands.narrative").insert_narrative_block()
+	end, { desc = "Insert narrative block" })
 	map("n", cfg.get().keymaps.insert_result, function()
 		local w, c = solo.ui.get_latest_content()
 		if c then
@@ -438,6 +441,10 @@ end, { nargs = 0, desc = "Insert auto-numbered scene marker" })
 vim.api.nvim_create_user_command("LonelogSession", function()
 	require("lonelog.commands.session").insert_session_header()
 end, { nargs = 0, desc = "Insert auto-numbered session header" })
+
+vim.api.nvim_create_user_command("LonelogNarrative", function()
+	require("lonelog.commands.narrative").insert_narrative_block()
+end, { nargs = 0, desc = "Insert narrative block" })
 
 -- Scene navigation commands
 vim.api.nvim_create_user_command("LonelogScenePrev", function()

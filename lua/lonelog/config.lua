@@ -10,6 +10,7 @@ local defaults = {
 		scenes = "<leader>lS",
 		chaos = "<leader>lC",
 		session_header = "<leader>lH",
+		narrative_block = "<leader>lN",
 		insert_result = "<leader>lI",
 		scene_marker = "<leader>lM",
 		scene_prev = "<leader>l[",
