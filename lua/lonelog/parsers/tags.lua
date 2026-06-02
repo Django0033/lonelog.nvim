@@ -284,9 +284,7 @@ function M.show_tags_browser(all_tags)
 			return
 		end
 		vim.api.nvim_win_close(0, true)
-		vim.schedule(function()
-			open_tag_picker(group_info[idx].tags, ui_pick)
-		end)
+		open_tag_picker(group_info[idx].tags, ui_pick)
 	end
 
 	vim.keymap.set("n", "<CR>", on_enter, { buffer = buf, nowait = true, silent = true })

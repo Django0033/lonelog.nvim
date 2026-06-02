@@ -292,9 +292,7 @@ function M.show_scenes_browser(all_scenes)
 			return
 		end
 		vim.api.nvim_win_close(0, true)
-		vim.schedule(function()
-			open_scene_picker(group_info[idx].scenes, ui_pick)
-		end)
+		open_scene_picker(group_info[idx].scenes, ui_pick)
 	end
 
 	vim.keymap.set("n", "<CR>", on_enter, { buffer = buf, nowait = true, silent = true })
