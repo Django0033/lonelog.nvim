@@ -123,7 +123,7 @@ function M.should_use_telescope()
 	if use == false then
 		return false
 	end
-	return pcall(require, "telescope") and pcall(require, "telescope.pickers")
+	return pcall(require, "telescope")
 end
 
 return M
