@@ -287,8 +287,8 @@ function M.show_scenes_browser(all_scenes)
 	local ui_pick = require("lonelog.ui").pick
 	local function on_enter()
 		local line = vim.fn.line(".")
-		local idx = line - 1
-		if idx < 1 or idx > #group_info then
+		local idx = line - 2
+		if idx < 0 or idx >= #group_info then
 			return
 		end
 		vim.api.nvim_win_close(0, true)
