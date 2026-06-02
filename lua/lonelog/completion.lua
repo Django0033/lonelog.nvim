@@ -19,18 +19,20 @@ function M.refresh_completions(bufnr)
 	for _, tag in ipairs(tags) do
 		if tag.name and tag.name ~= "" then
 			groups[tag.type] = groups[tag.type] or {}
-			groups[tag.type][tag.name] = true
+			if not groups[tag.type][tag.name] then
+				groups[tag.type][tag.name] = tag.tags
+			end
 		end
 	end
 
 	local fresh = {}
-	for type_key, name_set in pairs(groups) do
+	for type_key, name_map in pairs(groups) do
 		local list = {}
-		for name in pairs(name_set) do
+		for name in pairs(name_map) do
 			table.insert(list, name)
 		end
 		table.sort(list)
-		fresh[type_key] = list
+		fresh[type_key] = { names = list, tags_by_name = name_map }
 	end
 	cache[bufnr] = { changedtick = changedtick, names = fresh }
 end
@@ -63,14 +65,18 @@ function M.complete_tag()
 	if not entry then
 		return
 	end
-	local all = entry.names[type_upper] or {}
-	if #all == 0 then
+	local all = entry.names[type_upper]
+	if not all then
+		return
+	end
+	local name_list = all.names
+	if #name_list == 0 then
 		return
 	end
 
 	local q = query:lower()
 	local matches = {}
-	for _, name in ipairs(all) do
+	for _, name in ipairs(name_list) do
 		if q == "" or name:lower():find(q, 1, true) then
 			table.insert(matches, name)
 		end
@@ -99,7 +105,9 @@ function M.complete_tag()
 
 	local items = {}
 	for _, name in ipairs(matches) do
-		table.insert(items, { word = name })
+		local tag_list = all.tags_by_name[name] or {}
+		local menu = #tag_list > 0 and table.concat(tag_list, ", ") or nil
+		table.insert(items, { word = name, menu = menu })
 	end
 
 	-- startcol: 1-indexed position of first char to replace (right after :)
