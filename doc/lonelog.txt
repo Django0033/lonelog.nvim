@@ -253,6 +253,19 @@ Config key: addons~
       resources = true,   -- :LonelogResourcesBlock, :LonelogSupplyRoll
     }
 
+Config key: highlight~
+  Custom highlight colors for any Lonelog syntax group. Each key is a
+  highlight group name from the syntax file; each value is a table of
+  options passed to |nvim_set_hl()|.
+
+    highlight = {
+      lonelogAction = { fg = "#ff6600", bold = true },
+      lonelogDiceNotation = { fg = "#22c55e" },
+      lonelogDialogString = { link = "String" },
+    }
+
+  If not set, default Vim highlight links are used.
+
   Set to true to enable individual add-ons. When disabled, the add-on's
   commands and keymaps are not registered and do not appear in the picker.
 

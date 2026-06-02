@@ -19,6 +19,11 @@ function M.setup(opts)
 		group = vim.api.nvim_create_augroup("LonelogSyntax", { clear = true }),
 		callback = function()
 			vim.cmd("runtime! after/syntax/markdown/lonelog.vim")
+			for group, opts in pairs(M.config.get().highlight or {}) do
+				if vim.fn.hlexists(group) > 0 then
+					vim.api.nvim_set_hl(0, group, opts)
+				end
+			end
 		end,
 		desc = "Load lonelog syntax highlighting for markdown buffers",
 	})

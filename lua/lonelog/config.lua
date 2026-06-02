@@ -96,6 +96,7 @@ local defaults = {
 		dungeon = false,
 		resources = false,
 	},
+	highlight = {},
 }
 
 M.options = vim.deepcopy(defaults)
