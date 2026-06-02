@@ -301,7 +301,8 @@ function M.show_scenes_browser(all_scenes)
 		local sbuf = vim.api.nvim_create_buf(false, true)
 		local slines = {}
 		for _, s in ipairs(items) do
-			table.insert(slines, "  " .. M.format_scene_display(s))
+			local display = M.format_scene_display(s):gsub("\n.*$", " [...]")
+			table.insert(slines, "  " .. display)
 		end
 		vim.api.nvim_buf_set_lines(sbuf, 0, -1, false, slines)
 		vim.api.nvim_buf_set_option(sbuf, "modifiable", false)

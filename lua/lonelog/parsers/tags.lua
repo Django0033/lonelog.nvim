@@ -274,7 +274,8 @@ local function open_tag_buffer(items, format_fn, on_select_fn, title)
 	local buf = vim.api.nvim_create_buf(false, true)
 	local lines = {}
 	for _, item in ipairs(items) do
-		table.insert(lines, "  " .. format_fn(item))
+		local display = format_fn(item):gsub("\n.*$", " [...]")
+		table.insert(lines, "  " .. display)
 	end
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 	vim.api.nvim_buf_set_option(buf, "modifiable", false)
