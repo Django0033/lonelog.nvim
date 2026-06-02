@@ -67,7 +67,7 @@ d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
 > If you enable add-ons, add their commands to `cmd`: `"LonelogCombat"`,
 > `"LonelogRound"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
 > `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`,
-> `"LonelogWealthDelta"`, `"LonelogInvDelta"`.
+> `"LonelogWealthDelta"`, `"LonelogInvDelta"`, `"LonelogItemState"`.
 > Or remove `cmd` entirely to load everything at startup.
 
 </details>
@@ -173,6 +173,17 @@ Press `<leader>` followed by these keys:
 | `<leader>lpc` | Clock | `[E:Name 0/5]` |
 | `<leader>lpt` | Track | `[Track:Name 0/5]` |
 | `<leader>lpi` | Timer | `[Timer:Name 0]` |
+
+### Resources (add-on)
+
+| Key | Action |
+|-----|--------|
+| `<leader>lti` | Insert `[Inv:\|]` |
+| `<leader>ltw` | Insert `[Wealth:Gold 0]` |
+| `<leader>lwd` | Add/subtract wealth |
+| `<leader>lwi` | Add/subtract inventory |
+| `<leader>lws` | Add/remove item properties |
+| `<leader>lrr` | Insert `--- RESOURCES ---` block |
 
 ---
 
