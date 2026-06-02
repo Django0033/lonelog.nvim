@@ -42,4 +42,37 @@ function M.insert_block()
 	vim.api.nvim_buf_set_lines(bufnr, cursor[1], cursor[1], false, block)
 end
 
+function M.wealth_delta()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local line = vim.api.nvim_buf_get_lines(bufnr, cursor[1] - 1, cursor[1], false)[1]
+	if not line then
+		return
+	end
+
+	local wealth_tag = line:match("%[Wealth:[^%]]+%]")
+	if not wealth_tag then
+		vim.notify("lonelog: No [Wealth:] tag found on this line", vim.log.levels.INFO)
+		return
+	end
+
+	vim.ui.input({ prompt = "Delta (e.g. +15, -8): " }, function(delta)
+		if not delta or delta == "" then
+			return
+		end
+		local amount = tonumber(delta:gsub("%s+", ""))
+		if not amount or amount == 0 then
+			return
+		end
+
+		local new_tag = wealth_tag:gsub("(%d+)", function(n)
+			return tonumber(n) + amount
+		end)
+
+		local new_line = line:gsub("%[Wealth:[^%]]+%]", new_tag, 1)
+		vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
+		vim.notify("lonelog: " .. wealth_tag .. " -> " .. new_tag, vim.log.levels.INFO)
+	end)
+end
+
 return M

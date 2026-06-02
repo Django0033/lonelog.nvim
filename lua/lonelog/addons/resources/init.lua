@@ -24,6 +24,13 @@ M.commands = {
 		end,
 		opts = { nargs = 0, desc = "Roll supply die and degrade if needed" },
 	},
+	{
+		name = "LonelogWealthDelta",
+		command = function()
+			require("lonelog.addons.resources.resources").wealth_delta()
+		end,
+		opts = { nargs = "?", desc = "Add or subtract wealth" },
+	},
 }
 
 M.keymaps = {
@@ -39,6 +46,8 @@ M.keymaps = {
 	{ mode = "n", key = "resources_block",
 		rhs = ":LonelogResourcesBlock<CR>",
 		opts = { silent = true, desc = "Insert resources status block" } },
+	{ mode = "n", key = "wealth_delta", rhs = ":LonelogWealthDelta<CR>",
+		opts = { silent = true, desc = "Add/subtract wealth" } },
 }
 
 M.requires = {}

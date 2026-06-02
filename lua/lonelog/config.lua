@@ -28,6 +28,7 @@ local defaults = {
 		room_state = "<leader>lxs",
 		insert_round = "<leader>lxr",
 		resources_block = "<leader>lrr",
+		wealth_delta = "<leader>lwd",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",
