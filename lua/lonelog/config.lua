@@ -50,6 +50,7 @@ local defaults = {
 		tag_room = "<leader>ltm",
 		tag_inv = "<leader>lti",
 		tag_wealth = "<leader>ltw",
+		pc_update = "<leader>ltx",
 
 		-- Multi-line tags
 		mltag_npc = "<leader>lmn",

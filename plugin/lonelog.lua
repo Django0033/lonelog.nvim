@@ -193,6 +193,15 @@ local function setup_keymaps()
 	map("n", cfg.get().keymaps.tag_foe, function()
 		insert_text("[F:|]", 2)
 	end, { desc = "Insert foe tag" })
+	map("n", cfg.get().keymaps.pc_update, function()
+		vim.ui.input({ prompt = "PC name: " }, function(name)
+			if not name or name == "" then return end
+			vim.ui.input({ prompt = "Stat update (e.g. HP-2, Stress+1): " }, function(stat)
+				if not stat or stat == "" then return end
+				insert_text("[PC:" .. name .. "|" .. stat .. "]", 0)
+			end)
+		end)
+	end, { desc = "Insert PC stat update" })
 
 	-- ================================================================
 	-- Multi-line tags (lm-)
