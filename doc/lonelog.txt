@@ -185,7 +185,8 @@ Call setup() with an optional table of overrides. All keys and defaults:
       tag_pc       = "<leader>ltp",
       tag_thread   = "<leader>ltt",
       tag_ref      = "<leader>ltr",
-      tag_foe      = "<leader>ltf",
+       tag_foe      = "<leader>ltf",
+       tag_room     = "<leader>ltm",
        -- Core actions (uppercase)
        oracle = "<leader>lO",
        dice   = "<leader>lD",
@@ -821,6 +822,9 @@ Normal mode keymaps~
   <leader>ltt    Insert thread tag             [Thread:|Open]
   <leader>ltr    Insert reference tag          [#N:|]
   <leader>ltf    Insert foe tag                [F:|]
+  <leader>ltm    Insert room tag (*)            [R:|]
+
+  (*) Requires the respective add-on to be enabled (see |lonelog-config|).
 
   Multi-line tags (lm-)~
   Key            Action                        Command ~

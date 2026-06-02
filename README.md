@@ -140,6 +140,7 @@ Press `<leader>` followed by these keys:
 | `<leader>ltt` | `<C-l>h` | `[Thread:\|Open]` |
 | `<leader>ltr` | `<C-l>r` | `[#N:\|]` — Reference |
 | `<leader>ltf` | `<C-l>f` | `[F:\|]` — Foe |
+| `<leader>ltm` | — | `[R:\|]` — Room |
 
 ### Progress
 
