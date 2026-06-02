@@ -10,6 +10,5 @@ M.show_oracle_result = M.floating.show_oracle_result
 M.insert_result = M.floating.insert_result
 M.get_latest_content = M.floating.get_latest_content
 M.pick = M.picker.pick
-M.wait_for_close = M.picker.wait_for_close
 
 return M
