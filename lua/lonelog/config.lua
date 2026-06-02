@@ -83,6 +83,11 @@ local defaults = {
 	},
 	dice = { max_dice = 100, max_sides = 1000 },
 	prompt_for_scene_context = true,
+	campaign = {
+		default_ruleset = "",
+		default_genre = "",
+		default_player = "",
+	},
 	addons = {
 		combat = false,
 		dungeon = false,

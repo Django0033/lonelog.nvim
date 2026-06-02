@@ -585,3 +585,13 @@ vim.api.nvim_create_autocmd("TextChangedI", {
 	end,
 	desc = "Lonelog tag autocomplete",
 })
+
+vim.api.nvim_create_augroup("LonelogFrontmatter", { clear = true })
+vim.api.nvim_create_autocmd("BufWritePre", {
+	group = "LonelogFrontmatter",
+	pattern = "*.md",
+	callback = function()
+		require("lonelog.commands.campaign").update_last_update()
+	end,
+	desc = "Update last_update in lonelog frontmatter",
+})
