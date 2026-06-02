@@ -185,12 +185,18 @@ function M.format_tag_display(tag)
 	return table.concat(parts, "")
 end
 
--- Count tags by type
+-- Count tags by unique name
 function M.tags_summary(tags)
 	local s = {}
+	local seen = {}
 	for _, t in ipairs(tags) do
 		s[t.type] = s[t.type] or { label = TAG_LABELS[t.type], count = 0 }
-		s[t.type].count = s[t.type].count + 1
+		local key = (t.name or ""):lower()
+		seen[t.type] = seen[t.type] or {}
+		if not seen[t.type][key] then
+			seen[t.type][key] = true
+			s[t.type].count = s[t.type].count + 1
+		end
 	end
 	return s
 end
@@ -221,8 +227,13 @@ function M.show_tags_picker()
 	-- Build type filter list
 	local summary = M.tags_summary(file_tags)
 	local type_items, key_by_label = {}, {}
-	table.insert(type_items, "All Tags (" .. #file_tags .. ")")
-	key_by_label["All Tags (" .. #file_tags .. ")"] = "all"
+	local summary = M.tags_summary(file_tags)
+	local total_unique = 0
+	for _, v in pairs(summary) do
+		total_unique = total_unique + v.count
+	end
+	table.insert(type_items, "All Tags (" .. total_unique .. ")")
+	key_by_label["All Tags (" .. total_unique .. ")"] = "all"
 	for k, v in pairs(summary) do
 		local label = v.label .. " (" .. v.count .. ")"
 		table.insert(type_items, label)
@@ -268,8 +279,12 @@ end
 -- Native sidebar picker for tags
 function M.show_tags_picker_native(all_tags)
 	local summary = M.tags_summary(all_tags)
+	local total_unique = 0
+	for _, v in pairs(summary) do
+		total_unique = total_unique + v.count
+	end
 	local type_items, key_by_type = {}, {}
-	table.insert(type_items, "All Tags (" .. #all_tags .. ")")
+	table.insert(type_items, "All Tags (" .. total_unique .. ")")
 	key_by_type[1] = nil -- Index 1 is "All"
 	local idx = 2
 	for k, v in pairs(summary) do
