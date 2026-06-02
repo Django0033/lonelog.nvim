@@ -125,7 +125,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
 >
   require("lonelog").setup({
     -- Picker: "auto" (detect Telescope), true (always Telescope),
-    --         false (native sidebar)
+    --         false (split browser)
     use_telescope = "auto",
 
     -- Native sidebar width
@@ -229,9 +229,9 @@ Call setup() with an optional table of overrides. All keys and defaults:
 <
 
 Config key: use_telescope~
-  "auto"  - Use Telescope if the plugin is installed, native sidebar otherwise.
+  "auto"  - Use Telescope if the plugin is installed, split browser otherwise.
   true    - Always use Telescope (error if not installed).
-  false   - Always use the built-in sidebar picker.
+  false   - Always use the built-in split browser for tags and scenes.
 
 Config key: campaign~
   Default values for campaign header fields. Used when creating a new

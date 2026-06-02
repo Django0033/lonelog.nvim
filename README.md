@@ -21,6 +21,32 @@ lonelog.nvim implements the [Lonelog notation standard](https://github.com/valgu
 
 ---
 
+## What it looks like
+
+```markdown
+## Session 5
+
+### S1 *The abandoned mine*
+@ Enter the darkness
+? Is anyone here?
+d: 2d6+3 -> 9  [N:Elara|waiting]
+=> The tunnel is empty, but torchlight flickers ahead.
+[E:Torch 3/6]
+
+### S2 *Collapsed passage*
+d: 1d20>=15 -> 17 >= 15 -> Success
+@ Clear the rubble
+[F:Goblin|HP 6|alerta]
+```
+
+Press `<leader>lR` on any `d:` line to roll and replace the result in-place:
+
+```markdown
+d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
+```
+
+---
+
 ## Installation
 
 <details open>
@@ -66,48 +92,20 @@ require("lonelog").setup()
 
 ---
 
-## What it looks like
-
-A session log in a markdown buffer:
-
-```markdown
-## Session 5
-
-### S1 *The abandoned mine*
-@ Enter the darkness
-? Is anyone here?
-d: 2d6+3 -> 9  [N:Elara|waiting]
-=> The tunnel is empty, but torchlight flickers ahead.
-[E:Torch 3/6]
-
-### S2 *Collapsed passage*
-d: 1d20>=15 -> 17 >= 15 -> Success
-@ Clear the rubble
-[F:Goblin|HP 6|alerta]
-```
-
-Press `<leader>lR` on any `d:` line to roll and replace the result in-place:
-
-```markdown
-d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
-```
-
----
-
 ## Quick start
 
 Press `<leader>` followed by these keys:
 
-### Core actions
+### Core
 
 | Key | Action |
 |-----|--------|
-| `<leader>lO` | Roll an oracle (fate, binary, mythic) |
+| `<leader>lO` | Roll an oracle |
 | `<leader>lD` | Interactive dice roller |
-| `<leader>lR` | Roll dice/table on current line |
-| `<leader>lT` | Browse all tags |
-| `<leader>lS` | Browse all scenes |
-| `<leader>lC` | Adjust Mythic chaos factor |
+| `<leader>lR` | Roll current line |
+| `<leader>lT` | Browse tags (Telescope or split browser) |
+| `<leader>lS` | Browse scenes |
+| `<leader>lC` | Adjust chaos factor |
 | `<leader>lI` | Insert last result |
 
 ### Session
@@ -119,7 +117,7 @@ Press `<leader>` followed by these keys:
 | `<leader>lsm` | Insert scene marker |
 | `<leader>lsn` | Insert narrative block |
 | `<leader>lss` | Show session summary |
-| `<leader>l[` / `<leader>l]` | Navigate scenes |
+| `<leader>l[` / `<leader>l]` | Previous / next scene |
 
 ### Insert notation
 
@@ -141,6 +139,8 @@ Press `<leader>` followed by these keys:
 | `<leader>ltr` | `<C-l>r` | `[#N:\|]` — Reference |
 | `<leader>ltf` | `<C-l>f` | `[F:\|]` — Foe |
 | `<leader>ltm` | — | `[R:\|]` — Room |
+| `<leader>ltx` | — | `[PC:Name\|HP-2]` — stat update |
+| `<leader>ltz` | — | `[N:Name\|+change]` — status update |
 
 ### Progress
 
@@ -162,6 +162,14 @@ require("lonelog").setup({
   dice = { max_dice = 100, max_sides = 1000 },
   prompt_for_scene_context = true,
   keymaps = { /* see :help lonelog-keymaps */ },
+  highlight = {
+    lonelogAction = { fg = "#ff6600" },
+  },
+  campaign = {
+    default_ruleset = "",
+    default_genre = "",
+    default_player = "",
+  },
 })
 ```
 
@@ -184,7 +192,8 @@ Bundled but disabled by default. Enable the ones you need:
 require("lonelog").setup({
   addons = {
     combat  = true,   -- [COMBAT] blocks, round markers, auto-roster
-    dungeon = true,   -- Dungeon Status block, room navigation, room states
+    dungeon = true,   -- dungeon status, room nav, room states
+    resources = true, -- [Inv:], [Wealth:], supply dice, resources block
   },
 })
 ```
@@ -233,7 +242,7 @@ See `:help lonelog-commands` for the full list (30+ commands).
 :help lonelog
 ```
 
-Covers all keymaps, notation format, oracle probabilities, tag autocomplete, syntax highlighting, and session workflow tips.
+Covers all keymaps, notation format, oracle probabilities, tag autocomplete, syntax highlighting, add-on configuration, and session workflow tips.
 
 ## Requirements
 
