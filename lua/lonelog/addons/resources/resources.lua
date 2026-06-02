@@ -60,7 +60,8 @@ function M.wealth_delta()
 		if not delta or delta == "" then
 			return
 		end
-		local amount = tonumber(delta:gsub("%s+", ""))
+		local cleaned = delta:gsub("%s+", "")
+		local amount = tonumber(cleaned)
 		if not amount or amount == 0 then
 			return
 		end
