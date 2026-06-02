@@ -59,9 +59,10 @@ function M.wealth_delta()
 	-- Parse currencies: [Wealth:Gold 40|Silver 50] -> {{name="Gold", value=40}, ...}
 	local currencies = {}
 	for pair in wealth_tag:gmatch("[^|]+") do
-		local name, val = pair:match("(%a+)%s+(%d+)")
+		local clean = pair:gsub("[%[%]]", "")
+		local name, val = clean:match("(%a+)%s+(%d+)")
 		if name and val then
-			table.insert(currencies, { name = name, value = tonumber(val), raw = pair })
+			table.insert(currencies, { name = name, value = tonumber(val), raw = clean })
 		end
 	end
 
