@@ -227,6 +227,7 @@ function M.show_tags_picker()
 	-- Build type filter list
 	local summary = M.tags_summary(file_tags)
 	local type_items, key_by_label = {}, {}
+	local summary = M.tags_summary(file_tags)
 	local total_unique = 0
 	for _, v in pairs(summary) do
 		total_unique = total_unique + v.count
@@ -238,13 +239,6 @@ function M.show_tags_picker()
 		table.insert(type_items, label)
 		key_by_label[label] = k
 	end
-
-	-- Build a single flat list of all tags for Telescope path
-	local flat_items = {}
-	for _, t in ipairs(file_tags) do
-		table.insert(flat_items, { tag = t, display = M.format_tag_display(t) })
-	end
-
 	local ui_pick = require("lonelog.ui").pick
 	ui_pick({
 		title = "Filter by Type",
@@ -255,20 +249,26 @@ function M.show_tags_picker()
 				return
 			end
 			local key = key_by_label[choice]
-			local items = key == "all" and flat_items
-				or vim.tbl_filter(function(item)
-					return item.tag.type == key
-				end, flat_items)
-			if #items == 0 then
-				return
+			local filtered = key == "all" and file_tags
+				or vim.tbl_filter(function(t)
+					return t.type == key
+				end, file_tags)
+			local items = {}
+			for _, t in ipairs(filtered) do
+				table.insert(items, M.format_tag_display(t))
 			end
 			ui_pick({
 				title = "Lonelog Tags",
 				items = items,
-				format_item = function(item) return item.display end,
+				format_item = function(item) return item end,
 				on_select = function(c)
 					if c then
-						vim.api.nvim_win_set_cursor(0, { c.tag.line, 0 })
+						for i, display in ipairs(items) do
+							if display == c then
+								vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
+								break
+							end
+						end
 					end
 				end,
 			})
