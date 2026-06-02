@@ -217,6 +217,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
        room_state      = "<leader>lxs",
        insert_round    = "<leader>lxr",
        resources_block = "<leader>lrr",
+       wealth_delta    = "<leader>lwd",
       roll_line     = "<leader>lr",
       complete_tag  = "<C-l>c",
 
@@ -251,7 +252,7 @@ Config key: addons~
     addons = {
       combat   = true,    -- :LonelogCombat, :LonelogRound
       dungeon  = true,    -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
-      resources = true,   -- :LonelogResourcesBlock, :LonelogSupplyRoll
+      resources = true,   -- :LonelogResourcesBlock, :LonelogSupplyRoll, :LonelogWealthDelta
     }
 
 Config key: highlight~
@@ -835,6 +836,7 @@ Normal mode keymaps~
   <leader>lxg    Navigate to connected room     :LonelogRoomGo
   <leader>lxs    Toggle room state              :LonelogRoomState
   <leader>lrr    Insert resources status block   :LonelogResourcesBlock
+  <leader>lwd    Add/subtract wealth             :LonelogWealthDelta
 
   (*) Requires the respective add-on to be enabled (see |lonelog-config|).
 

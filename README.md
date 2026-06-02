@@ -187,7 +187,6 @@ require("lonelog").setup({
 > tag and scene navigation. Set `true` to require Telescope or `false`
 > to always use the built-in split browser. Other pickers (oracles, main
 > menu) fall back to the native sidebar.
-```
 
 > [!TIP]
 > Disable or rebind any keymap:
