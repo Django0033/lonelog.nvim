@@ -29,6 +29,7 @@ local defaults = {
 		insert_round = "<leader>lxr",
 		resources_block = "<leader>lrr",
 		wealth_delta = "<leader>lwd",
+		inv_delta = "<leader>lwi",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",

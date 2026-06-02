@@ -31,6 +31,13 @@ M.commands = {
 		end,
 		opts = { nargs = "?", desc = "Add or subtract wealth" },
 	},
+	{
+		name = "LonelogInvDelta",
+		command = function()
+			require("lonelog.addons.resources.resources").inv_delta()
+		end,
+		opts = { nargs = "?", desc = "Add or subtract inventory quantity" },
+	},
 }
 
 M.keymaps = {
@@ -48,6 +55,8 @@ M.keymaps = {
 		opts = { silent = true, desc = "Insert resources status block" } },
 	{ mode = "n", key = "wealth_delta", rhs = ":LonelogWealthDelta<CR>",
 		opts = { silent = true, desc = "Add/subtract wealth" } },
+	{ mode = "n", key = "inv_delta", rhs = ":LonelogInvDelta<CR>",
+		opts = { silent = true, desc = "Add/subtract inventory" } },
 }
 
 M.requires = {}

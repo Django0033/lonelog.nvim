@@ -124,4 +124,65 @@ function M.wealth_delta()
 	})
 end
 
+function M.inv_delta()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local line = vim.api.nvim_buf_get_lines(bufnr, cursor[1] - 1, cursor[1], false)[1]
+	if not line then
+		return
+	end
+
+	local inv_tag = line:match("%[Inv:[^%]]+%]")
+	if not inv_tag then
+		vim.notify("lonelog: No [Inv:] tag found on this line", vim.log.levels.INFO)
+		return
+	end
+
+	local inner = inv_tag:match("^%[Inv:(.*)%]$")
+	if not inner then
+		return
+	end
+
+	local parts = {}
+	for p in inner:gmatch("[^|]+") do
+		table.insert(parts, p)
+	end
+	if #parts == 0 then
+		return
+	end
+
+	local last = parts[#parts]
+	local qty = tonumber(last)
+	if not qty then
+		vim.notify("lonelog: No numeric quantity to adjust in inventory tag", vim.log.levels.INFO)
+		return
+	end
+
+	vim.ui.input({ prompt = "Delta (e.g. -1, +2): " }, function(delta)
+		if not delta or delta == "" then
+			return
+		end
+		local cleaned = delta:gsub("%s+", "")
+		local amount = tonumber(cleaned)
+		if not amount or amount == 0 then
+			return
+		end
+		local new_qty = qty + amount
+		local new_last
+		if new_qty <= 0 then
+			new_last = "depleted"
+		else
+			new_last = tostring(new_qty)
+		end
+		local s = inv_tag:find(last, 1, true)
+		if not s then
+			return
+		end
+		local new_tag = inv_tag:sub(1, s - 1) .. new_last .. inv_tag:sub(s + #last)
+		local new_line = line:gsub("%[Inv:[^%]]+%]", new_tag, 1)
+		vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
+		vim.notify("lonelog: " .. inv_tag .. " -> " .. new_tag, vim.log.levels.INFO)
+	end)
+end
+
 return M
