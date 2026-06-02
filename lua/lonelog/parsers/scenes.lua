@@ -234,40 +234,71 @@ function M.show_scenes_picker()
 			key_by_label[label] = k
 		end
 	end
-	local ui_pick = require("lonelog.ui").pick
+	-- Open browser with scene groups
+	M.show_scenes_browser(scenes)
+end
+
+local function open_scene_picker(filtered_scenes, ui_pick)
+	local items = {}
+	for _, s in ipairs(filtered_scenes) do
+		table.insert(items, { scene = s, display = M.format_scene_display(s) })
+	end
 	ui_pick({
-		title = "Filter by Type",
-		items = type_items,
-		format_item = function(item) return item end,
-		on_select = function(choice)
-			if not choice then
-				return
+		title = "Lonelog Scenes",
+		items = items,
+		format_item = function(item) return item.display end,
+		on_select = function(c)
+			if c then
+				vim.api.nvim_win_set_cursor(0, { c.scene.line, 0 })
 			end
-			local key = key_by_label[choice]
-			local filtered = key == "all" and scenes or vim.tbl_filter(function(s)
-				return s.type == key
-			end, scenes)
-			local items = {}
-			for _, sc in ipairs(filtered) do
-				table.insert(items, M.format_scene_display(sc))
-			end
-			ui_pick({
-				title = "Lonelog Scenes",
-				items = items,
-				format_item = function(item) return item end,
-				on_select = function(c)
-					if c then
-						for i, display in ipairs(items) do
-							if display == c then
-								vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
-								break
-							end
-						end
-					end
-				end,
-			})
 		end,
 	})
+end
+
+function M.show_scenes_browser(all_scenes)
+	local summary = M.scenes_summary(all_scenes)
+	local lines = { "  Lonelog Scenes", "" }
+	local group_info = {}
+	table.insert(lines, "    All Scenes (" .. #all_scenes .. ")")
+	table.insert(group_info, { label = lines[#lines], type_key = "all", scenes = all_scenes })
+	for k, v in pairs(summary) do
+		if k ~= "all" then
+			local label = "    " .. v.label .. " (" .. v.count .. ")"
+			table.insert(lines, label)
+			local filtered = vim.tbl_filter(function(s)
+				return s.type == k
+			end, all_scenes)
+			table.insert(group_info, { label = label, type_key = k, scenes = filtered })
+		end
+	end
+	table.insert(lines, "")
+	table.insert(lines, "  <CR> open picker    q close")
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.api.nvim_buf_set_option(buf, "modifiable", false)
+	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+
+	vim.cmd("botright vnew")
+	vim.api.nvim_win_set_buf(0, buf)
+	vim.api.nvim_win_set_width(0, 35)
+	vim.api.nvim_buf_set_name(buf, "Lonelog Scenes")
+
+	local ui_pick = require("lonelog.ui").pick
+	local function on_enter()
+		local line = vim.fn.line(".")
+		local idx = line - 1
+		if idx < 1 or idx > #group_info then
+			return
+		end
+		vim.api.nvim_win_close(0, true)
+		open_scene_picker(group_info[idx].scenes, ui_pick)
+	end
+
+	vim.keymap.set("n", "<CR>", on_enter, { buffer = buf, nowait = true, silent = true })
+	vim.keymap.set("n", "q", function()
+		vim.api.nvim_win_close(0, true)
+	end, { buffer = buf, nowait = true, silent = true })
 end
 
 -- Native sidebar picker for scenes
