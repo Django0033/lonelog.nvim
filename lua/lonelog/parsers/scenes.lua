@@ -255,18 +255,16 @@ function M.show_scenes_picker()
 			if #items == 0 then
 				return
 			end
-			require("lonelog.ui").wait_for_close(function()
-				ui_pick({
-					title = "Lonelog Scenes",
-					items = items,
-					format_item = function(item) return item.display end,
-					on_select = function(c)
-						if c then
-							vim.api.nvim_win_set_cursor(0, { c.scene.line, 0 })
-						end
-					end,
-				})
-			end)
+			ui_pick({
+				title = "Lonelog Scenes",
+				items = items,
+				format_item = function(item) return item.display end,
+				on_select = function(c)
+					if c then
+						vim.api.nvim_win_set_cursor(0, { c.scene.line, 0 })
+					end
+				end,
+			})
 		end,
 	})
 end
