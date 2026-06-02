@@ -12,14 +12,14 @@ syn match lonelogSceneId '\v^###\s+\zs(S\d+([a-z])?(\.\d+)?|T\d+(\+T\d+)?(-S\d+)
 
 " === Entity tags [TYPE:...] ===
 syn region lonelogTag
-  \ start='\v\[(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|R|F|TAG|#N):'
+  \ start='\v\[(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|WEALTH|R|F|TAG|#N):'
   \ end='\]'
   \ contains=lonelogTagBracket,lonelogTagType,lonelogTagSep
   \ keepend
   \ oneline
 
 syn match lonelogTagBracket '\v\[|\]' contained
-syn match lonelogTagType '\v(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|R|F|TAG|#N):' contained
+syn match lonelogTagType '\v(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|WEALTH|R|F|TAG|#N):' contained
 syn match lonelogTagSep '|' contained
 
 " === Tag modifiers (inside tags after pipe) ===
@@ -69,13 +69,13 @@ syn region lonelogNota matchgroup=lonelogNotaParen
 
 " === Multi-line tags (span lines, close with ] on its own line) ===
 syn region lonelogTagML
-  \ start='\v\[(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|R|F|TAG|#N):'
+  \ start='\v\[(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|WEALTH|R|F|TAG|#N):'
   \ end='^\s*\]'
   \ contains=lonelogTagMLBracket,lonelogTagMLType,lonelogTagMLSep,lonelogTagMLContent
   \ keepend
 
 syn match lonelogTagMLBracket '\v\[|\]' contained
-syn match lonelogTagMLType '\v(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|R|F|TAG|#N):' contained
+syn match lonelogTagMLType '\v(N|L|PC|E|THREAD|CLOCK|TRACK|TIMER|INV|WEALTH|R|F|TAG|#N):' contained
 syn match lonelogTagMLSep '|' contained
 syn match lonelogTagMLContent '.*' contained contains=lonelogModArrow,lonelogModPlus,lonelogModMinus,lonelogProgressNum
 
