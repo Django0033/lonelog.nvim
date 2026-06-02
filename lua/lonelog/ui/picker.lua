@@ -25,7 +25,9 @@ function M.telescope_pick(items, opts)
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
 				if selection then
-					opts.on_select(selection.value)
+					vim.schedule(function()
+						opts.on_select(selection.value)
+					end)
 				end
 			end)
 			return true
