@@ -228,30 +228,41 @@ function M.show_tags_picker()
 		table.insert(type_items, label)
 		key_by_label[label] = k
 	end
-	vim.ui.select(type_items, { prompt = "Filter by Type" }, function(choice)
-		if not choice then
-			return
-		end
-		local key = key_by_label[choice]
-		local filtered = key == "all" and file_tags
-			or vim.tbl_filter(function(t)
-				return t.type == key
-			end, file_tags)
-		local items = {}
-		for _, t in ipairs(filtered) do
-			table.insert(items, M.format_tag_display(t))
-		end
-		vim.ui.select(items, { prompt = "Lonelog Tags" }, function(c)
-			if c then
-				for i, display in ipairs(items) do
-					if display == c then
-						vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
-						break
-					end
-				end
+	local ui_pick = require("lonelog.ui").pick
+	ui_pick({
+		title = "Filter by Type",
+		items = type_items,
+		format_item = function(item) return item end,
+		on_select = function(choice)
+			if not choice then
+				return
 			end
-		end)
-	end)
+			local key = key_by_label[choice]
+			local filtered = key == "all" and file_tags
+				or vim.tbl_filter(function(t)
+					return t.type == key
+				end, file_tags)
+			local items = {}
+			for _, t in ipairs(filtered) do
+				table.insert(items, M.format_tag_display(t))
+			end
+			ui_pick({
+				title = "Lonelog Tags",
+				items = items,
+				format_item = function(item) return item end,
+				on_select = function(c)
+					if c then
+						for i, display in ipairs(items) do
+							if display == c then
+								vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
+								break
+							end
+						end
+					end
+				end,
+			})
+		end,
+	})
 end
 
 -- Native sidebar picker for tags

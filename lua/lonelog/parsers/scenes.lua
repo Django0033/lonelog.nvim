@@ -234,29 +234,40 @@ function M.show_scenes_picker()
 			key_by_label[label] = k
 		end
 	end
-	vim.ui.select(type_items, { prompt = "Filter by Type" }, function(choice)
-		if not choice then
-			return
-		end
-		local key = key_by_label[choice]
-		local filtered = key == "all" and scenes or vim.tbl_filter(function(s)
-			return s.type == key
-		end, scenes)
-		local items = {}
-		for _, sc in ipairs(filtered) do
-			table.insert(items, M.format_scene_display(sc))
-		end
-		vim.ui.select(items, { prompt = "Lonelog Scenes" }, function(c)
-			if c then
-				for i, display in ipairs(items) do
-					if display == c then
-						vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
-						break
-					end
-				end
+	local ui_pick = require("lonelog.ui").pick
+	ui_pick({
+		title = "Filter by Type",
+		items = type_items,
+		format_item = function(item) return item end,
+		on_select = function(choice)
+			if not choice then
+				return
 			end
-		end)
-	end)
+			local key = key_by_label[choice]
+			local filtered = key == "all" and scenes or vim.tbl_filter(function(s)
+				return s.type == key
+			end, scenes)
+			local items = {}
+			for _, sc in ipairs(filtered) do
+				table.insert(items, M.format_scene_display(sc))
+			end
+			ui_pick({
+				title = "Lonelog Scenes",
+				items = items,
+				format_item = function(item) return item end,
+				on_select = function(c)
+					if c then
+						for i, display in ipairs(items) do
+							if display == c then
+								vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
+								break
+							end
+						end
+					end
+				end,
+			})
+		end,
+	})
 end
 
 -- Native sidebar picker for scenes
