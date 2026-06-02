@@ -1,5 +1,18 @@
 local M = {}
 
+-- Poll Telescope state until no picker is active, then fire callback
+function M.wait_for_close(callback)
+	local function check()
+		local ok, state = pcall(require, "telescope.state")
+		if ok and state.get_active_picker() then
+			vim.defer_fn(check, 15)
+			return
+		end
+		callback()
+	end
+	check()
+end
+
 function M.telescope_pick(items, opts)
 	local pickers = require("telescope.pickers")
 	local finders = require("telescope.finders")
