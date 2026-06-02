@@ -56,24 +56,66 @@ function M.wealth_delta()
 		return
 	end
 
-	vim.ui.input({ prompt = "Delta (e.g. +15, -8): " }, function(delta)
-		if not delta or delta == "" then
-			return
+	-- Parse currencies: [Wealth:Gold 40|Silver 50] -> {{name="Gold", value=40}, ...}
+	local currencies = {}
+	for pair in wealth_tag:gmatch("[^|]+") do
+		local name, val = pair:match("(%a+)%s+(%d+)")
+		if name and val then
+			table.insert(currencies, { name = name, value = tonumber(val), raw = pair })
 		end
-		local cleaned = delta:gsub("%s+", "")
-		local amount = tonumber(cleaned)
-		if not amount or amount == 0 then
-			return
-		end
+	end
 
-		local new_tag = wealth_tag:gsub("(%d+)", function(n)
-			return tonumber(n) + amount
-		end)
+	if #currencies == 0 then
+		vim.notify("lonelog: No currency values found in wealth tag", vim.log.levels.INFO)
+		return
+	end
 
+	local function apply_delta(currency, amount)
+		local new_value = currency.value + amount
+		local new_pair = currency.name .. " " .. new_value
+		local new_tag = wealth_tag:gsub("%" .. currency.raw, new_pair, 1)
 		local new_line = line:gsub("%[Wealth:[^%]]+%]", new_tag, 1)
 		vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
-		vim.notify("lonelog: " .. wealth_tag .. " -> " .. new_tag, vim.log.levels.INFO)
-	end)
+		vim.notify("lonelog: " .. currency.raw .. " -> " .. new_value, vim.log.levels.INFO)
+	end
+
+	local function prompt_delta(currency)
+		vim.ui.input({ prompt = "Delta for " .. currency.name .. " (e.g. +15, -8): " }, function(delta)
+			if not delta or delta == "" then
+				return
+			end
+			local cleaned = delta:gsub("%s+", "")
+			local amount = tonumber(cleaned)
+			if not amount or amount == 0 then
+				return
+			end
+			apply_delta(currency, amount)
+		end)
+	end
+
+	if #currencies == 1 then
+		prompt_delta(currencies[1])
+		return
+	end
+
+	local items = {}
+	for _, c in ipairs(currencies) do
+		table.insert(items, c.name .. " " .. c.value)
+	end
+	require("lonelog.ui").pick({
+		title = "Select currency",
+		items = items,
+		format_item = function(item) return item end,
+		on_select = function(choice)
+			if not choice then return end
+			for _, c in ipairs(currencies) do
+				if c.name .. " " .. c.value == choice then
+					prompt_delta(c)
+					return
+				end
+			end
+		end,
+	})
 end
 
 return M
