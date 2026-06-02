@@ -96,8 +96,8 @@ require("lonelog").setup()
 ```
 
 > [!NOTE]
-> `vim.pack.add` carga automáticamente los plugins. Si usás lazy.nvim,
-> usa esa configuración en su lugar.
+> `vim.pack.add` loads plugins automatically. If you use lazy.nvim,
+> use that configuration instead.
 </details>
 
 <details>
