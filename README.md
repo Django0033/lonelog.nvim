@@ -62,6 +62,13 @@ d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
   end,
 }
 ```
+
+> [!NOTE]
+> If you enable add-ons, add their commands to `cmd`: `"LonelogCombat"`,
+> `"LonelogRound"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
+> `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`.
+> Or remove `cmd` entirely to load everything at startup.
+
 </details>
 
 <details>
@@ -157,13 +164,14 @@ Press `<leader>` followed by these keys:
 ```lua
 require("lonelog").setup({
   use_telescope = "auto",         -- "auto" | true | false
+  sidebar = { width = 50 },
   float = { border = "rounded", height = 0.4, width = 0.6 },
   oracle = { default_table = "fate", persist_chaos = true },
   dice = { max_dice = 100, max_sides = 1000 },
   prompt_for_scene_context = true,
   keymaps = { /* see :help lonelog-keymaps */ },
   highlight = {
-    lonelogAction = { fg = "#ff6600" },
+    lonelogAction = { fg = "#ff6600", bold = true },
   },
   campaign = {
     default_ruleset = "",
@@ -171,6 +179,14 @@ require("lonelog").setup({
     default_player = "",
   },
 })
+```
+
+> [!TIP]
+> Set `use_telescope = "auto"` (default) to use Telescope when installed.
+> When Telescope is not available, a vertical split browser is used for
+> tag and scene navigation. Set `true` to require Telescope or `false`
+> to always use the built-in split browser. Other pickers (oracles, main
+> menu) fall back to the native sidebar.
 ```
 
 > [!TIP]

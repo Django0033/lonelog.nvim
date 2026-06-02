@@ -97,7 +97,8 @@ lazy.nvim~
 <
   If you enable add-ons via |lonelog-config|, add their commands to cmd:
   "LonelogCombat", "LonelogRound", "LonelogDungeonStatus",
-  "LonelogRoomGo", "LonelogRoomState".
+  "LonelogRoomGo", "LonelogRoomState", "LonelogResourcesBlock",
+  "LonelogSupplyRoll".
 
 packer.nvim~
 >
