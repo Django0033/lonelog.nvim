@@ -38,6 +38,13 @@ M.commands = {
 		end,
 		opts = { nargs = "?", desc = "Add or subtract inventory quantity" },
 	},
+	{
+		name = "LonelogItemState",
+		command = function()
+			require("lonelog.addons.resources.resources").item_state()
+		end,
+		opts = { nargs = "?", desc = "Add/remove item properties" },
+	},
 }
 
 M.keymaps = {
@@ -57,6 +64,8 @@ M.keymaps = {
 		opts = { silent = true, desc = "Add/subtract wealth" } },
 	{ mode = "n", key = "inv_delta", rhs = ":LonelogInvDelta<CR>",
 		opts = { silent = true, desc = "Add/subtract inventory" } },
+	{ mode = "n", key = "item_state", rhs = ":LonelogItemState<CR>",
+		opts = { silent = true, desc = "Change item properties" } },
 }
 
 M.requires = {}

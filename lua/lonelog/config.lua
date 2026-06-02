@@ -30,6 +30,7 @@ local defaults = {
 		resources_block = "<leader>lrr",
 		wealth_delta = "<leader>lwd",
 		inv_delta = "<leader>lwi",
+		item_state = "<leader>lws",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",

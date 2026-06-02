@@ -183,4 +183,65 @@ function M.inv_delta()
 	end)
 end
 
+function M.item_state()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local line = vim.api.nvim_buf_get_lines(bufnr, cursor[1] - 1, cursor[1], false)[1]
+	if not line then
+		return
+	end
+
+	local inv_tag = line:match("%[Inv:[^%]]+%]")
+	if not inv_tag then
+		vim.notify("lonelog: No [Inv:] tag found on this line", vim.log.levels.INFO)
+		return
+	end
+
+	local inner = inv_tag:match("^%[Inv:(.*)%]$")
+	if not inner then
+		return
+	end
+
+	local parts = {}
+	for p in inner:gmatch("[^|]+") do
+		table.insert(parts, p)
+	end
+	local item_name = parts[1]
+	local props = {}
+	for i = 2, #parts do
+		table.insert(props, parts[i])
+	end
+
+	local prop_str = #props > 0 and table.concat(props, "|") or "(none)"
+	vim.ui.input({ prompt = "Item state for " .. item_name .. " (current: " .. prop_str .. "): " }, function(input)
+		if not input or input == "" then
+			return
+		end
+		local new_props = {}
+		for _, p in ipairs(props) do
+			new_props[p] = true
+		end
+		for change in input:gmatch("%S+") do
+			local add = change:match("^%+(.+)$")
+			if add then
+				new_props[add] = true
+			end
+			local remove = change:match("^%-(.+)$")
+			if remove then
+				new_props[remove] = nil
+			end
+		end
+		local result = {}
+		for p in pairs(new_props) do
+			table.insert(result, p)
+		end
+		table.sort(result)
+		local new_inner = #result > 0 and item_name .. "|" .. table.concat(result, "|") or item_name
+		local new_tag = "[Inv:" .. new_inner .. "]"
+		local new_line = line:gsub("%[Inv:[^%]]+%]", new_tag, 1)
+		vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
+		vim.notify("lonelog: " .. inv_tag .. " -> " .. new_tag, vim.log.levels.INFO)
+	end)
+end
+
 return M
