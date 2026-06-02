@@ -110,6 +110,18 @@ packer.nvim~
   }
 <
 
+vim.pack.add (Neovim 0.11+)~
+>
+  " init.lua
+  vim.pack.add({ 'https://github.com/Django0033/lonelog.nvim' })
+  require("lonelog").setup()
+<
+
+>
+  vim.pack.add loads plugins automatically. Use lazy.nvim if you prefer
+  its lazy-loading features instead.
+<
+
 vim-pack (built-in)~
 >
   git clone https://github.com/Django0033/lonelog.nvim.git \
