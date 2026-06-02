@@ -27,6 +27,7 @@ local defaults = {
 		room_go = "<leader>lxg",
 		room_state = "<leader>lxs",
 		insert_round = "<leader>lxr",
+		resources_block = "<leader>lrr",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",
@@ -47,6 +48,8 @@ local defaults = {
 		tag_ref = "<leader>ltr",
 		tag_foe = "<leader>ltf",
 		tag_room = "<leader>ltm",
+		tag_inv = "<leader>lti",
+		tag_wealth = "<leader>ltw",
 
 		-- Multi-line tags
 		mltag_npc = "<leader>lmn",
@@ -91,6 +94,7 @@ local defaults = {
 	addons = {
 		combat = false,
 		dungeon = false,
+		resources = false,
 	},
 }
 

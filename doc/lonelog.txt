@@ -187,6 +187,8 @@ Call setup() with an optional table of overrides. All keys and defaults:
       tag_ref      = "<leader>ltr",
        tag_foe      = "<leader>ltf",
        tag_room     = "<leader>ltm",
+       tag_inv      = "<leader>lti",
+       tag_wealth   = "<leader>ltw",
        -- Core actions (uppercase)
        oracle = "<leader>lO",
        dice   = "<leader>lD",
@@ -213,6 +215,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
        room_go         = "<leader>lxg",
        room_state      = "<leader>lxs",
        insert_round    = "<leader>lxr",
+       resources_block = "<leader>lrr",
       roll_line     = "<leader>lr",
       complete_tag  = "<C-l>c",
 
@@ -245,8 +248,9 @@ Config key: addons~
   own commands and keymaps only when enabled. All default to false.
 
     addons = {
-      combat  = true,   -- :LonelogCombat, :LonelogRound
-      dungeon = true,   -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
+      combat   = true,    -- :LonelogCombat, :LonelogRound
+      dungeon  = true,    -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
+      resources = true,   -- :LonelogResourcesBlock, :LonelogSupplyRoll
     }
 
   Set to true to enable individual add-ons. When disabled, the add-on's
@@ -816,6 +820,7 @@ Normal mode keymaps~
   <leader>lxd    Insert/update dungeon status   :LonelogDungeonStatus
   <leader>lxg    Navigate to connected room     :LonelogRoomGo
   <leader>lxs    Toggle room state              :LonelogRoomState
+  <leader>lrr    Insert resources status block   :LonelogResourcesBlock
 
   (*) Requires the respective add-on to be enabled (see |lonelog-config|).
 
@@ -839,6 +844,8 @@ Normal mode keymaps~
   <leader>ltt    Insert thread tag             [Thread:|Open]
   <leader>ltr    Insert reference tag          [#N:|]
   <leader>ltf    Insert foe tag                [F:|]
+  <leader>lti    Insert inventory tag          [Inv:|]
+  <leader>ltw    Insert wealth tag             [Wealth:Gold 0]
   <leader>ltm    Insert room tag (*)            [R:|]
 
   (*) Requires the respective add-on to be enabled (see |lonelog-config|).

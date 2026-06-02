@@ -11,6 +11,7 @@ local TAG_TYPES = {
 	TRACK = "Track",
 	TIMER = "Timer",
 	INV = "Inventory",
+	WEALTH = "Wealth",
 	R = "Room",
 	F = "Foe",
 }
@@ -25,6 +26,7 @@ local TAG_LABELS = {
 	TRACK = "Tracks",
 	TIMER = "Timers",
 	INV = "Inventory",
+	WEALTH = "Wealth",
 	R = "Rooms",
 	F = "Foes",
 }
