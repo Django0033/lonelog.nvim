@@ -223,20 +223,44 @@ function M.show_scenes_picker()
 		return
 	end
 
-	-- Build flat picker with all scenes
-	local items = {}
-	for _, s in ipairs(scenes) do
-		table.insert(items, { scene = s, display = M.format_scene_display(s) })
+	-- Build type filter picker
+	local summary = M.scenes_summary(scenes)
+	local type_items, key_by_label = {}, {}
+	table.insert(type_items, "All Scenes (" .. #scenes .. ")")
+	key_by_label["All Scenes (" .. #scenes .. ")"] = "all"
+	for k, v in pairs(summary) do
+		if k ~= "all" then
+			local label = v.label .. " (" .. v.count .. ")"
+			table.insert(type_items, label)
+			key_by_label[label] = k
+		end
 	end
 	local ui_pick = require("lonelog.ui").pick
 	ui_pick({
-		title = "Lonelog Scenes",
-		items = items,
-		format_item = function(item) return item.display end,
-		on_select = function(c)
-			if c then
-				vim.api.nvim_win_set_cursor(0, { c.scene.line, 0 })
+		title = "Filter by Type",
+		items = type_items,
+		format_item = function(item) return item end,
+		on_select = function(choice)
+			if not choice then
+				return
 			end
+			local key = key_by_label[choice]
+			local filtered = key == "all" and scenes
+				or vim.tbl_filter(function(s) return s.type == key end, scenes)
+			local items = {}
+			for _, s in ipairs(filtered) do
+				table.insert(items, { scene = s, display = M.format_scene_display(s) })
+			end
+			ui_pick({
+				title = "Lonelog Scenes",
+				items = items,
+				format_item = function(item) return item.display end,
+				on_select = function(c)
+					if c then
+						vim.api.nvim_win_set_cursor(0, { c.scene.line, 0 })
+					end
+				end,
+			})
 		end,
 	})
 end

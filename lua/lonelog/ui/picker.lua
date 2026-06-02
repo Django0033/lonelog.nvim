@@ -8,6 +8,7 @@ function M.telescope_pick(items, opts)
 	local action_state = require("telescope.actions.state")
 
 	pickers.new({}, {
+		sorting_strategy = "ascending",
 		prompt_title = opts.title or "Select",
 		finder = finders.new_table({
 			results = items,

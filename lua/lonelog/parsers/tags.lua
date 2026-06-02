@@ -224,20 +224,48 @@ function M.show_tags_picker()
 		return
 	end
 
-	-- Build flat picker with all tags
-	local items = {}
-	for _, t in ipairs(file_tags) do
-		table.insert(items, { tag = t, display = M.format_tag_display(t) })
+	-- Build type filter picker
+	local summary = M.tags_summary(file_tags)
+	local type_items, key_by_label = {}, {}
+	local total_unique = 0
+	for _, v in pairs(summary) do
+		total_unique = total_unique + v.count
+	end
+	table.insert(type_items, "All Tags (" .. total_unique .. ")")
+	key_by_label["All Tags (" .. total_unique .. ")"] = "all"
+	for k, v in pairs(summary) do
+		local label = v.label .. " (" .. v.count .. ")"
+		table.insert(type_items, label)
+		key_by_label[label] = k
 	end
 	local ui_pick = require("lonelog.ui").pick
 	ui_pick({
-		title = "Lonelog Tags",
-		items = items,
-		format_item = function(item) return item.display end,
-		on_select = function(c)
-			if c then
-				vim.api.nvim_win_set_cursor(0, { c.tag.line, 0 })
+		title = "Filter by Type",
+		items = type_items,
+		format_item = function(item) return item end,
+		on_select = function(choice)
+			if not choice then
+				return
 			end
+			local key = key_by_label[choice]
+			local filtered = key == "all" and file_tags
+				or vim.tbl_filter(function(t)
+					return t.type == key
+				end, file_tags)
+			local items = {}
+			for _, t in ipairs(filtered) do
+				table.insert(items, { tag = t, display = M.format_tag_display(t) })
+			end
+			ui_pick({
+				title = "Lonelog Tags",
+				items = items,
+				format_item = function(item) return item.display end,
+				on_select = function(c)
+					if c then
+						vim.api.nvim_win_set_cursor(0, { c.tag.line, 0 })
+					end
+				end,
+			})
 		end,
 	})
 end
