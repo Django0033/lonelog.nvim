@@ -1,3 +1,7 @@
+-- NOTE: This file is currently only used by test files (test_prose.lua).
+-- It is NOT required by any production source code in `/lua/`.
+-- The tokenizer it depends on is likewise only used here and in tests.
+-- These files are kept as infrastructure for potential future integration.
 local M = {}
 
 function M.parse_prose(lines)

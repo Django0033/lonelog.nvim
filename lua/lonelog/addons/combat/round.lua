@@ -1,3 +1,6 @@
+-- NOTE: `is_dead` is duplicated in `parsers/combat.lua`.
+-- Consolidation opportunity: extract to a shared utility module if both
+-- call-sites are ever needed simultaneously in production.
 local M = {}
 
 local function is_dead(field)

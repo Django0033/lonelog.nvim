@@ -1,3 +1,7 @@
+-- NOTE: This file is currently only used by test files (test_combat_parser.lua).
+-- It is NOT required by any production source code in `/lua/`.
+-- The addon `lonelog.addons.combat.round` provides similar functionality
+-- with its own copy of the `is_dead` helper.
 local M = {}
 
 local function is_dead(field)

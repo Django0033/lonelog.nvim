@@ -1,3 +1,5 @@
+-- NOTE: This file is only used by parsers/prose.lua (which is itself unused
+-- in production) and test files. Not required by any production source code.
 local M = {}
 
 local function dice_tokens(text)

@@ -280,19 +280,4 @@ function M.roll(notation)
 	}
 end
 
--- Quick roll helpers for common dice
-for _, d in ipairs({
-	{ "d4", "1d4" },
-	{ "d6", "1d6" },
-	{ "d8", "1d8" },
-	{ "d10", "1d10" },
-	{ "d12", "1d12" },
-	{ "d20", "1d20" },
-	{ "d100", "1d100" },
-}) do
-	M[d[1]] = function()
-		return M.roll(d[2])
-	end
-end
-
 return M
