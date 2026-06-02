@@ -174,10 +174,8 @@ function M.inv_delta()
 		else
 			new_last = tostring(new_qty)
 		end
-		local s = inv_tag:find(last, 1, true)
-		if not s then
-			return
-		end
+		local left = inv_tag:match("^(.*|)")
+		local s = left and (#left + 1) or 1
 		local new_tag = inv_tag:sub(1, s - 1) .. new_last .. inv_tag:sub(s + #last)
 		local new_line = line:gsub("%[Inv:[^%]]+%]", new_tag, 1)
 		vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
