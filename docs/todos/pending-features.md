@@ -12,7 +12,7 @@
 | 6 | Frontmatter YAML init + auto-update | ~80 lines | Initialize note properties, update `last_modified` |
 | 7 | Resaltado de sintaxis configurable | ~200 lines | 16 customizable colors (Obsidian parity) |
 | 8 | i18n EN/ES | ~200 lines | Full translation of all UI strings |
-| 9 | ParsedElements Cache | ~100 lines | Unified parser: NPCs, locations, threads, progress, scenes, sessions with mention tracking |
+| 9 | ParsedElements Cache | ~100 lines | ✅ Done |
 
 ## Phase 3 — Lonelog spec addons
 
