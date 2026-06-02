@@ -230,6 +230,16 @@ Config key: use_telescope~
   true    - Always use Telescope (error if not installed).
   false   - Always use the built-in sidebar picker.
 
+Config key: campaign~
+  Default values for campaign header fields. Used when creating a new
+  frontmatter block via |:LonelogCampaign|.
+
+    campaign = {
+      default_ruleset = "",
+      default_genre   = "",
+      default_player  = "",
+    }
+
 Config key: addons~
   Control which optional add-on modules are loaded. Each add-on registers its
   own commands and keymaps only when enabled. All default to false.
@@ -542,12 +552,16 @@ Config key: addons~
 >
   :LonelogCampaign    " Insert campaign header YAML frontmatter
 <
-  Inserts a YAML frontmatter block at the top of the buffer with
-  campaign metadata fields (title, ruleset, genre, player, PCs,
-  dates, tools, themes, tone, notes). Prompts for the campaign title;
-  remaining fields default to blank or today's date.
+   Inserts a YAML frontmatter block at the top of the buffer with
+   campaign metadata fields (title, ruleset, genre, player, PCs,
+   dates, tools, themes, tone, notes). Prompts for title, ruleset,
+   genre, player name, and PCs in sequence. Optional fields can be
+   skipped by pressing Enter.
 
-  Refuses to insert if the buffer already begins with `---` (i.e.,
+   Config defaults for ruleset, genre, and player can be set via
+   |lonelog-config|.
+
+   Refuses to insert if the buffer already begins with `---` (i.e.,
   a campaign header already exists).
 >
   ---
@@ -568,6 +582,9 @@ Config key: addons~
 <
    The cursor is placed on the `ruleset:` line for immediate editing.
    See |lonelog-notation| §6 for field descriptions.
+
+   The `last_update` field is automatically updated to today's date
+   on each buffer write via an |autocmd|.
 
 4.15 Session summary                   *:LonelogSessionSummary* *:LonelogExportSummary*
                                          *lonelog-command-summary*
