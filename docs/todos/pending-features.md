@@ -4,7 +4,7 @@
 
 | # | Feature | Effort | Notes |
 |---|---------|--------|-------|
-| 1 | Campaign header modal (5 fields) | ~30 lines | `:LonelogCampaign` currently asks title only |
+| 1 | Campaign header modal (5 fields) | ~30 lines | ✅ Done |
 | 2 | Tokenizer unificado | ~70 lines | Classify lines by prefix for future features |
 | 3 | Parser de prosa (meta, dialogue, narrative) | ~50 lines | Parse `(note:)`, `Name: "text"`, `---` blocks |
 | 4 | Parser de combate completo | ~120 lines | Parse `[COMBAT]` blocks with rounds, combatants |
