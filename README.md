@@ -66,7 +66,8 @@ d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
 > [!NOTE]
 > If you enable add-ons, add their commands to `cmd`: `"LonelogCombat"`,
 > `"LonelogRound"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
-> `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`.
+> `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`,
+> `"LonelogWealthDelta"`, `"LonelogInvDelta"`.
 > Or remove `cmd` entirely to load everything at startup.
 
 </details>
