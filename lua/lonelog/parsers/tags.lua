@@ -218,62 +218,98 @@ function M.show_tags_picker()
 		return a.line < b.line
 	end)
 
-	-- Use native sidebar if Telescope is disabled
+	-- Use browser if Telescope is disabled
 	if not require("lonelog.config").should_use_telescope() then
-		M.show_tags_picker_native(file_tags)
+		M.show_tags_browser(file_tags)
 		return
 	end
 
-	-- Build type filter list
-	local summary = M.tags_summary(file_tags)
-	local type_items, key_by_label = {}, {}
-	local summary = M.tags_summary(file_tags)
+	-- Build flat picker with all tags
+	local items = {}
+	for _, t in ipairs(file_tags) do
+		table.insert(items, { tag = t, display = M.format_tag_display(t) })
+	end
+	local ui_pick = require("lonelog.ui").pick
+	ui_pick({
+		title = "Lonelog Tags",
+		items = items,
+		format_item = function(item) return item.display end,
+		on_select = function(c)
+			if c then
+				vim.api.nvim_win_set_cursor(0, { c.tag.line, 0 })
+			end
+		end,
+	})
+end
+
+local function open_tag_buffer(items, format_fn, on_select_fn, title)
+	local buf = vim.api.nvim_create_buf(false, true)
+	local lines = {}
+	for _, item in ipairs(items) do
+		table.insert(lines, "  " .. format_fn(item))
+	end
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.api.nvim_buf_set_option(buf, "modifiable", false)
+	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+
+	vim.cmd("botright vnew")
+	vim.api.nvim_win_set_buf(0, buf)
+	vim.api.nvim_win_set_width(0, 50)
+	vim.api.nvim_buf_set_name(buf, title or "Lonelog")
+	vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+	vim.keymap.set("n", "<CR>", function()
+		local line = vim.fn.line(".")
+		if line < 1 or line > #items then return end
+		vim.api.nvim_win_close(0, true)
+		on_select_fn(items[line])
+	end, { buffer = buf, nowait = true, silent = true })
+	vim.keymap.set("n", "q", function()
+		vim.api.nvim_win_close(0, true)
+	end, { buffer = buf, nowait = true, silent = true })
+end
+
+function M.show_tags_browser(all_tags)
+	local summary = M.tags_summary(all_tags)
+	local lines = { "  Lonelog Tags", "" }
+	local group_info = {}
 	local total_unique = 0
 	for _, v in pairs(summary) do
 		total_unique = total_unique + v.count
 	end
-	table.insert(type_items, "All Tags (" .. total_unique .. ")")
-	key_by_label["All Tags (" .. total_unique .. ")"] = "all"
+	table.insert(lines, "    All Tags (" .. total_unique .. ")")
+	table.insert(group_info, { key = "all", tags = all_tags, name = "All Tags" })
 	for k, v in pairs(summary) do
-		local label = v.label .. " (" .. v.count .. ")"
-		table.insert(type_items, label)
-		key_by_label[label] = k
+		local label = "    " .. v.label .. " (" .. v.count .. ")"
+		table.insert(lines, label)
+		local filtered = vim.tbl_filter(function(t) return t.type == k end, all_tags)
+		table.insert(group_info, { key = k, tags = filtered, name = v.label })
 	end
-	local ui_pick = require("lonelog.ui").pick
-	ui_pick({
-		title = "Filter by Type",
-		items = type_items,
-		format_item = function(item) return item end,
-		on_select = function(choice)
-			if not choice then
-				return
-			end
-			local key = key_by_label[choice]
-			local filtered = key == "all" and file_tags
-				or vim.tbl_filter(function(t)
-					return t.type == key
-				end, file_tags)
-			local items = {}
-			for _, t in ipairs(filtered) do
-				table.insert(items, M.format_tag_display(t))
-			end
-			ui_pick({
-				title = "Lonelog Tags",
-				items = items,
-				format_item = function(item) return item end,
-				on_select = function(c)
-					if c then
-						for i, display in ipairs(items) do
-							if display == c then
-								vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
-								break
-							end
-						end
-					end
-				end,
-			})
-		end,
-	})
+	table.insert(lines, "")
+	table.insert(lines, "  <CR> select group    q close")
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.api.nvim_buf_set_option(buf, "modifiable", false)
+	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+
+	vim.cmd("botright vnew")
+	vim.api.nvim_win_set_buf(0, buf)
+	vim.api.nvim_win_set_width(0, 40)
+	vim.api.nvim_buf_set_name(buf, "Lonelog Tags")
+
+	vim.keymap.set("n", "<CR>", function()
+		local idx = vim.fn.line(".") - 2
+		if idx < 0 or idx >= #group_info then return end
+		vim.api.nvim_win_close(0, true)
+		local group = group_info[idx]
+		open_tag_buffer(group.tags, M.format_tag_display, function(tag)
+			vim.api.nvim_win_set_cursor(0, { tag.line, 0 })
+		end, group.name)
+	end, { buffer = buf, nowait = true, silent = true })
+	vim.keymap.set("n", "q", function()
+		vim.api.nvim_win_close(0, true)
+	end, { buffer = buf, nowait = true, silent = true })
 end
 
 -- Native sidebar picker for tags
