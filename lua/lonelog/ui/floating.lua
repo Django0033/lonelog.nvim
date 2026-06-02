@@ -3,28 +3,6 @@ local M = {}
 -- Track all floating windows we create
 local active_windows, window_content, window_target_bufnr = {}, {}, {}
 
--- Show result text in floating window
-function M.show_result(title, lines, opts)
-	opts = opts or {}
-	M.close()
-	lines = type(lines) == "string" and vim.split(lines, "\n", { trimempty = true }) or lines
-	local content = vim.deepcopy(lines)
-	local can_insert = M.can_insert_here()
-	if title then
-		content = vim.list_extend({ title, string.rep("─", 40) }, lines)
-	end
-	table.insert(content, "")
-	table.insert(content, "  Press 'q' to close | 'y' to copy")
-	if can_insert then
-		table.insert(content, "  Press <CR> to insert")
-	end
-	return M.open(content, {
-		title = opts.title or "Result",
-		insert_content = vim.deepcopy(lines),
-		target_bufnr = can_insert and vim.api.nvim_get_current_buf() or nil,
-	})
-end
-
 -- Show result with syntax highlighting for Yes/No/Exceptional
 function M.show_colored_result(title, lines, opts)
 	opts = opts or {}

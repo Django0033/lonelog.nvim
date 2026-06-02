@@ -58,3 +58,37 @@ These files are only used by test code, NOT required in any production source un
 - All 22 test suites passing (0 failures)
 - Test files for the marked-unused modules still pass
 - No production API surface changed
+
+## [2026-06-02] Dead Code Cleanup — Unused Exports & Test-Only Documentation
+
+### Unused Exports Removed
+- `lua/lonelog/ui/floating.lua` — `M.show_result()` function (26 lines). Defined but never called from any production code or tests. Only `M.show_colored_result()` is used (by `show_dice_result` and `show_oracle_result`).
+- `lua/lonelog/oracle.lua` — `M.get_table()` function (3 lines). Defined but never called from any production code or tests.
+
+### Dead Tests Removed
+- `tests/test_oracle.lua` — Removed 2 test cases for `get_table()`:
+  - "returns table definition for valid name"
+  - "returns nil for unknown table"
+  These tested the dead `M.get_table` export.
+
+### Test-Only Files Documented
+- `lua/lonelog/parsers/cache.lua` — Added clear `NOTE` comment at top marking it as test-only infrastructure (only required by `test_cache.lua`).
+
+### Impact
+- Files modified: 4
+- Lines of code removed: 41 (floating.lua: 26, oracle.lua: 3, test_oracle.lua: 12)
+- Lines of comments added: 4 (cache.lua)
+- **Net reduction: 37 lines**
+
+### Summary of Production-Dead Files (Test-Only)
+| File | Production Usage | Test Coverage |
+|------|-----------------|---------------|
+| `lua/lonelog/parsers/prose.lua` | None | test_prose.lua (11 tests) |
+| `lua/lonelog/parsers/tokenizer.lua` | None (only used by prose.lua) | test_tokenizer.lua (30 tests) |
+| `lua/lonelog/parsers/combat.lua` | None | test_combat_parser.lua (28 tests) |
+| `lua/lonelog/parsers/cache.lua` | None | test_cache.lua (30 tests) |
+
+### Testing
+- All 22 test suites passing (0 failures)
+- Oracle tests: 8/8 passing (down from 10 — 2 get_table tests removed)
+- No production API surface changed

@@ -223,11 +223,6 @@ function M.list_tables()
 	return r
 end
 
--- Get oracle table definition by name
-function M.get_table(name)
-	return tables[name] and vim.deepcopy(tables[name]) or nil
-end
-
 -- Format oracle result for display
 function M.format_result(result)
 	if not result then

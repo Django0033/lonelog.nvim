@@ -118,18 +118,6 @@ test("returns error for unknown oracle table", function()
 	assert(err ~= nil, "should return error message")
 end)
 
-print("get_table:")
-test("returns table definition for valid name", function()
-	local t = oracle.get_table("fate")
-	assert(t ~= nil)
-	assert_eq(t.name, "Fate Oracle")
-end)
-
-test("returns nil for unknown table", function()
-	local t = oracle.get_table("bogus")
-	assert_nil(t)
-end)
-
 print("chaos_factor:")
 test("get/set chaos factor", function()
 	local orig = oracle.get_chaos()

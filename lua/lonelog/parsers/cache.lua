@@ -1,3 +1,7 @@
+-- NOTE: This file is currently only used by test files (test_cache.lua).
+-- It is NOT required by any production source code in `/lua/`.
+-- The refresh/get/invalidate pattern aggregates tags, scenes, and sessions
+-- for efficient test-time assertions. Kept as test-only infrastructure.
 local M = {}
 
 local cache = {}
