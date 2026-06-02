@@ -227,7 +227,6 @@ function M.show_tags_picker()
 	-- Build type filter list
 	local summary = M.tags_summary(file_tags)
 	local type_items, key_by_label = {}, {}
-	local summary = M.tags_summary(file_tags)
 	local total_unique = 0
 	for _, v in pairs(summary) do
 		total_unique = total_unique + v.count
@@ -257,21 +256,23 @@ function M.show_tags_picker()
 			for _, t in ipairs(filtered) do
 				table.insert(items, M.format_tag_display(t))
 			end
-			ui_pick({
-				title = "Lonelog Tags",
-				items = items,
-				format_item = function(item) return item end,
-				on_select = function(c)
-					if c then
-						for i, display in ipairs(items) do
-							if display == c then
-								vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
-								break
+			vim.defer_fn(function()
+				ui_pick({
+					title = "Lonelog Tags",
+					items = items,
+					format_item = function(item) return item end,
+					on_select = function(c)
+						if c then
+							for i, display in ipairs(items) do
+								if display == c then
+									vim.api.nvim_win_set_cursor(0, { filtered[i].line, 0 })
+									break
+								end
 							end
 						end
-					end
-				end,
-			})
+					end,
+				})
+			end, 50)
 		end,
 	})
 end
