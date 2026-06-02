@@ -74,7 +74,9 @@ function M.wealth_delta()
 	local function apply_delta(currency, amount)
 		local new_value = currency.value + amount
 		local new_pair = currency.name .. " " .. new_value
-		local new_tag = wealth_tag:gsub("%" .. currency.raw, new_pair, 1)
+		local s = wealth_tag:find(currency.raw, 1, true)
+		if not s then return end
+		local new_tag = wealth_tag:sub(1, s - 1) .. new_pair .. wealth_tag:sub(s + #currency.raw)
 		local new_line = line:gsub("%[Wealth:[^%]]+%]", new_tag, 1)
 		vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
 		vim.notify("lonelog: " .. currency.raw .. " -> " .. new_value, vim.log.levels.INFO)
