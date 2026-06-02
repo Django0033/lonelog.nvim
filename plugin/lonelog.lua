@@ -202,6 +202,15 @@ local function setup_keymaps()
 			end)
 		end)
 	end, { desc = "Insert PC stat update" })
+	map("n", cfg.get().keymaps.npc_update, function()
+		vim.ui.input({ prompt = "NPC name: " }, function(name)
+			if not name or name == "" then return end
+			vim.ui.input({ prompt = "Change (e.g. +captured, -wounded, friendly->hostile): " }, function(change)
+				if not change or change == "" then return end
+				insert_text("[N:" .. name .. "|" .. change .. "]", 0)
+			end)
+		end)
+	end, { desc = "Insert NPC status update" })
 
 	-- ================================================================
 	-- Multi-line tags (lm-)

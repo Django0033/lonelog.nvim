@@ -51,6 +51,7 @@ local defaults = {
 		tag_inv = "<leader>lti",
 		tag_wealth = "<leader>ltw",
 		pc_update = "<leader>ltx",
+		npc_update = "<leader>ltz",
 
 		-- Multi-line tags
 		mltag_npc = "<leader>lmn",
