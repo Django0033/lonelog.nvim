@@ -38,7 +38,16 @@ local function line_type(line)
 	if line:match("^###%s+S") then
 		return "scene"
 	end
-	if line:match("^---%s*$") or line:match("^\\\\---") or line:match("^---\\\\") then
+	if line:match("^---%s*$") then
+		return "narrative"
+	end
+	if line:byte(1) == 92 then
+		local rest = line:sub(2)
+		if rest:match("^---") then
+			return "narrative"
+		end
+	end
+	if line:byte(1) == 45 and line:byte(2) == 45 and line:byte(3) == 45 and line:byte(4) == 92 then
 		return "narrative"
 	end
 	if line:match("^@") then
