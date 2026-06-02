@@ -82,6 +82,21 @@ function M.navigate_to_room()
 		})
 	end
 
+	if not require("lonelog.config").should_use_telescope() then
+		require("lonelog.ui.sidebar").open("Navigate to room", choices, {
+			format_item = function(item) return item.label end,
+			on_select = function(choice)
+				if not choice.target then
+					vim.notify("lonelog: Room R:" .. choice.exit.id .. " not found in buffer", vim.log.levels.WARN)
+					return
+				end
+				vim.api.nvim_win_set_cursor(0, { choice.target.line, 0 })
+				vim.cmd("normal! zz")
+			end,
+		})
+		return
+	end
+
 	vim.ui.select(choices, {
 		prompt = "Navigate to room:",
 		format_item = function(item)

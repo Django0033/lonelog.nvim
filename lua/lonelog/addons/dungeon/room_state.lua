@@ -61,6 +61,34 @@ function M.edit_room_state()
 		})
 	end
 
+	if not require("lonelog.config").should_use_telescope() then
+		require("lonelog.ui.sidebar").open("Toggle room state", choices, {
+			format_item = function(item) return item.label end,
+			on_select = function(choice)
+				if not choice then return end
+				local new_states = {}
+				local found = false
+				for _, s in ipairs(current) do
+					if s == choice.state then
+						found = true
+					else
+						table.insert(new_states, s)
+					end
+				end
+				if not found then
+					table.insert(new_states, choice.state)
+				end
+				local new_tag = M.build_tag(raw_tag, new_states)
+				local line = vim.api.nvim_buf_get_lines(bufnr, cursor[1] - 1, cursor[1], false)[1]
+				if line then
+					local new_line = line:gsub("%[R:[^%]]+%]", new_tag, 1)
+					vim.api.nvim_buf_set_lines(bufnr, cursor[1] - 1, cursor[1], false, { new_line })
+				end
+			end,
+		})
+		return
+	end
+
 	vim.ui.select(choices, {
 		prompt = "Toggle room state:",
 		format_item = function(item)
