@@ -195,7 +195,7 @@ function M.show_tags_picker()
 		vim.notify("lonelog: No file name", vim.log.levels.WARN)
 		return
 	end
-	local file_tags = M.parse_tags(bufnr)
+	local file_tags = require("lonelog.cache").get(bufnr).tags
 	if #file_tags == 0 then
 		vim.notify("lonelog: No tags found", vim.log.levels.INFO)
 		return

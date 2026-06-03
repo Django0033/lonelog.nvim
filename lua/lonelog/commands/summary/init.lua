@@ -177,13 +177,37 @@ local function count_words(lines)
 	return total
 end
 
+-- Filter cache progress items to a session's line range and convert to summary format.
+---@param progress table Progress array from cache.get().progress
+---@param session table Session object {start_line, end_line}
+---@return table { clocks, tracks, timers, completed }
+local function progress_from_cache(progress, session)
+	local result = { clocks = 0, tracks = 0, timers = 0, completed = {} }
+	for _, p in ipairs(progress) do
+		if p.line >= session.start_line and p.line < session.end_line then
+			if p.type == "E" or p.type == "CLOCK" then
+				result.clocks = result.clocks + 1
+			elseif p.type == "TRACK" then
+				result.tracks = result.tracks + 1
+			elseif p.type == "TIMER" then
+				result.timers = result.timers + 1
+			end
+			if p.current and p.max and p.current >= p.max then
+				table.insert(result.completed, p.name)
+			end
+		end
+	end
+	return result
+end
+
 -- Build a full summary for one session
 ---@param session table Session object {number, date, start_line, end_line}
 ---@param all_lines table All buffer lines (1-indexed)
----@param all_tags table All tags from parse_tags()
----@param all_scenes table All scenes from parse_scenes()
+---@param all_tags table All tags from parse_tags() / cache.get().tags
+---@param all_scenes table All scenes from parse_scenes() / cache.get().scenes
+---@param cached_progress? table Optional progress array from cache.get().progress
 ---@return table SessionSummary
-function M.build_session_summary(session, all_lines, all_tags, all_scenes)
+function M.build_session_summary(session, all_lines, all_tags, all_scenes, cached_progress)
 	local slines = session_lines(all_lines, session)
 	local summary = {
 		session = session,
@@ -191,7 +215,7 @@ function M.build_session_summary(session, all_lines, all_tags, all_scenes)
 		words_count = count_words(slines),
 		notation = count_notation(slines),
 		dice = build_dice_summary(slines),
-		progress = build_progress_summary(slines),
+		progress = cached_progress and progress_from_cache(cached_progress, session) or build_progress_summary(slines),
 		tags = {},
 		scenes = {},
 		tag_counts = {},
@@ -261,10 +285,12 @@ end
 
 -- Get current buffer data needed for session operations
 local function get_current_buffer_data()
+	local d = require("lonelog.cache").get()
 	return {
 		lines = vim.api.nvim_buf_get_lines(vim.api.nvim_get_current_buf(), 0, -1, false),
-		tags = require("lonelog.parsers.tags").parse_tags(),
-		scenes = require("lonelog.parsers.scenes").parse_scenes(),
+		tags = d.tags,
+		scenes = d.scenes,
+		progress = d.progress,
 	}
 end
 
@@ -279,7 +305,7 @@ function M.show_session_summary()
 	local data = get_current_buffer_data()
 
 	local function display_summary(session)
-		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes)
+		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes, data.progress)
 		local lines = fmt.format_summary(summary)
 		local float = require("lonelog.ui.floating")
 		local export_text = fmt.export_summary(summary)
@@ -319,7 +345,7 @@ function M.export_session_summary()
 	local data = get_current_buffer_data()
 
 	local function do_export(session)
-		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes)
+		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes, data.progress)
 		local export_text = fmt.export_summary(summary)
 		local default_name = "session-" .. session.number .. "-summary.md"
 

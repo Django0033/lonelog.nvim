@@ -18,6 +18,7 @@ vim = {
   api = {
     nvim_buf_get_lines = function() return {} end,
     nvim_buf_get_name = function() return "test.md" end,
+    nvim_buf_get_changedtick = function() return 0 end,
     nvim_get_current_buf = function() return 1 end,
     nvim_win_get_cursor = function() return { 5, 0 } end,
     nvim_win_set_cursor = function() end,
@@ -29,7 +30,7 @@ vim = {
   tbl_filter = function(fn, t) local r = {}; for _, v in ipairs(t) do if fn(v) then table.insert(r, v) end end; return r end,
 }
 
-package.path = package.path .. ";./lua/?.lua"
+package.path = package.path .. ";./lua/?.lua;./lua/?/init.lua"
 local M = require("lonelog.ui.parsers").scenes
 
 local test_cases = {

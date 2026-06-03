@@ -214,7 +214,7 @@ function M.show_scenes_picker()
 		vim.notify("lonelog: No file name", vim.log.levels.WARN)
 		return
 	end
-	local scenes = M.parse_scenes(bufnr)
+	local scenes = require("lonelog.cache").get(bufnr).scenes
 	if #scenes == 0 then
 		vim.notify("lonelog: No scenes found", vim.log.levels.INFO)
 		return
@@ -307,7 +307,7 @@ function M.navigate_scene(direction)
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local cur_line = cursor[1]
 
-	local scenes = M.parse_scenes(bufnr)
+	local scenes = require("lonelog.cache").get(bufnr).scenes
 	if #scenes == 0 then
 		vim.notify("lonelog: No scenes found", vim.log.levels.INFO)
 		return
