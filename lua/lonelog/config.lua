@@ -31,6 +31,7 @@ local defaults = {
 		wealth_delta = "<leader>lwd",
 		inv_delta = "<leader>lwi",
 		item_state = "<leader>lws",
+		slot_insert = "<leader>lts",
 
 		-- Insert notation symbols
 		insert_action = "<leader>lia",

@@ -45,6 +45,20 @@ M.commands = {
 		end,
 		opts = { nargs = "?", desc = "Add/remove item properties" },
 	},
+	{
+		name = "LonelogSlotInsert",
+		command = function()
+			require("lonelog.addons.resources.resources").slot_insert()
+		end,
+		opts = { nargs = 0, desc = "Insert inventory slot tag" },
+	},
+	{
+		name = "LonelogSlotSummary",
+		command = function()
+			require("lonelog.addons.resources.resources").slot_summary()
+		end,
+		opts = { nargs = 0, desc = "Show inventory slot summary" },
+	},
 }
 
 M.keymaps = {
@@ -66,6 +80,8 @@ M.keymaps = {
 		opts = { silent = true, desc = "Add/subtract inventory" } },
 	{ mode = "n", key = "item_state", rhs = ":LonelogItemState<CR>",
 		opts = { silent = true, desc = "Change item properties" } },
+	{ mode = "n", key = "slot_insert", rhs = ":LonelogSlotInsert<CR>",
+		opts = { silent = true, desc = "Insert inventory slot" } },
 }
 
 M.requires = {}
