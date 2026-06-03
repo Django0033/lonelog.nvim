@@ -300,10 +300,10 @@ function M.slot_summary()
 
 	local used, free = 0, 0
 	for i = 1, max_slot do
-		if occupied[i] == nil then
-			free = free + 1
-		elseif occupied[i] then
+		if occupied[i] then
 			used = used + 1
+		else
+			free = free + 1
 		end
 	end
 
