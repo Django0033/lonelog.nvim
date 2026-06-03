@@ -301,31 +301,9 @@ function M.show_scenes_browser(all_scenes)
 		if idx < 0 or idx >= #group_info then return end
 		vim.api.nvim_win_close(0, true)
 		local group = group_info[idx]
-		local items = group.scenes
-		local sbuf = vim.api.nvim_create_buf(false, true)
-		local slines = {}
-		for _, s in ipairs(items) do
-			local display = M.format_scene_display(s):gsub("\n.*$", " [...]")
-			table.insert(slines, "  " .. display)
-		end
-		vim.api.nvim_buf_set_lines(sbuf, 0, -1, false, slines)
-		vim.api.nvim_buf_set_option(sbuf, "modifiable", false)
-		vim.api.nvim_buf_set_option(sbuf, "bufhidden", "wipe")
-
-		vim.cmd("botright vnew")
-		vim.api.nvim_win_set_buf(0, sbuf)
-		vim.api.nvim_win_set_width(0, 60)
-		vim.api.nvim_buf_set_name(sbuf, group.name)
-
-		vim.keymap.set("n", "<CR>", function()
-			local ln = vim.fn.line(".")
-			if ln < 1 or ln > #items then return end
-			vim.api.nvim_win_close(0, true)
-			vim.api.nvim_win_set_cursor(0, { items[ln].line, 0 })
-		end, { buffer = sbuf, nowait = true, silent = true })
-		vim.keymap.set("n", "q", function()
-			vim.api.nvim_win_close(0, true)
-		end, { buffer = sbuf, nowait = true, silent = true })
+		require("lonelog.ui.buffer").open_items(group.scenes, M.format_scene_display, function(scene)
+			vim.api.nvim_win_set_cursor(0, { scene.line, 0 })
+		end, group.name)
 	end, { buffer = buf, nowait = true, silent = true })
 	vim.keymap.set("n", "q", function()
 		vim.api.nvim_win_close(0, true)

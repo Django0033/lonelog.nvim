@@ -270,33 +270,7 @@ function M.show_tags_picker()
 	})
 end
 
-local function open_tag_buffer(items, format_fn, on_select_fn, title)
-	local buf = vim.api.nvim_create_buf(false, true)
-	local lines = {}
-	for _, item in ipairs(items) do
-		local display = format_fn(item):gsub("\n.*$", " [...]")
-		table.insert(lines, "  " .. display)
-	end
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.api.nvim_buf_set_option(buf, "modifiable", false)
-	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-
-	vim.cmd("botright vnew")
-	vim.api.nvim_win_set_buf(0, buf)
-	vim.api.nvim_win_set_width(0, 50)
-	vim.api.nvim_buf_set_name(buf, title or "Lonelog")
-	vim.api.nvim_win_set_cursor(0, { 1, 0 })
-
-	vim.keymap.set("n", "<CR>", function()
-		local line = vim.fn.line(".")
-		if line < 1 or line > #items then return end
-		vim.api.nvim_win_close(0, true)
-		on_select_fn(items[line])
-	end, { buffer = buf, nowait = true, silent = true })
-	vim.keymap.set("n", "q", function()
-		vim.api.nvim_win_close(0, true)
-	end, { buffer = buf, nowait = true, silent = true })
-end
+local buf_util = require("lonelog.ui.buffer")
 
 function M.show_tags_browser(all_tags)
 	local summary = M.tags_summary(all_tags)
@@ -332,7 +306,7 @@ function M.show_tags_browser(all_tags)
 		if idx < 0 or idx >= #group_info then return end
 		vim.api.nvim_win_close(0, true)
 		local group = group_info[idx]
-		open_tag_buffer(group.tags, M.format_tag_display, function(tag)
+		buf_util.open_items(group.tags, M.format_tag_display, function(tag)
 			vim.api.nvim_win_set_cursor(0, { tag.line, 0 })
 		end, group.name)
 	end, { buffer = buf, nowait = true, silent = true })
