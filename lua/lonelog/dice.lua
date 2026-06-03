@@ -122,6 +122,67 @@ local function roll_single(sides, exploding, exploded)
 	return exploded
 end
 
+local function calc_total(kept, modifier, target, target_mode)
+	local total = 0
+	if target > 0 then
+		if target_mode == "sum" then
+			for _, r in ipairs(kept) do total = total + r end
+			total = total + modifier
+		else
+			for _, r in ipairs(kept) do
+				if r >= target then total = total + 1 end
+			end
+		end
+	else
+		for _, r in ipairs(kept) do total = total + r end
+		total = total + modifier
+	end
+	return total
+end
+
+local function build_display(parsed, kept, total)
+	local parts, dice_str = {}, parsed.count .. "d" .. parsed.sides
+	if parsed.exploding then dice_str = dice_str .. "!" end
+	if parsed.keep_highest > 0 then
+		dice_str = dice_str .. "kh" .. parsed.keep_highest
+	elseif parsed.keep_lowest > 0 then
+		dice_str = dice_str .. "kl" .. parsed.keep_lowest
+	end
+	if parsed.target > 0 then
+		if parsed.modifier ~= 0 then
+			local s = parsed.modifier > 0 and "+" or ""
+			dice_str = dice_str .. s .. parsed.modifier
+		end
+		dice_str = dice_str .. (parsed.target_mode == "successes" and ">>" or parsed.operator) .. parsed.target
+	elseif parsed.modifier ~= 0 then
+		local s = parsed.modifier > 0 and "+" or ""
+		dice_str = dice_str .. s .. parsed.modifier
+	end
+	table.insert(parts, dice_str)
+	table.insert(parts, "[" .. table.concat(kept, ", ") .. "]")
+
+	if parsed.target > 0 then
+		if parsed.target_mode == "successes" then
+			table.insert(parts, " successes")
+		else
+			local sum = 0
+			for _, r in ipairs(kept) do sum = sum + r end
+			sum = sum + parsed.modifier
+			local op = parsed.operator or ">"
+			local ok = op == "<=" and sum <= parsed.target
+				or (op == ">" and sum > parsed.target)
+				or (sum >= parsed.target)
+			table.insert(parts, string.format(" = %d %s %d -> %s", sum, op, parsed.target, ok and "Success" or "Fail"))
+			total = sum
+		end
+	elseif parsed.modifier ~= 0 then
+		table.insert(parts, " = " .. tostring(total))
+	else
+		table.insert(parts, " = " .. tostring(total))
+	end
+	return total, table.concat(parts, "")
+end
+
 -- Main dice rolling function
 -- Parses notation, rolls dice, and returns result object
 function M.roll(notation)
@@ -184,87 +245,16 @@ function M.roll(notation)
 	-- Apply keep highest/lowest if specified
 	local kept = all_rolls
 	if parsed.keep_highest > 0 then
-		table.sort(all_rolls, function(a, b)
-			return a > b
-		end)
+		table.sort(all_rolls, function(a, b) return a > b end)
 		kept = vim.list_slice(all_rolls, 1, parsed.keep_highest)
 	elseif parsed.keep_lowest > 0 then
-		table.sort(all_rolls, function(a, b)
-			return a < b
-		end)
+		table.sort(all_rolls, function(a, b) return a < b end)
 		kept = vim.list_slice(all_rolls, 1, parsed.keep_lowest)
 	end
 
-	-- Calculate total based on target mode
-	local total = 0
-	if parsed.target > 0 then
-		if parsed.target_mode == "sum" then
-			for _, r in ipairs(kept) do
-				total = total + r
-			end
-			total = total + parsed.modifier
-		else
-			for _, r in ipairs(kept) do
-				if r >= parsed.target then
-					total = total + 1
-				end
-			end
-		end
-	else
-		for _, r in ipairs(kept) do
-			total = total + r
-		end
-		total = total + parsed.modifier
-	end
-
-	-- Build display string
-	local parts, dice_str = {}, parsed.count .. "d" .. parsed.sides
-	if parsed.exploding then
-		dice_str = dice_str .. "!"
-	end
-	if parsed.keep_highest > 0 then
-		dice_str = dice_str .. "kh" .. parsed.keep_highest
-	elseif parsed.keep_lowest > 0 then
-		dice_str = dice_str .. "kl" .. parsed.keep_lowest
-	end
-	if parsed.target > 0 then
-		if parsed.modifier ~= 0 then
-			local s = parsed.modifier > 0 and "+" or ""
-			dice_str = dice_str .. s .. parsed.modifier
-		end
-		dice_str = dice_str .. (parsed.target_mode == "successes" and ">>" or parsed.operator) .. parsed.target
-	elseif parsed.modifier ~= 0 then
-		local s = parsed.modifier > 0 and "+" or ""
-		dice_str = dice_str .. s .. parsed.modifier
-	end
-	table.insert(parts, dice_str)
-	table.insert(parts, "[" .. table.concat(kept, ", ") .. "]")
-
-	if parsed.target > 0 then
-		if parsed.target_mode == "successes" then
-			table.insert(parts, " successes")
-		else
-			local sum = 0
-			for _, r in ipairs(kept) do
-				sum = sum + r
-			end
-			sum = sum + parsed.modifier
-			local op = parsed.operator or ">"
-			local ok = op == "<=" and sum <= parsed.target
-				or (op == ">" and sum > parsed.target)
-				or (sum >= parsed.target)
-			table.insert(
-				parts,
-				string.format(" = %d %s %d -> %s", sum, op, parsed.target, ok and "Success" or "Fail")
-			)
-			total = sum
-		end
-	elseif parsed.modifier ~= 0 then
-		table.insert(parts, " = " .. tostring(total))
-	else
-		table.insert(parts, " = " .. tostring(total))
-	end
-
+	local total = calc_total(kept, parsed.modifier, parsed.target, parsed.target_mode)
+	local display
+	total, display = build_display(parsed, kept, total)
 	return {
 		original = notation,
 		count = parsed.count,
@@ -276,7 +266,7 @@ function M.roll(notation)
 		exploding = parsed.exploding,
 		operator = parsed.operator,
 		total = total,
-		display = table.concat(parts, ""),
+		display = display,
 	}
 end
 
