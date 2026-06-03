@@ -67,7 +67,8 @@ d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
 > If you enable add-ons, add their commands to `cmd`: `"LonelogCombat"`,
 > `"LonelogRound"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
 > `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`,
-> `"LonelogWealthDelta"`, `"LonelogInvDelta"`, `"LonelogItemState"`.
+> `"LonelogWealthDelta"`, `"LonelogInvDelta"`, `"LonelogItemState"`,
+> `"LonelogSlotInsert"`, `"LonelogSlotSummary"`.
 > Or remove `cmd` entirely to load everything at startup.
 
 </details>
@@ -184,6 +185,7 @@ Press `<leader>` followed by these keys:
 | `<leader>lwi` | Add/subtract inventory |
 | `<leader>lws` | Add/remove item properties |
 | `<leader>lrr` | Insert `--- RESOURCES ---` block |
+| `<leader>lts` | Insert inventory slot `[Inv:Slot N\|item]` |
 
 ---
 

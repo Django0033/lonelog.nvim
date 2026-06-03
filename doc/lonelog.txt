@@ -232,6 +232,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
        wealth_delta    = "<leader>lwd",
        inv_delta       = "<leader>lwi",
        item_state      = "<leader>lws",
+       slot_insert     = "<leader>lts",
       roll_line     = "<leader>lr",
       complete_tag  = "<C-l>c",
 
@@ -266,7 +267,7 @@ Config key: addons~
     addons = {
       combat   = true,    -- :LonelogCombat, :LonelogRound
       dungeon  = true,    -- :LonelogDungeonStatus, :LonelogRoomGo, :LonelogRoomState
-      resources = true,   -- :LonelogResourcesBlock, :LonelogSupplyRoll, :LonelogWealthDelta, :LonelogInvDelta, :LonelogItemState
+      resources = true,   -- :LonelogResourcesBlock, :LonelogSupplyRoll, :LonelogWealthDelta, :LonelogInvDelta, :LonelogItemState, :LonelogSlotInsert
     }
 
 Config key: highlight~
@@ -853,6 +854,7 @@ Normal mode keymaps~
   <leader>lwd    Add/subtract wealth             :LonelogWealthDelta
   <leader>lwi    Add/subtract inventory          :LonelogInvDelta
   <leader>lws    Change item properties           :LonelogItemState
+  <leader>lts    Insert inventory slot            :LonelogSlotInsert
 
   (*) Requires the respective add-on to be enabled (see |lonelog-config|).
 
