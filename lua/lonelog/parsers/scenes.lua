@@ -1,8 +1,12 @@
 local M = {}
 
 -- Map scene type keys to labels
-local SCENE_TYPES = { main = "Main", flashback = "Flashback", sub = "Sub-scene", thread = "Thread" }
-local SCENE_LABELS = { main = "Main Scenes", flashback = "Flashbacks", sub = "Sub-scenes", thread = "Thread Scenes" }
+local SCENE_TYPES = {
+	main = { label = "Main", plural = "Main Scenes" },
+	flashback = { label = "Flashback", plural = "Flashbacks" },
+	sub = { label = "Sub-scene", plural = "Sub-scenes" },
+	thread = { label = "Thread", plural = "Thread Scenes" },
+}
 
 -- Parse all scenes from a buffer
 function M.parse_scenes(bufnr)
@@ -52,7 +56,7 @@ function M.parse_scene(line, line_num)
 		local sort_t = tonumber(t1) or 0
 		return {
 			type = "thread",
-			type_label = SCENE_TYPES.thread,
+			type_label = SCENE_TYPES.thread.label,
 			scene_id = scene_id,
 			context = rest:match("%*(.-)%*"),
 			location = rest:match("%[L:([^%]]+)"),
@@ -64,7 +68,7 @@ function M.parse_scene(line, line_num)
 		local num, let = scene_id:match("^S(%d+)([a-z])")
 		return {
 			type = "flashback",
-			type_label = SCENE_TYPES.flashback,
+			type_label = SCENE_TYPES.flashback.label,
 			scene_id = scene_id,
 			context = rest:match("%*(.-)%*"),
 			location = rest:match("%[L:([^%]]+)"),
@@ -76,7 +80,7 @@ function M.parse_scene(line, line_num)
 		local num, sub = scene_id:match("^S(%d+)%.(%d+)")
 		return {
 			type = "sub",
-			type_label = SCENE_TYPES.sub,
+			type_label = SCENE_TYPES.sub.label,
 			scene_id = scene_id,
 			context = rest:match("%*(.-)%*"),
 			location = rest:match("%[L:([^%]]+)"),
@@ -87,7 +91,7 @@ function M.parse_scene(line, line_num)
 	else
 		return {
 			type = "main",
-			type_label = SCENE_TYPES.main,
+			type_label = SCENE_TYPES.main.label,
 			scene_id = scene_id,
 			context = rest:match("%*(.-)%*"),
 			location = rest:match("%[L:([^%]]+)"),
@@ -113,7 +117,7 @@ end
 function M.scenes_summary(scenes)
 	local s = {}
 	for _, sc in ipairs(scenes) do
-		s[sc.type] = s[sc.type] or { label = SCENE_LABELS[sc.type], count = 0 }
+		s[sc.type] = s[sc.type] or { label = SCENE_TYPES[sc.type].plural, count = 0 }
 		s[sc.type].count = s[sc.type].count + 1
 	end
 	return s

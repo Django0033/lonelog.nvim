@@ -53,29 +53,44 @@ function M.insert_campaign_header()
 		return
 	end
 
-	vim.ui.input({ prompt = "Campaign title: " }, function(title)
-		if not title or title == "" then
+	local fields = { "title", "ruleset", "genre", "player", "pcs" }
+	local prompts = {
+		title = "Campaign title: ",
+		ruleset = "Ruleset (optional): ",
+		genre = "Genre (optional): ",
+		player = "Player name: ",
+		pcs = "PCs (comma-separated): ",
+	}
+	local values = {}
+	local idx = 1
+
+	local function prompt_next()
+		if idx > #fields then
+			local cfg = require("lonelog.config").get()
+			local lines = M.build_campaign_header(
+				values.title,
+				values.ruleset ~= "" and values.ruleset or cfg.campaign.default_ruleset,
+				values.genre ~= "" and values.genre or cfg.campaign.default_genre,
+				values.player ~= "" and values.player or cfg.campaign.default_player,
+				values.pcs ~= "" and values.pcs or nil
+			)
+			vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
+			vim.api.nvim_win_set_cursor(0, { 3, #"ruleset: " })
 			return
 		end
-		vim.ui.input({ prompt = "Ruleset (optional): " }, function(ruleset)
-			vim.ui.input({ prompt = "Genre (optional): " }, function(genre)
-				vim.ui.input({ prompt = "Player name: " }, function(player)
-					vim.ui.input({ prompt = "PCs (comma-separated): " }, function(pcs)
-						local cfg = require("lonelog.config").get()
-						local lines = M.build_campaign_header(
-							title,
-							ruleset ~= "" and ruleset or cfg.campaign.default_ruleset,
-							genre ~= "" and genre or cfg.campaign.default_genre,
-							player ~= "" and player or cfg.campaign.default_player,
-							pcs ~= "" and pcs or nil
-						)
-						vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
-						vim.api.nvim_win_set_cursor(0, { 3, #"ruleset: " })
-					end)
-				end)
-			end)
+
+		local key = fields[idx]
+		vim.ui.input({ prompt = prompts[key] }, function(input)
+			if key == "title" and (not input or input == "") then
+				return
+			end
+			values[key] = input or ""
+			idx = idx + 1
+			prompt_next()
 		end)
-	end)
+	end
+
+	prompt_next()
 end
 
 return M
