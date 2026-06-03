@@ -44,4 +44,38 @@ function M.open_items(items, format_fn, on_select, title)
 	})
 end
 
+function M.open_group_browser(opts)
+	local lines = { "  " .. opts.title, "" }
+	local group_info = {}
+	for _, g in ipairs(opts.groups) do
+		table.insert(lines, "    " .. g.label)
+		table.insert(group_info, { name = g.name, items = g.items })
+	end
+	table.insert(lines, "")
+	table.insert(lines, "  <CR> select group    q close")
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+	vim.api.nvim_buf_set_option(buf, "modifiable", false)
+	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+
+	vim.cmd("botright vnew")
+	vim.api.nvim_win_set_buf(0, buf)
+	vim.api.nvim_win_set_width(0, 40)
+	vim.api.nvim_buf_set_name(buf, opts.title)
+
+	vim.keymap.set("n", "<CR>", function()
+		local idx = vim.fn.line(".") - 2
+		if idx < 0 or idx >= #group_info then return end
+		vim.api.nvim_win_close(0, true)
+		local group = group_info[idx]
+		M.open_items(group.items, opts.format_item, function(item)
+			opts.on_select(item)
+		end, group.name)
+	end, { buffer = buf, nowait = true, silent = true })
+	vim.keymap.set("n", "q", function()
+		vim.api.nvim_win_close(0, true)
+	end, { buffer = buf, nowait = true, silent = true })
+end
+
 return M

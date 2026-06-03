@@ -271,43 +271,31 @@ end
 
 function M.show_scenes_browser(all_scenes)
 	local summary = M.scenes_summary(all_scenes)
-	local lines = { "  Lonelog Scenes", "" }
-	local group_info = {}
-	table.insert(lines, "    All Scenes (" .. #all_scenes .. ")")
-	table.insert(group_info, { key = "all", scenes = all_scenes, name = "All Scenes" })
+	local groups = {}
+	table.insert(groups, {
+		label = "All Scenes (" .. #all_scenes .. ")",
+		name = "All Scenes",
+		items = all_scenes,
+	})
 	for k, v in pairs(summary) do
 		if k ~= "all" then
-			local label = "    " .. v.label .. " (" .. v.count .. ")"
-			table.insert(lines, label)
 			local filtered = vim.tbl_filter(function(s) return s.type == k end, all_scenes)
-			table.insert(group_info, { key = k, scenes = filtered, name = v.label })
+			table.insert(groups, {
+				label = v.label .. " (" .. v.count .. ")",
+				name = v.label,
+				items = filtered,
+			})
 		end
 	end
-	table.insert(lines, "")
-	table.insert(lines, "  <CR> select group    q close")
 
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.api.nvim_buf_set_option(buf, "modifiable", false)
-	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-
-	vim.cmd("botright vnew")
-	vim.api.nvim_win_set_buf(0, buf)
-	vim.api.nvim_win_set_width(0, 40)
-	vim.api.nvim_buf_set_name(buf, "Lonelog Scenes")
-
-	vim.keymap.set("n", "<CR>", function()
-		local idx = vim.fn.line(".") - 2
-		if idx < 0 or idx >= #group_info then return end
-		vim.api.nvim_win_close(0, true)
-		local group = group_info[idx]
-		require("lonelog.ui.buffer").open_items(group.scenes, M.format_scene_display, function(scene)
+	require("lonelog.ui.buffer").open_group_browser({
+		title = "Lonelog Scenes",
+		groups = groups,
+		format_item = M.format_scene_display,
+		on_select = function(scene)
 			vim.api.nvim_win_set_cursor(0, { scene.line, 0 })
-		end, group.name)
-	end, { buffer = buf, nowait = true, silent = true })
-	vim.keymap.set("n", "q", function()
-		vim.api.nvim_win_close(0, true)
-	end, { buffer = buf, nowait = true, silent = true })
+		end,
+	})
 end
 
 -- Native sidebar picker for scenes

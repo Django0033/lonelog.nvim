@@ -274,45 +274,33 @@ local buf_util = require("lonelog.ui.buffer")
 
 function M.show_tags_browser(all_tags)
 	local summary = M.tags_summary(all_tags)
-	local lines = { "  Lonelog Tags", "" }
-	local group_info = {}
+	local groups = {}
 	local total_unique = 0
 	for _, v in pairs(summary) do
 		total_unique = total_unique + v.count
 	end
-	table.insert(lines, "    All Tags (" .. total_unique .. ")")
-	table.insert(group_info, { key = "all", tags = all_tags, name = "All Tags" })
+	table.insert(groups, {
+		label = "All Tags (" .. total_unique .. ")",
+		name = "All Tags",
+		items = all_tags,
+	})
 	for k, v in pairs(summary) do
-		local label = "    " .. v.label .. " (" .. v.count .. ")"
-		table.insert(lines, label)
 		local filtered = vim.tbl_filter(function(t) return t.type == k end, all_tags)
-		table.insert(group_info, { key = k, tags = filtered, name = v.label })
+		table.insert(groups, {
+			label = v.label .. " (" .. v.count .. ")",
+			name = v.label,
+			items = filtered,
+		})
 	end
-	table.insert(lines, "")
-	table.insert(lines, "  <CR> select group    q close")
 
-	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.api.nvim_buf_set_option(buf, "modifiable", false)
-	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-
-	vim.cmd("botright vnew")
-	vim.api.nvim_win_set_buf(0, buf)
-	vim.api.nvim_win_set_width(0, 40)
-	vim.api.nvim_buf_set_name(buf, "Lonelog Tags")
-
-	vim.keymap.set("n", "<CR>", function()
-		local idx = vim.fn.line(".") - 2
-		if idx < 0 or idx >= #group_info then return end
-		vim.api.nvim_win_close(0, true)
-		local group = group_info[idx]
-		buf_util.open_items(group.tags, M.format_tag_display, function(tag)
+	buf_util.open_group_browser({
+		title = "Lonelog Tags",
+		groups = groups,
+		format_item = M.format_tag_display,
+		on_select = function(tag)
 			vim.api.nvim_win_set_cursor(0, { tag.line, 0 })
-		end, group.name)
-	end, { buffer = buf, nowait = true, silent = true })
-	vim.keymap.set("n", "q", function()
-		vim.api.nvim_win_close(0, true)
-	end, { buffer = buf, nowait = true, silent = true })
+		end,
+	})
 end
 
 -- Native sidebar picker for tags
