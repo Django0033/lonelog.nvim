@@ -5,7 +5,7 @@
 local M = {}
 
 function M.parse_prose(lines)
-	local tokenizer = require("lonelog.parsers.tokenizer")
+	local tokenizer = require("tests.helpers.tokenizer")
 
 	local result = {
 		meta_notes = {},

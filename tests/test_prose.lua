@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-package.path = package.path .. ";./lua/?.lua"
+package.path = package.path .. ";./lua/?.lua;./tests/helpers/?.lua"
 
 local _G_vim = _G.vim
 _G.vim = _G_vim or {
@@ -11,7 +11,7 @@ _G.vim = _G_vim or {
   log = { levels = {} },
 }
 
-local prose = require("lonelog.parsers.prose")
+local prose = require("tests.helpers.prose")
 local passed, failed = 0, 0
 
 local function check(name, got, expected)

@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-package.path = package.path .. ";./lua/?.lua"
+package.path = package.path .. ";./lua/?.lua;./tests/helpers/?.lua"
 
 _G.vim = {
   api = {
@@ -58,7 +58,7 @@ _G.vim = {
   log = { levels = { ERROR = 1, WARN = 2 } },
 }
 
-local cache = require("lonelog.parsers.cache")
+local cache = require("tests.helpers.cache")
 local passed, failed = 0, 0
 
 local function check(name, got, expected)

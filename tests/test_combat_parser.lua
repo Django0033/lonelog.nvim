@@ -1,8 +1,7 @@
 #!/usr/bin/env lua
 
-package.path = package.path .. ";./lua/?.lua"
-
-local combat = require("lonelog.parsers.combat")
+package.path = package.path .. ";./lua/?.lua;./tests/helpers/?.lua"
+local combat = require("tests.helpers.combat")
 local passed, failed = 0, 0
 
 local function check(name, got, expected)

@@ -1,8 +1,7 @@
 #!/usr/bin/env lua
 
-package.path = package.path .. ";./lua/?.lua"
-
-local tokenizer = require("lonelog.parsers.tokenizer")
+package.path = package.path .. ";./lua/?.lua;./tests/helpers/?.lua"
+local tokenizer = require("tests.helpers.tokenizer")
 local passed, failed = 0, 0
 
 local function check(name, got, expected)
