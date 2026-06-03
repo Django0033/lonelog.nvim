@@ -210,7 +210,8 @@ function M.build_session_summary(session, all_lines, all_tags, all_scenes)
 	for _, t in ipairs(summary.tags) do
 		local key = t.type
 		if not summary.tag_counts[key] then
-			local label = tag_type_labels[key] or key
+			local tt = tag_type_labels[key]
+			local label = (tt and tt.label) or key
 			summary.tag_counts[key] = { label = label, count = 0 }
 		end
 		summary.tag_counts[key].count = summary.tag_counts[key].count + 1
@@ -224,11 +225,12 @@ function M.build_session_summary(session, all_lines, all_tags, all_scenes)
 	end
 
 	-- Build scene counts
-	local scene_type_labels = { main = "Main Scenes", flashback = "Flashbacks", sub = "Sub-scenes", thread = "Thread Scenes" }
+	local scene_types = require("lonelog.parsers.scenes").SCENE_TYPES
 	for _, s in ipairs(summary.scenes) do
 		local key = s.type
 		if not summary.scene_counts[key] then
-			local label = scene_type_labels and scene_type_labels[key] or key
+			local st = scene_types and scene_types[key]
+			local label = (st and st.plural) or key
 			summary.scene_counts[key] = { label = label, count = 0 }
 		end
 		summary.scene_counts[key].count = summary.scene_counts[key].count + 1

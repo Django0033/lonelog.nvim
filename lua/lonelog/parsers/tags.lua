@@ -2,34 +2,20 @@ local M = {}
 
 -- Map tag type keys to human-readable names
 local TAG_TYPES = {
-	N = "NPC",
-	L = "Location",
-	E = "Event",
-	PC = "PC",
-	THREAD = "Thread",
-	CLOCK = "Clock",
-	TRACK = "Track",
-	TIMER = "Timer",
-	INV = "Inventory",
-	WEALTH = "Wealth",
-	R = "Room",
-	F = "Foe",
+	N = { label = "NPC", plural = "NPCs" },
+	L = { label = "Location", plural = "Locations" },
+	E = { label = "Event", plural = "Events" },
+	PC = { label = "PC", plural = "Player Characters" },
+	THREAD = { label = "Thread", plural = "Threads" },
+	CLOCK = { label = "Clock", plural = "Clocks" },
+	TRACK = { label = "Track", plural = "Tracks" },
+	TIMER = { label = "Timer", plural = "Timers" },
+	INV = { label = "Inventory", plural = "Inventory" },
+	WEALTH = { label = "Wealth", plural = "Wealth" },
+	R = { label = "Room", plural = "Rooms" },
+	F = { label = "Foe", plural = "Foes" },
 }
 M.TAG_TYPES = TAG_TYPES
-local TAG_LABELS = {
-	N = "NPCs",
-	L = "Locations",
-	E = "Events",
-	PC = "Player Characters",
-	THREAD = "Threads",
-	CLOCK = "Clocks",
-	TRACK = "Tracks",
-	TIMER = "Timers",
-	INV = "Inventory",
-	WEALTH = "Wealth",
-	R = "Rooms",
-	F = "Foes",
-}
 
 -- Parse all Lonelog tags from a buffer
 ---@param bufnr number|nil Buffer number (default:current)
@@ -150,7 +136,7 @@ function M.parse_tag(raw, line_num)
 	end
 	return {
 		type = type_key,
-		type_label = TAG_TYPES[type_key],
+		type_label = TAG_TYPES[type_key].label,
 		name = name,
 		tags = tags,
 		changes = changes,
@@ -190,7 +176,7 @@ function M.tags_summary(tags)
 	local s = {}
 	local seen = {}
 	for _, t in ipairs(tags) do
-		s[t.type] = s[t.type] or { label = TAG_LABELS[t.type], count = 0 }
+		s[t.type] = s[t.type] or { label = TAG_TYPES[t.type].plural, count = 0 }
 		local key = (t.name or ""):lower()
 		seen[t.type] = seen[t.type] or {}
 		if not seen[t.type][key] then

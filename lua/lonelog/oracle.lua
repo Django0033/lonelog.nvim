@@ -2,6 +2,9 @@ local M = {}
 
 -- Chaos factor modifiers for Mythic oracle (indexed by chaos 1-9)
 local CHAOS_MODIFIERS = { [1] = -5, [2] = -4, [3] = -2, [4] = -1, [5] = 0, [6] = 1, [7] = 2, [8] = 4, [9] = 5 }
+local MYTHIC_EXCEPTIONAL = 4
+local MYTHIC_NO = 10
+local MYTHIC_YES = 17
 local chaos_factor = 5
 
 -- Oracle tables with weighted entries
@@ -170,14 +173,14 @@ function M.mythic_roll(chaos)
 	local d10_1, d10_2 = math.random(1, 10), math.random(1, 10)
 	local final = d10_1 + d10_2 + chaos_mod
 	local result_val, display_val
-	if final <= 4 then
-		result_val, display_val = "exceptional_no", "Exceptional No"
-	elseif final <= 10 then
-		result_val, display_val = "no", "No"
-	elseif final <= 17 then
-		result_val, display_val = "yes", "Yes"
+	if final <= MYTHIC_EXCEPTIONAL then
+		result = "Exceptional No"
+	elseif final <= MYTHIC_NO then
+		result = "No"
+	elseif final <= MYTHIC_YES then
+		result = "Yes"
 	else
-		result_val, display_val = "exceptional_yes", "Exceptional Yes"
+		result = "Exceptional Yes"
 	end
 	return {
 		table = "mythic",

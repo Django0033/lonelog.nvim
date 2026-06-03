@@ -7,6 +7,7 @@ local SCENE_TYPES = {
 	sub = { label = "Sub-scene", plural = "Sub-scenes" },
 	thread = { label = "Thread", plural = "Thread Scenes" },
 }
+M.SCENE_TYPES = SCENE_TYPES
 
 -- Parse all scenes from a buffer
 function M.parse_scenes(bufnr)
