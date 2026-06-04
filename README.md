@@ -251,6 +251,32 @@ require("lonelog").setup({
 })
 ```
 
+### Combat add-on keymaps
+
+| Key | Action |
+|-----|--------|
+| `<leader>lxc` | Insert `[COMBAT]` block |
+| `<leader>lxv` | Show combat status overview |
+| `<leader>lxr` | Insert round marker |
+
+### Dungeon add-on keymaps
+
+| Key | Action |
+|-----|--------|
+| `<leader>lxd` | Insert/update dungeon status block |
+| `<leader>lxg` | Navigate to connected room |
+| `<leader>lxs` | Toggle room state |
+
+### Resources add-on keymaps
+
+| Key | Action |
+|-----|--------|
+| `<leader>lrr` | Insert resources status block |
+| `<leader>lwd` | Add/subtract wealth |
+| `<leader>lwi` | Add/subtract inventory |
+| `<leader>lws` | Change item properties |
+| `<leader>lts` | Insert inventory slot |
+
 ## Dice notation
 
 | Notation | Example | Description |
