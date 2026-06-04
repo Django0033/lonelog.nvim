@@ -286,6 +286,20 @@ function M.show_tags_browser(all_tags)
 		on_select = function(tag)
 			vim.api.nvim_win_set_cursor(0, { tag.line, 0 })
 		end,
+		group_filter = function(items, query)
+			local q = query:lower()
+			return vim.tbl_filter(function(t)
+				if t.name and t.name:lower():find(q, 1, true) then
+					return true
+				end
+				for _, tag in ipairs(t.tags or {}) do
+					if tag:lower():find(q, 1, true) then
+						return true
+					end
+				end
+				return false
+			end, items)
+		end,
 	})
 end
 

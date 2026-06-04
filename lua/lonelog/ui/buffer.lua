@@ -67,9 +67,20 @@ function M.open_group_browser(opts)
 	vim.keymap.set("n", "<CR>", function()
 		local idx = vim.fn.line(".") - 2
 		if idx < 0 or idx >= #group_info then return end
-		vim.api.nvim_win_close(0, true)
 		local group = group_info[idx]
-		M.open_items(group.items, opts.format_item, function(item)
+		local items = group.items
+		if opts.group_filter and #items > 0 then
+			local query = vim.fn.input("Search " .. group.name .. ": ")
+			if query and query ~= "" then
+				items = opts.group_filter(items, query)
+				if #items == 0 then
+					vim.notify("No tags match")
+					return
+				end
+			end
+		end
+		vim.api.nvim_win_close(0, true)
+		M.open_items(items, opts.format_item, function(item)
 			opts.on_select(item)
 		end, group.name)
 	end, { buffer = buf, nowait = true, silent = true })
