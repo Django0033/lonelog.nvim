@@ -7,7 +7,7 @@ Lista unificada de features pendientes.
 - [x] **Tag Search by Name** — filtro de búsqueda al abrir el tags picker
 - [ ] **Dice Roll History** — UI para ver historial de tiradas (infraestructura ya implementada)
 - [ ] **Dice Macro System** — secuencias con nombre en config (ej. `attack = "2d6+3"`)
-- [ ] **Custom Oracle Tables** — tablas de oráculo personalizadas con entradas ponderadas
+- [x] **Custom Oracle Tables** — tablas de oráculo personalizadas con entradas ponderadas
 - [ ] **Dead Roster Detection** — excluir muertos del roster automático en bloques `[COMBAT]`
 - [ ] **Round Markers** — insertar marcadores `R#` auto-incrementados en bloques `[COMBAT]`
 
@@ -17,8 +17,8 @@ Lista unificada de features pendientes.
 - [ ] **Scene Graph View** — árbol de escenas en ventana flotante
 - [ ] **Custom Random Tables Generator** — tablas aleatorias configurables
 - [x] **Parsed Elements Cache** — cache unificado de entidades parseadas
-- [ ] **Prose Parser** — parser de producción para notas meta, diálogos y bloques narrativos
-- [ ] **Combat Parser** — parser completo de bloques `[COMBAT]`
+- [x] **Prose Parser** — parser de producción para notas meta, diálogos y bloques narrativos
+- [x] **Combat Parser** — parser completo de bloques `[COMBAT]`
 - [ ] **ASCII Dungeon Map** — mapa de dungeon renderizado en ASCII
 
 ## L — Large (~300–500+ líneas)
