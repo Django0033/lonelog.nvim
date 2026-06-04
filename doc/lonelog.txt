@@ -63,20 +63,23 @@ The plugin implements the Lonelog notation standard (v1.4.1) by Roberto
 Bisceglie, a structured markdown format for solo RPG session logs.
 
 Key features:
-  - Dice engine: 2d6+3, 2d20kh1, 4d6!, 6d6>>4, 2d6>7
+  - Dice engine: 2d6+3, 2d20kh1, 4d6!, 6d6>>4, 2d6>7, 4df, >=, <=, vs
   - Oracle system: Fate, Binary, Mythic with persistent chaos factor
   - Tag navigation: NPCs, locations, threads, PCs, foes, rooms, inventory
+    with search filtering in the native browser
   - Scene navigation: main, flashback, sub-scenes, thread scenes
   - Progress elements: clocks, tracks, timers with smart increment
+  - Session summary with dice breakdown by type and oracle result distribution
   - Inline tables: range tables and bracket shorthand
   - Tag autocomplete with relevance sorting
-  - Inline rolling: dice, table lookups, generator blocks
+  - Inline rolling: dice, table lookups, generator blocks, multi-roll
   - Session headers with auto-numbering and date
   - Campaign YAML frontmatter
   - Narrative excerpt blocks, meta notes, dialogue syntax
   - Multi-line tags for detailed descriptions
   - Combat blocks: [COMBAT] / [/COMBAT] tactical encounter delimiters
-  - Dungeon Status: auto-collected room tags under === Dungeon Status ===
+  - Dungeon Status: auto-collected room tags with ASCII map
+  - Resource tracking: inventory, wealth, supply dice, slot-based items
   - Telescope integration (optional, auto-detected)
   - 29 syntax highlight groups
   - Zero dependencies (pure Lua)
@@ -390,10 +393,14 @@ Config key: highlight~
     ref      - [#N:|]      Reference to existing NPC
     foe      - [F:|]       Foe/combatant tag
 >
-  :LonelogTags
+   :LonelogTags
 <
-  Open the tag navigator picker. Browse all Lonelog tags in the current
-  buffer, filterable by type. Press Enter to jump to a tag's line.
+   Open the tag navigator picker. Browse all Lonelog tags in the current
+   buffer, filterable by type. When using the native split browser,
+   after selecting a tag type you are prompted for a search string.
+   The filter searches both tag names and their metadata tags
+   (e.g. "friendly", "merchant") case-insensitively. Press Enter to
+   jump to a tag's line.
 
   Also see |lonelog-notation-tags| for tag format.
 
@@ -645,8 +652,17 @@ Config key: highlight~
      - Tags grouped by type (NPCs, locations, threads, etc.)
      - Notation counts: actions, questions, dice, notes, dialogues
      - Progress elements: clocks, tracks, timers
-     - Dice statistics: total rolls, sum of totals, average per roll
-     - Complete dice breakdown with each notation and result
+     - Dice breakdown by notation type (counts, sums, averages, min, max
+       per notation group — e.g. "2d6: 5 rolls, sum: 30, avg: 6.0")
+     - Oracle result distribution (counts per outcome for each oracle
+       table — Fate, Binary, Mythic)
+     - Fate dice and success-counting roll totals
+
+   Dice and oracle data is collected automatically from both buffer
+   "d:" lines and in-memory roll history. Rolls made via |:LonelogDice|
+   or |:LonelogDiceRoll| are tracked per buffer even when not written
+   to the buffer. Oracle results from |:LonelogOracle| are also tracked
+   in memory.
 
    Results include all data needed for session recaps, campaign logs,
    or sharing play reports. The floating window supports standard
@@ -1304,9 +1320,10 @@ Usage dice~
    -- -> { number, date, start_line, end_line }[]
 
    local summary_data = require("lonelog.commands.summary")
-     .build_session_summary(session, all_lines, all_tags, all_scenes)
+     .build_session_summary(session, all_lines, all_tags, all_scenes,
+                            nil, cached_rolls)
    -- -> { session, lines_count, words_count, notation, dice, progress,
-   --      tags, scenes, tag_counts, scene_counts }
+   --      tags, scenes, tag_counts, scene_counts, roll_stats }
 
    local display_lines = require("lonelog.commands.summary")
      .format_summary(summary_data)
@@ -1320,6 +1337,25 @@ Usage dice~
    local comp = require("lonelog.completion")
    comp.refresh_completions()
    comp.complete_tag()
+
+   -- Parsed elements cache
+   local cache = require("lonelog.cache")
+   local data = cache.get(bufnr)
+   -- -> { npcs, locations, pcs, threads, foes, inventory, wealth, rooms,
+   --      progress, scenes, sessions, rolls }
+   cache.refresh(bufnr)     -- force full re-parse
+   cache.invalidate(bufnr)  -- clear cached entry
+
+   -- Dice/oracle history
+   local dice = require("lonelog.dice")
+   dice.add_to_history(bufnr, result, line)
+   dice.get_history(bufnr)       -- -> { result, line }[]
+   dice.clear_history(bufnr)
+
+   local oracle = require("lonelog.oracle")
+   oracle.add_to_history(bufnr, result, line)
+   oracle.get_history(bufnr)     -- -> { result, line }[]
+   oracle.clear_history(bufnr)
 <
   Dice result structure~
 >

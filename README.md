@@ -4,24 +4,16 @@
 
 [![Neovim](https://img.shields.io/badge/Neovim-0.8+-green.svg?style=flat-square&logo=neovim)](https://neovim.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](/LICENSE)
-[![Build](https://img.shields.io/github/actions/workflow/status/Django0033/lonelog.nvim/ci.yml?style=flat-square)](https://github.com/Django0033/lonelog.nvim/actions)
-![Lua](https://img.shields.io/badge/Lua-blue.svg?style=flat-square&logo=lua)
+[![Lua](https://img.shields.io/badge/Lua-blue.svg?style=flat-square&logo=lua)](https://www.lua.org)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Django0033/lonelog.nvim/pulls)
 
-Solo tabletop RPG toolkit for Neovim — oracles, dice, tags, scenes, and session management.
+Solo tabletop RPG toolkit for Neovim — oracles, dice, notation, and session management.
 
-[Installation](#installation) • [Quick start](#quick-start) • [Configuration](#configuration) • [Add-ons](#add-ons) • [Documentation](#documentation)
+[Features](#features) • [Quick start](#quick-start) • [Installation](#installation) • [Configuration](#configuration) • [Documentation](#documentation)
 
 </div>
 
 lonelog.nvim implements the [Lonelog notation standard](https://github.com/valgur/lonelog) (v1.4.1), a structured markdown format for solo RPG session logs. All features are pure Lua with zero external dependencies.
-
-> [!TIP]
-> Open a `.md` file, press `<leader>lO` to roll an oracle, then `<leader>lsm` to insert a scene marker.
-
----
-
-## What it looks like
 
 ```markdown
 ## Session 5
@@ -29,93 +21,42 @@ lonelog.nvim implements the [Lonelog notation standard](https://github.com/valgu
 ### S1 *The abandoned mine*
 @ Enter the darkness
 ? Is anyone here?
-d: 2d6+3 -> 9  [N:Elara|waiting]
-=> The tunnel is empty, but torchlight flickers ahead.
+d: 2d6+3[4, 2] = 10  => The tunnel is empty, but torchlight flickers ahead.
 [E:Torch 3/6]
 
 ### S2 *Collapsed passage*
-d: 1d20>=15 -> 17 >= 15 -> Success
-@ Clear the rubble
-[F:Goblin|HP 6|alerta]
+d: 1d20>=15[17] = 17 >= 15 -> Success
+[F:Goblin|HP 6|alert]
 ```
 
-Press `<leader>lR` on any `d:` line to roll and replace the result in-place:
+Press `<leader>lR` on any `d:` line to roll and replace the result in-place.
 
-```markdown
-d: 1d20>=15 -> 1d20>=15[17] = 17 >= 15 -> Success
-```
+> [!TIP]
+> Open a `.md` file, press `<leader>lO` to roll an oracle, then `<leader>lsm` to insert a scene marker.
 
----
+## Features
 
-## Installation
+**Dice engine** — Standard notation (`2d6+3`), advantage (`2d20kh1`), exploding (`4d6!`), success counting (`6d6>>4`), Fate dice (`4df`), comparison operators (`>=`, `<=`, `vs`), and multi-roll on one line.
 
-<details open>
-<summary><strong>lazy.nvim</strong></summary>
+**Oracle system** — Fate (7 weighted outcomes), Binary (50/50), and Mythic (2d10 + chaos factor) oracles with persistent chaos factor and interactive adjustment.
 
-```lua
-{
-  "Django0033/lonelog.nvim",
-  cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
-          "LonelogScenes", "LonelogRollLine" },
-  config = function()
-    require("lonelog").setup()
-  end,
-}
-```
+**Tag navigation** — Browse tags by type (NPCs, locations, PCs, threads, foes, inventory, rooms) with search filtering in the native browser. Jump to any tag's line instantly.
 
-> [!NOTE]
-> If you enable add-ons, add their commands to `cmd`: `"LonelogCombat"`,
-> `"LonelogRound"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
-> `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`,
-> `"LonelogWealthDelta"`, `"LonelogInvDelta"`, `"LonelogItemState"`,
-> `"LonelogSlotInsert"`, `"LonelogSlotSummary"`.
-> Or remove `cmd` entirely to load everything at startup.
+**Scene navigation** — Navigate main scenes, flashbacks, sub-scenes, and thread scenes. Auto-numbering for scene markers.
 
-</details>
+**Progress elements** — Insert and increment clocks (`[E:Name 0/5]`), tracks (`[Track:Name 0/5]`), and timers (`[Timer:Name 0]`) with smart auto-increment.
 
-<details>
-<summary><strong>packer.nvim</strong></summary>
+**Session management** — Auto-numbered session headers, campaign YAML frontmatter with auto-updating dates, and a session summary with scene/tag/dice breakdown and oracle result distribution.
 
-```lua
-use {
-  "Django0033/lonelog.nvim",
-  config = function()
-    require("lonelog").setup()
-  end,
-}
-```
-</details>
+**Inline rolling** — Roll dice, resolve table lookups, and process generator blocks directly on the current line with a single keypress.
 
-<details>
-<summary><strong>vim.pack.add (Neovim 0.11+)</strong></summary>
+**Tag autocomplete** — Automatic name completion when editing tags, with relevance-based sorting.
 
-```lua
--- init.lua
-vim.pack.add({ 'https://github.com/Django0033/lonelog.nvim' })
+**Add-on system** — Optional modules for combat blocks with round markers, dungeon status with room state editor and ASCII maps, and resource tracking with supply dice and slot-based inventory.
 
--- Setup must be called after vim.pack.add
-require("lonelog").setup()
-```
+**Telescope integration** — Auto-detected; falls back to a built-in vertical split browser with search filtering when Telescope is not available.
 
-> [!NOTE]
-> `vim.pack.add` loads plugins automatically. If you use lazy.nvim,
-> use that configuration instead.
-</details>
-
-<details>
-<summary><strong>git clone (built-in)</strong></summary>
-
-```bash
-git clone https://github.com/Django0033/lonelog.nvim.git \
-  ~/.local/share/nvim/site/pack/plugins/start/lonelog.nvim
-```
-
-```lua
-require("lonelog").setup()
-```
-</details>
-
----
+**Zero dependencies** — Pure Lua, requires only Neovim 0.8+.
 
 ## Quick start
 
@@ -128,7 +69,7 @@ Press `<leader>` followed by these keys:
 | `<leader>lO` | Roll an oracle |
 | `<leader>lD` | Interactive dice roller |
 | `<leader>lR` | Roll current line |
-| `<leader>lT` | Browse tags (Telescope or split browser) |
+| `<leader>lT` | Browse tags (with search in native browser) |
 | `<leader>lS` | Browse scenes |
 | `<leader>lC` | Adjust chaos factor |
 | `<leader>lI` | Insert last result |
@@ -144,7 +85,7 @@ Press `<leader>` followed by these keys:
 | `<leader>lss` | Show session summary |
 | `<leader>l[` / `<leader>l]` | Previous / next scene |
 
-### Insert notation
+### Notation
 
 | Normal | Insert | Inserts |
 |--------|--------|---------|
@@ -164,8 +105,8 @@ Press `<leader>` followed by these keys:
 | `<leader>ltr` | `<C-l>r` | `[#N:\|]` — Reference |
 | `<leader>ltf` | `<C-l>f` | `[F:\|]` — Foe |
 | `<leader>ltm` | — | `[R:\|]` — Room |
-| `<leader>ltx` | — | `[PC:Name\|HP-2]` — stat update |
-| `<leader>ltz` | — | `[N:Name\|+change]` — status update |
+| `<leader>lti` | — | `[Inv:\|]` — Inventory |
+| `<leader>ltw` | — | `[Wealth:Gold 0]` |
 
 ### Progress
 
@@ -175,19 +116,84 @@ Press `<leader>` followed by these keys:
 | `<leader>lpt` | Track | `[Track:Name 0/5]` |
 | `<leader>lpi` | Timer | `[Timer:Name 0]` |
 
-### Resources (add-on)
+### Session summary
 
 | Key | Action |
 |-----|--------|
-| `<leader>lti` | Insert `[Inv:\|]` |
-| `<leader>ltw` | Insert `[Wealth:Gold 0]` |
-| `<leader>lwd` | Add/subtract wealth |
-| `<leader>lwi` | Add/subtract inventory |
-| `<leader>lws` | Add/remove item properties |
-| `<leader>lrr` | Insert `--- RESOURCES ---` block |
-| `<leader>lts` | Insert inventory slot `[Inv:Slot N\|item]` |
+| `<leader>lss` | Show session overview |
 
----
+The summary includes:
+- Scenes list with context
+- Tags grouped by type (NPCs, locations, threads, etc.)
+- Notation counts (actions, questions, dice, notes, dialogues)
+- Progress elements (clocks, tracks, timers)
+- Dice breakdown by notation type (counts, sums, averages per notation)
+- Oracle result distribution
+
+See `:help lonelog-keymaps` for the complete keymap reference (45+ keymaps).
+
+## Installation
+
+<details open>
+<summary><strong>lazy.nvim</strong></summary>
+
+```lua
+{
+  "Django0033/lonelog.nvim",
+  cmd = { "Lonelog", "LonelogOracle", "LonelogDice", "LonelogTags",
+          "LonelogScenes", "LonelogRollLine" },
+  config = function()
+    require("lonelog").setup()
+  end,
+}
+```
+
+> If you enable add-ons, add their commands to `cmd`: `"LonelogCombat"`,
+> `"LonelogRound"`, `"LonelogDungeonStatus"`, `"LonelogRoomGo"`,
+> `"LonelogRoomState"`, `"LonelogResourcesBlock"`, `"LonelogSupplyRoll"`,
+> `"LonelogWealthDelta"`, `"LonelogInvDelta"`, `"LonelogItemState"`,
+> `"LonelogSlotInsert"`, `"LonelogSlotSummary"`.
+
+</details>
+
+<details>
+<summary><strong>packer.nvim</strong></summary>
+
+```lua
+use {
+  "Django0033/lonelog.nvim",
+  config = function()
+    require("lonelog").setup()
+  end,
+}
+```
+
+</details>
+
+<details>
+<summary><strong>vim.pack.add (Neovim 0.11+)</strong></summary>
+
+```lua
+-- init.lua
+vim.pack.add({ 'https://github.com/Django0033/lonelog.nvim' })
+require("lonelog").setup()
+```
+
+</details>
+
+<details>
+<summary><strong>git clone (built-in)</strong></summary>
+
+```bash
+git clone https://github.com/Django0033/lonelog.nvim.git \
+  ~/.local/share/nvim/site/pack/plugins/start/lonelog.nvim
+```
+
+```lua
+require("lonelog").setup()
+```
+
+</details>
 
 ## Configuration
 
@@ -208,15 +214,19 @@ require("lonelog").setup({
     default_genre = "",
     default_player = "",
   },
+  addons = {
+    combat = false,
+    dungeon = false,
+    resources = false,
+  },
 })
 ```
 
 > [!TIP]
 > Set `use_telescope = "auto"` (default) to use Telescope when installed.
-> When Telescope is not available, a vertical split browser is used for
-> tag and scene navigation. Set `true` to require Telescope or `false`
-> to always use the built-in split browser. Other pickers (oracles, main
-> menu) fall back to the native sidebar.
+> When Telescope is not available, a vertical split browser with search
+> filtering is used for tag and scene navigation. Other pickers (oracles,
+> main menu) fall back to the native sidebar.
 
 > [!TIP]
 > Disable or rebind any keymap:
@@ -227,8 +237,6 @@ require("lonelog").setup({
 > }
 > ```
 
----
-
 ## Add-ons
 
 Bundled but disabled by default. Enable the ones you need:
@@ -237,13 +245,11 @@ Bundled but disabled by default. Enable the ones you need:
 require("lonelog").setup({
   addons = {
     combat  = true,   -- [COMBAT] blocks, round markers, auto-roster
-    dungeon = true,   -- dungeon status, room nav, room states
-    resources = true, -- [Inv:], [Wealth:], supply dice, resources block
+    dungeon = true,   -- dungeon status, room nav, room state editor
+    resources = true, -- inventory, wealth, supply dice, resources block
   },
 })
 ```
-
----
 
 ## Dice notation
 
@@ -259,11 +265,9 @@ require("lonelog").setup({
 | `4df` | `4df` | Fate dice (+, 0, -) |
 | `NdN>=T` | `1d20>=15` | Greater-or-equal |
 | `NdN<=T` | `1d20<=10` | Less-or-equal |
-| `NdN vs T` | `1d100 vs 50` | Versus (alias for `>=`) |
+| `NdN vs T` | `1d100 vs 50` | Versus (alias for >=) |
 | `NdN>T` | `2d6>7` | Sum vs target |
 | `d: 2d6, 1d8` | — | Multiple rolls on one line |
-
----
 
 ## Commands
 
@@ -273,13 +277,13 @@ require("lonelog").setup({
 | `:LonelogOracle [table]` | Roll oracle |
 | `:LonelogDiceRoll <notation>` | Roll specific dice |
 | `:LonelogRollLine` | Roll current line |
-| `:LonelogTags` / `:LonelogScenes` | Browse tags / scenes |
+| `:LonelogTags` | Browse tags (with search in native browser) |
+| `:LonelogScenes` | Browse scenes |
+| `:LonelogSessionSummary` | Show session overview with roll stats |
+| `:LonelogExportSummary` | Export summary to markdown file |
 | `:LonelogSession` / `:LonelogCampaign` | Insert headers |
-| `:LonelogSessionSummary` | Show session summary |
 
 See `:help lonelog-commands` for the full list (30+ commands).
-
----
 
 ## Documentation
 
