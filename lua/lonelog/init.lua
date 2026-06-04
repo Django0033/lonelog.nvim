@@ -35,6 +35,9 @@ function M.roll_dice(notation)
 		vim.notify("lonelog: " .. err, vim.log.levels.ERROR)
 		return nil, err
 	end
+	-- Capture to history before showing UI
+	local bufnr = vim.api.nvim_get_current_buf()
+	M.dice.add_to_history(bufnr, result, vim.fn.line("."))
 	M.ui.show_dice_result(result)
 	vim.cmd("echo '" .. result.display .. "'")
 	return result
@@ -61,6 +64,9 @@ function M.roll_oracle(table_name)
 				end
 				M.oracle.set_chaos(chaos)
 				local result = M.oracle.roll("mythic")
+				-- Capture to history before showing UI
+				local bufnr = vim.api.nvim_get_current_buf()
+				M.oracle.add_to_history(bufnr, result, vim.fn.line("."))
 				M.ui.show_oracle_result(result)
 				vim.cmd("echo '" .. M.oracle.format_result(result) .. "'")
 			end
@@ -72,6 +78,9 @@ function M.roll_oracle(table_name)
 		vim.notify("lonelog: " .. err, vim.log.levels.ERROR)
 		return nil, err
 	end
+	-- Capture to history before showing UI
+	local bufnr = vim.api.nvim_get_current_buf()
+	M.oracle.add_to_history(bufnr, result, vim.fn.line("."))
 	M.ui.show_oracle_result(result)
 	vim.cmd("echo '" .. M.oracle.format_result(result) .. "'")
 	return result

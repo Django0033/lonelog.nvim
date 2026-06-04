@@ -381,6 +381,133 @@ test("session without date has nil date", function()
 end)
 
 -- ============================================================================
+-- roll_stats (Phase 3)
+-- ============================================================================
+
+print("\n=== roll_stats ===\n")
+
+local mock_roll_stats = {
+	by_type = {
+		{ notation = "2d6", count = 2, sum = 17, min = 7, max = 10, average = 8.5 },
+		{ notation = "1d20", count = 1, sum = 15, min = 15, max = 15, average = 15 },
+	},
+	total_rolls = 3,
+	oracle_results = {
+		{ table = "Fate Oracle", results = { Yes = 3, No = 1, ["Yes, but..."] = 2 } },
+	},
+}
+
+test("build_session_summary with roll_stats includes by_type and total_rolls", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, mock_roll_stats)
+	assert_eq(s.roll_stats.by_type[1].notation, "2d6", "first by_type should be 2d6")
+	assert_eq(s.roll_stats.by_type[1].count, 2, "2d6 count should be 2")
+	assert_eq(s.roll_stats.by_type[1].sum, 17, "2d6 sum should be 17")
+	assert_eq(s.roll_stats.by_type[1].average, 8.5, "2d6 avg should be 8.5")
+	assert_eq(s.roll_stats.by_type[1].min, 7, "2d6 min should be 7")
+	assert_eq(s.roll_stats.by_type[1].max, 10, "2d6 max should be 10")
+	assert_eq(s.roll_stats.by_type[2].notation, "1d20", "second by_type should be 1d20")
+	assert_eq(s.roll_stats.total_rolls, 3, "total_rolls should be 3")
+end)
+
+test("build_session_summary with roll_stats includes oracle_results", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, mock_roll_stats)
+	assert_eq(#s.roll_stats.oracle_results, 1, "should have 1 oracle table")
+	assert_eq(s.roll_stats.oracle_results[1].table, "Fate Oracle", "oracle table name")
+	assert_eq(s.roll_stats.oracle_results[1].results.Yes, 3, "Yes count should be 3")
+	assert_eq(s.roll_stats.oracle_results[1].results.No, 1, "No count should be 1")
+	assert_eq(s.roll_stats.oracle_results[1].results["Yes, but..."], 2, "Yes, but... count should be 2")
+end)
+
+test("build_session_summary without roll_stats has no roll_stats field", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes)
+	assert_eq(s.roll_stats, nil, "roll_stats should be nil when not provided")
+end)
+
+test("format_summary includes Dice by Type section with mock_roll_stats", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, mock_roll_stats)
+	local lines = summary.format_summary(s)
+	local found_header = false
+	local found_2d6 = false
+	for _, l in ipairs(lines) do
+		if l:match("Dice by Type") then
+			found_header = true
+		end
+		if l:match("2d6:") and l:match("2 rolls") and l:match("sum: 17") then
+			found_2d6 = true
+		end
+	end
+	assert(found_header, "format should include 'Dice by Type' section")
+	assert(found_2d6, "format should include 2d6 breakdown with count, sum")
+end)
+
+test("format_summary without roll_stats has no Dice by Type section", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes)
+	local lines = summary.format_summary(s)
+	local found = false
+	for _, l in ipairs(lines) do
+		if l:match("Dice by Type") then
+			found = true
+			break
+		end
+	end
+	assert(not found, "format should NOT include 'Dice by Type' when no roll_stats")
+end)
+
+test("export_summary includes Oracle Results section with roll_stats", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, mock_roll_stats)
+	local text = summary.export_summary(s)
+	assert(text:match("### Oracle Results"), "export should have 'Oracle Results' heading")
+	assert(text:match("Fate Oracle:"), "export should have oracle table name")
+	assert(text:match("Yes: 3"), "export should include Yes: 3")
+	assert(text:match("No: 1"), "export should include No: 1")
+	assert(text:match("Yes, but%.%.%."), "export should include 'Yes, but...'")
+end)
+
+test("export_summary without roll_stats has no Oracle Results section", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes)
+	local text = summary.export_summary(s)
+	assert(not text:match("### Oracle Results"), "export should NOT have 'Oracle Results' when no roll_stats")
+end)
+
+-- Triangulation: edge cases
+test("roll_stats with empty by_type does not error", function()
+	local empty = { by_type = {}, total_rolls = 0, oracle_results = {} }
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, empty)
+	assert_eq(s.roll_stats.total_rolls, 0, "total_rolls should be 0")
+	assert_eq(#s.roll_stats.by_type, 0, "by_type should be empty")
+	local lines = summary.format_summary(s)
+	local found = false
+	for _, l in ipairs(lines) do
+		if l:match("Dice by Type") then found = true break end
+	end
+	assert(not found, "empty by_type should not show Dice by Type section")
+end)
+
+test("roll_stats with zero rolls does not add Oracle Results to export", function()
+	local no_oracle = { by_type = {}, total_rolls = 0, oracle_results = {} }
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, no_oracle)
+	local text = summary.export_summary(s)
+	assert(not text:match("### Oracle Results"), "empty oracle_results should not show Oracle Results heading")
+end)
+
+test("roll_stats with multiple oracle tables shows each table", function()
+	local multi_oracle = {
+		by_type = {},
+		total_rolls = 0,
+		oracle_results = {
+			{ table = "Fate", results = { Yes = 2, No = 1 } },
+			{ table = "Mythic", results = { Yes = 4, ["No, but..."] = 1 } },
+		},
+	}
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes, nil, multi_oracle)
+	assert_eq(#s.roll_stats.oracle_results, 2, "should have 2 oracle tables")
+	local text = summary.export_summary(s)
+	assert(text:match("Fate:"), "export should include Fate table")
+	assert(text:match("Mythic:"), "export should include Mythic table")
+	assert(text:match("No, but%.%.%.: 1"), "export should include No, but...: 1")
+end)
+
+-- ============================================================================
 -- Summary
 -- ============================================================================
 

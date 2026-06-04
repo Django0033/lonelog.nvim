@@ -206,8 +206,9 @@ end
 ---@param all_tags table All tags from parse_tags() / cache.get().tags
 ---@param all_scenes table All scenes from parse_scenes() / cache.get().scenes
 ---@param cached_progress? table Optional progress array from cache.get().progress
+---@param roll_stats? table Optional roll statistics from cache.get().rolls
 ---@return table SessionSummary
-function M.build_session_summary(session, all_lines, all_tags, all_scenes, cached_progress)
+function M.build_session_summary(session, all_lines, all_tags, all_scenes, cached_progress, roll_stats)
 	local slines = session_lines(all_lines, session)
 	local summary = {
 		session = session,
@@ -221,6 +222,14 @@ function M.build_session_summary(session, all_lines, all_tags, all_scenes, cache
 		tag_counts = {},
 		scene_counts = {},
 	}
+
+	if roll_stats then
+		summary.roll_stats = {
+			by_type = roll_stats.by_type,
+			total_rolls = roll_stats.total_rolls,
+			oracle_results = roll_stats.oracle_results,
+		}
+	end
 
 	-- Filter tags to this session's range
 	for _, t in ipairs(all_tags) do
@@ -291,6 +300,7 @@ local function get_current_buffer_data()
 		tags = d.tags,
 		scenes = d.scenes,
 		progress = d.progress,
+		rolls = d.rolls,
 	}
 end
 
@@ -305,7 +315,7 @@ function M.show_session_summary()
 	local data = get_current_buffer_data()
 
 	local function display_summary(session)
-		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes, data.progress)
+		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes, data.progress, data.rolls)
 		local lines = fmt.format_summary(summary)
 		local float = require("lonelog.ui.floating")
 		local export_text = fmt.export_summary(summary)
@@ -345,7 +355,7 @@ function M.export_session_summary()
 	local data = get_current_buffer_data()
 
 	local function do_export(session)
-		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes, data.progress)
+		local summary = M.build_session_summary(session, data.lines, data.tags, data.scenes, data.progress, data.rolls)
 		local export_text = fmt.export_summary(summary)
 		local default_name = "session-" .. session.number .. "-summary.md"
 

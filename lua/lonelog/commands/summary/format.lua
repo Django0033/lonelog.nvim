@@ -69,6 +69,31 @@ function M.format_summary(summary)
 		end
 	end
 
+	local rs = summary.roll_stats
+	if rs and rs.by_type and #rs.by_type > 0 then
+		table.insert(lines, "  Dice by Type:")
+		for _, entry in ipairs(rs.by_type) do
+			local line = string.format("    %s: %d rolls (sum: %d, avg: %.1f, min: %d, max: %d)",
+				entry.notation, entry.count, entry.sum, entry.average, entry.min, entry.max)
+			table.insert(lines, line)
+		end
+	end
+
+	if rs and rs.oracle_results and #rs.oracle_results > 0 then
+		table.insert(lines, "  Oracle Results:")
+		for _, ot in ipairs(rs.oracle_results) do
+			table.insert(lines, "    " .. ot.table .. ":")
+			local val_keys = {}
+			for k in pairs(ot.results) do
+				table.insert(val_keys, k)
+			end
+			table.sort(val_keys)
+			for _, k in ipairs(val_keys) do
+				table.insert(lines, "      " .. k .. ": " .. ot.results[k])
+			end
+		end
+	end
+
 	return lines
 end
 
@@ -160,6 +185,24 @@ function M.export_summary(summary)
 		table.sort(sorted, function(a, b) return a.type < b.type or (a.type == b.type and a.name < b.name) end)
 		for _, t in ipairs(sorted) do
 			table.insert(out, "- [" .. t.type .. ":" .. t.name .. "]")
+		end
+	end
+
+	local rs = summary.roll_stats
+	if rs and rs.oracle_results and #rs.oracle_results > 0 then
+		table.insert(out, "")
+		table.insert(out, "### Oracle Results")
+		table.insert(out, "")
+		for _, ot in ipairs(rs.oracle_results) do
+			table.insert(out, ot.table .. ":")
+			local val_keys = {}
+			for k in pairs(ot.results) do
+				table.insert(val_keys, k)
+			end
+			table.sort(val_keys)
+			for _, k in ipairs(val_keys) do
+				table.insert(out, "  " .. k .. ": " .. ot.results[k])
+			end
 		end
 	end
 

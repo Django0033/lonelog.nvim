@@ -1,5 +1,8 @@
 local M = {}
 
+-- Oracle roll history: keyed by bufnr -> { result, line, timestamp }[]
+local oracle_history = {}
+
 -- Chaos factor modifiers for Mythic oracle (indexed by chaos 1-9)
 local CHAOS_MODIFIERS = { [1] = -5, [2] = -4, [3] = -2, [4] = -1, [5] = 0, [6] = 1, [7] = 2, [8] = 4, [9] = 5 }
 local MYTHIC_EXCEPTIONAL = 4
@@ -243,6 +246,38 @@ function M.format_result(result)
 		)
 	end
 	return string.format("[%s] %s", result.table_name, result.display)
+end
+
+-- History accessors
+
+--- Get oracle roll history for a buffer.
+---@param bufnr? number Buffer number (defaults to 0 for current buffer)
+---@return table[] Array of { result, line, bufnr } entries
+function M.get_history(bufnr)
+	bufnr = bufnr or 0
+	return oracle_history[bufnr] or {}
+end
+
+--- Clear oracle roll history for a buffer.
+---@param bufnr? number Buffer number (defaults to 0 for current buffer)
+function M.clear_history(bufnr)
+	bufnr = bufnr or 0
+	oracle_history[bufnr] = {}
+end
+
+--- Add an oracle result to history.
+---@param bufnr number Buffer number
+---@param result table Result from M.roll()
+---@param line number Line number where roll was triggered
+function M.add_to_history(bufnr, result, line)
+	if not oracle_history[bufnr] then
+		oracle_history[bufnr] = {}
+	end
+	table.insert(oracle_history[bufnr], {
+		result = result,
+		line = line,
+		bufnr = bufnr,
+	})
 end
 
 return M

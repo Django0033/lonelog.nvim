@@ -219,6 +219,118 @@ if test_error("invalid_no_d", "2x6") then passed = passed + 1 else failed = fail
 if test_error("invalid_letters", "abc") then passed = passed + 1 else failed = failed + 1 end
 
 print()
+print("--- Roll History Tests ---")
+
+-- Need to reset history module state between runs
+-- Test get_history returns empty for unknown buffer
+do
+  local h = dice.get_history(9999)
+  if type(h) == "table" and #h == 0 then
+    print("PASS [history: get_history returns empty for unknown buffer]")
+    passed = passed + 1
+  else
+    print("FAIL [history: get_history returns empty for unknown buffer] expected empty array, got " .. tostring(h))
+    failed = failed + 1
+  end
+end
+
+-- Test add_to_history then get_history returns the entry
+do
+  local test_bufnr = 42
+  local test_result = { original = "2d6", count = 2, sides = 6, rolls = { 3, 4 }, total = 7, display = "2d6[3, 4] = 7" }
+  dice.add_to_history(test_bufnr, test_result, 10)
+  local h = dice.get_history(test_bufnr)
+  if type(h) == "table" and #h == 1 then
+    local entry = h[1]
+    if entry.line == 10 and entry.bufnr == test_bufnr and entry.result.original == "2d6" and entry.result.total == 7 then
+      print("PASS [history: add_to_history then get_history returns entry]")
+      passed = passed + 1
+    else
+      print("FAIL [history: add_to_history entry structure wrong]")
+      failed = failed + 1
+    end
+  else
+    print("FAIL [history: add_to_history then get_history] expected array with 1 entry, got " .. #h)
+    failed = failed + 1
+  end
+end
+
+-- Test clear_history clears
+do
+  dice.clear_history(42)
+  local h = dice.get_history(42)
+  if type(h) == "table" and #h == 0 then
+    print("PASS [history: clear_history clears]")
+    passed = passed + 1
+  else
+    print("FAIL [history: clear_history] expected empty array, got " .. #h)
+    failed = failed + 1
+  end
+end
+
+-- Test per-buffer isolation
+do
+  dice.add_to_history(1, { original = "1d20", total = 15 }, 5)
+  dice.add_to_history(2, { original = "2d6", total = 7 }, 8)
+  dice.add_to_history(2, { original = "1d4", total = 3 }, 10)
+
+  local h1 = dice.get_history(1)
+  local h2 = dice.get_history(2)
+
+  if #h1 == 1 and #h2 == 2 then
+    if h1[1].result.original == "1d20" and h2[1].result.original == "2d6" and h2[2].result.original == "1d4" then
+      print("PASS [history: per-buffer isolation]")
+      passed = passed + 1
+    else
+      print("FAIL [history: per-buffer isolation - wrong entries]")
+      failed = failed + 1
+    end
+  else
+    print("FAIL [history: per-buffer isolation] expected h1:1, h2:2, got h1:" .. #h1 .. " h2:" .. #h2)
+    failed = failed + 1
+  end
+
+  -- Clean up
+  dice.clear_history(1)
+  dice.clear_history(2)
+end
+
+-- Test multiple entries preserve insertion order (triangulation)
+do
+  dice.add_to_history(10, { original = "1d4", total = 3 }, 1)
+  dice.add_to_history(10, { original = "1d6", total = 5 }, 2)
+  dice.add_to_history(10, { original = "1d8", total = 7 }, 3)
+
+  local h = dice.get_history(10)
+  if #h == 3
+    and h[1].result.original == "1d4" and h[1].line == 1
+    and h[2].result.original == "1d6" and h[2].line == 2
+    and h[3].result.original == "1d8" and h[3].line == 3
+  then
+    print("PASS [history: multiple entries preserve insertion order]")
+    passed = passed + 1
+  else
+    print("FAIL [history: multiple entries preserve insertion order]")
+    failed = failed + 1
+  end
+  dice.clear_history(10)
+end
+
+-- Test nil bufnr defaults to 0 (current buffer) (triangulation)
+do
+  dice.add_to_history(0, { original = "1d20", total = 10 }, 5)
+  local h = dice.get_history(nil)
+  if #h == 1 and h[1].line == 5 and h[1].result.total == 10 then
+    print("PASS [history: nil bufnr defaults to 0]")
+    passed = passed + 1
+  else
+    print("FAIL [history: nil bufnr defaults to 0]")
+    failed = failed + 1
+  end
+  dice.clear_history(0)
+end
+
+print()
 print("=" .. string.rep("=", 70))
 print(string.format("RESULTS: %d passed, %d failed", passed, failed))
 print("=" .. string.rep("=", 70))

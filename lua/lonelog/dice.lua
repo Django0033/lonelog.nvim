@@ -1,5 +1,8 @@
 local M = {}
 
+-- Roll history: keyed by bufnr -> { result, line, timestamp }[]
+local roll_history = {}
+
 -- Seed random number generator with current time
 function M.setup()
 	math.randomseed(os.time())
@@ -268,6 +271,38 @@ function M.roll(notation)
 		total = total,
 		display = display,
 	}
+end
+
+-- History accessors
+
+--- Get roll history for a buffer.
+---@param bufnr? number Buffer number (defaults to 0 for current buffer)
+---@return table[] Array of { result, line, bufnr } entries
+function M.get_history(bufnr)
+	bufnr = bufnr or 0
+	return roll_history[bufnr] or {}
+end
+
+--- Clear roll history for a buffer.
+---@param bufnr? number Buffer number (defaults to 0 for current buffer)
+function M.clear_history(bufnr)
+	bufnr = bufnr or 0
+	roll_history[bufnr] = {}
+end
+
+--- Add a roll result to history.
+---@param bufnr number Buffer number
+---@param result table Roll result from M.roll()
+---@param line number Line number where roll was triggered
+function M.add_to_history(bufnr, result, line)
+	if not roll_history[bufnr] then
+		roll_history[bufnr] = {}
+	end
+	table.insert(roll_history[bufnr], {
+		result = result,
+		line = line,
+		bufnr = bufnr,
+	})
 end
 
 return M
