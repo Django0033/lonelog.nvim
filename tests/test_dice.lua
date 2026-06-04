@@ -172,6 +172,7 @@ print("--- Extended Comparison Tests ---")
 if test("gte_success", "1d20>=15", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
 if test("lte_fail", "1d20<=10", { count = 1, sides = 20 }) then passed = passed + 1 else failed = failed + 1 end
 if test("vs_success", "1d100 vs 50", { count = 1, sides = 100 }) then passed = passed + 1 else failed = failed + 1 end
+if test("vs_with_mod", "1d8+2 vs 12", { count = 1, sides = 8, modifier = 2 }) then passed = passed + 1 else failed = failed + 1 end
 
 print()
 print("--- Fate Dice Tests ---")

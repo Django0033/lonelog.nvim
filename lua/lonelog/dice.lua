@@ -84,7 +84,7 @@ local function parse_notation(notation)
 			p.operator = "vs"
 			p.target = tonumber(mt:match("%d+"))
 			p.target_mode = "sum"
-			notation = notation:gsub("vs%d+", "")
+			notation = notation:gsub("VS%d+", "")
 		end
 	end
 
