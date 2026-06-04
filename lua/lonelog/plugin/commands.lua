@@ -29,6 +29,10 @@ local function register_commands()
 		require("lonelog.roll_line").roll_current_line()
 	end, { nargs = 0, desc = "Roll dice/table on current line" })
 
+	vim.api.nvim_create_user_command("LonelogRollHistory", function()
+		require("lonelog.commands.roll_history").show_roll_history()
+	end, { nargs = 0, desc = "Show recent roll history" })
+
 	vim.api.nvim_create_user_command("LonelogTags", function()
 		require("lonelog.ui.parsers").tags.show_tags_picker()
 	end, { nargs = 0, desc = "Navigate tags" })

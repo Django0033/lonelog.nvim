@@ -11,6 +11,7 @@ local defaults = {
 		chaos = "<leader>lC",
 		insert_result = "<leader>lI",
 		roll_line = "<leader>lR",
+		roll_history = "<leader>lH",
 
 		-- Session structure (ls-)
 		session_header = "<leader>lsh",
