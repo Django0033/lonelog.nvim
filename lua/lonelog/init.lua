@@ -10,6 +10,8 @@ M.parsers = require("lonelog.ui.parsers")
 -- Initialize plugin with user configuration
 function M.setup(opts)
 	M.config.setup(opts)
+	local cfg = M.config.get()
+	M.oracle.init(cfg.oracle.custom_tables)
 	M.dice.setup()
 	M.oracle.load_chaos()
 

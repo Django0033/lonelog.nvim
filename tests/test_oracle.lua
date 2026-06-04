@@ -194,6 +194,78 @@ test("nil bufnr defaults to 0", function()
 	oracle.clear_history(0)
 end)
 
+print("custom_tables:")
+test("init with empty table is no-op", function()
+	local before = #oracle.list_tables()
+	oracle.init({})
+	local after = #oracle.list_tables()
+	assert_eq(after, before, "list_tables should not change with empty custom_tables")
+end)
+
+test("init array format creates equal weight entries", function()
+	oracle.init({ test_equal = { "A", "B", "C" } })
+	local tables = oracle.list_tables()
+	local found = false
+	for _, name in ipairs(tables) do
+		if name == "Test_equal" then
+			found = true
+		end
+	end
+	assert(found, "custom table should appear in list_tables")
+	local r = oracle.roll("test_equal")
+	assert(r ~= nil, "roll should succeed")
+	assert_eq(r.table, "test_equal")
+	assert(r.value ~= nil, "should have a value")
+end)
+
+test("init dict format preserves weights", function()
+	oracle.init({ test_weighted = { easy = 1, medium = 2, hard = 3 } })
+	local tables = oracle.list_tables()
+	local found = false
+	for _, name in ipairs(tables) do
+		if name == "Test_weighted" then
+			found = true
+		end
+	end
+	assert(found, "weighted table should appear in list_tables")
+	local r = oracle.roll("test_weighted")
+	assert(r ~= nil)
+	assert_eq(r.table, "test_weighted")
+end)
+
+test("custom table roll returns one of the entries", function()
+	oracle.init({ test_choices = { "X", "Y" } })
+	local r = oracle.roll("test_choices")
+	assert(r.value == "X" or r.value == "Y", "should be one of the choices")
+	assert(r.display ~= nil, "should have display string")
+end)
+
+test("custom table overrides built-in table", function()
+	oracle.init({ binary = { only_yes = 1 } })
+	local r = oracle.roll("binary")
+	assert_eq(r.value, "only_yes", "custom binary should override built-in")
+end)
+
+test("entry with weight 0 is excluded", function()
+	oracle.init({ test_zero = { A = 1, B = 0 } })
+	local r = oracle.roll("test_zero")
+	assert_eq(r.value, "A", "only A should be rolled (B has weight 0)")
+end)
+
+test("single-entry table always returns that entry", function()
+	oracle.init({ test_single = { "Only" } })
+	for _ = 1, 10 do
+		local r = oracle.roll("test_single")
+		assert_eq(r.value, "Only", "single entry should always be returned")
+	end
+end)
+
+test("mixed-case table name resolved case-insensitively", function()
+	oracle.init({ Weather = { "Sunny", "Rain" } })
+	local r = oracle.roll("weather")
+	assert(r.value == "Sunny" or r.value == "Rain", "lowercase roll should find Weather table")
+end)
+
 print()
 print(string.format("Results: %d passed, %d failed, %d total", passed, failed, passed + failed))
 if failed > 0 then

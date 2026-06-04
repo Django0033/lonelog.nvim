@@ -34,6 +34,43 @@ local tables = {
 	mythic = { name = "Mythic Oracle", entries = {} },
 }
 
+-- Initialize custom oracle tables from user config.
+-- Accepts array format (equal weight) or dict format (explicit weights).
+---@param custom_tables table<string, table>
+function M.init(custom_tables)
+	if not custom_tables then
+		return
+	end
+	for name, entries in pairs(custom_tables) do
+		local normalized = {}
+		-- Detect array vs dict: consecutive numeric keys with string values → array
+		if #entries > 0 then
+			-- Array format: {"A", "B", "C"} → equal weight
+			for _, v in ipairs(entries) do
+				normalized[#normalized + 1] = {
+					value = v,
+					display = v,
+					weight = 1,
+				}
+			end
+		else
+			-- Dict format: {A = 5, B = 3} → use weights as-is
+			for k, v in pairs(entries) do
+				normalized[#normalized + 1] = {
+					value = k,
+					display = k,
+					weight = v,
+				}
+			end
+		end
+		-- Override or add to tables (lowercase key to match M.roll() lookup)
+		tables[name:lower()] = {
+			name = name:sub(1, 1):upper() .. name:sub(2) .. " Oracle",
+			entries = normalized,
+		}
+	end
+end
+
 -- Select random entry from table using weighted probability
 local function weighted_random(entries)
 	local total = 0

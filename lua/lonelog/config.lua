@@ -90,6 +90,7 @@ local defaults = {
 		default_table = "fate",
 		persist_chaos = true,
 		chaos_file = "chaos_factor.json",
+		custom_tables = {},
 	},
 	dice = { max_dice = 100, max_sides = 1000 },
 	prompt_for_scene_context = true,
