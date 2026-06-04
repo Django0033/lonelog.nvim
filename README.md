@@ -202,7 +202,7 @@ require("lonelog").setup({
   use_telescope = "auto",         -- "auto" | true | false
   sidebar = { width = 50 },
   float = { border = "rounded", height = 0.4, width = 0.6 },
-  oracle = { default_table = "fate", persist_chaos = true },
+  oracle = { default_table = "fate", persist_chaos = true, custom_tables = {} },
   dice = { max_dice = 100, max_sides = 1000 },
   prompt_for_scene_context = true,
   keymaps = { /* see :help lonelog-keymaps */ },
@@ -221,6 +221,18 @@ require("lonelog").setup({
   },
 })
 ```
+
+> [!TIP]
+> Define custom oracle tables with weighted or equal-probability entries:
+> ```lua
+> oracle = {
+>   custom_tables = {
+>     Weather = { "Sunny", "Cloudy", "Rain" },        -- equal weight
+>     NPC_Reaction = { Hostile = 1, Neutral = 2, Friendly = 1 },  -- weighted
+>   },
+> }
+> ```
+> They appear in the `:LonelogOracle` picker alongside the built-in tables.
 
 > [!TIP]
 > Set `use_telescope = "auto"` (default) to use Telescope when installed.
@@ -307,6 +319,7 @@ require("lonelog").setup({
 | `:LonelogScenes` | Browse scenes |
 | `:LonelogSessionSummary` | Show session overview with roll stats |
 | `:LonelogExportSummary` | Export summary to markdown file |
+| `:LonelogCombatStatus` | Show combat status (requires add-on) |
 | `:LonelogSession` / `:LonelogCampaign` | Insert headers |
 
 See `:help lonelog-commands` for the full list (30+ commands).

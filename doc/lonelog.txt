@@ -160,6 +160,7 @@ Call setup() with an optional table of overrides. All keys and defaults:
       default_table = "fate",          -- "fate", "binary", or "mythic"
       persist_chaos = true,             -- save chaos factor to disk
       chaos_file = "chaos_factor.json", -- filename in stdpath("data")/lonelog/
+      custom_tables = {},               -- user-defined weighted oracles
     },
 
     -- Dice safety limits
@@ -1190,7 +1191,29 @@ Mythic oracle (2d10 + chaos)~
     Mod -5 -4 -2 -1  0 +1 +2 +4 +5
 
   Chaos factor is persistent (saved to disk when persist_chaos = true).
-  Adjust via <leader>lC or :LonelogChaos.
+  Adjust via <leader>lC or |:LonelogChaos|.
+
+Custom oracle tables~
+  Define custom weighted oracles via |lonelog-config|:
+>
+  require("lonelog").setup({
+    oracle = {
+      custom_tables = {
+        -- Array format (equal probability)
+        Weather = { "Sunny", "Cloudy", "Rain" },
+        -- Dict format (weighted probability)
+        NPC_Reaction = { Hostile = 1, Neutral = 2, Friendly = 1 },
+      },
+    },
+  })
+<
+  Custom tables appear in the |:LonelogOracle| picker alongside the
+  built-in Fate, Binary, and Mythic oracles. They use the same weighted
+  random selection logic. Names are case-insensitive — |:LonelogOracle weather|
+  works as well as |:LonelogOracle Weather|.
+
+  If a custom table has the same name as a built-in table (e.g. "Fate"),
+  the custom version overrides the built-in one.
 
 ==============================================================================
 8. TAG AUTOCOMPLETE                                *lonelog-completion*
