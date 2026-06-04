@@ -41,8 +41,9 @@ function M.format_summary(summary)
 	table.insert(lines, "  " .. pad("Actions @", n.actions))
 	table.insert(lines, "  " .. pad("Questions ?", n.questions))
 	table.insert(lines, "  " .. pad("Dice d:", n.dice_lines))
-	table.insert(lines, "  " .. pad("Notes", n.meta_notes))
-	table.insert(lines, "  " .. pad("Dialogues", n.dialogues))
+	table.insert(lines, "  " .. pad("Notes", summary.meta_notes))
+	table.insert(lines, "  " .. pad("Dialogues", summary.dialogues))
+	table.insert(lines, "  " .. pad("Narrative", summary.narrative_blocks))
 	table.insert(lines, "")
 
 	local p = summary.progress
@@ -136,8 +137,9 @@ function M.export_summary(summary)
 	table.insert(out, "| Actions | " .. n.actions .. " |")
 	table.insert(out, "| Oracle questions | " .. n.questions .. " |")
 	table.insert(out, "| Dice rolls | " .. n.dice_lines .. " |")
-	table.insert(out, "| Meta notes | " .. n.meta_notes .. " |")
-	table.insert(out, "| Dialogues | " .. n.dialogues .. " |")
+	table.insert(out, "| Meta notes | " .. summary.meta_notes .. " |")
+	table.insert(out, "| Dialogues | " .. summary.dialogues .. " |")
+	table.insert(out, "| Narrative | " .. summary.narrative_blocks .. " |")
 
 	local p = summary.progress
 	if p.clocks > 0 or p.tracks > 0 or p.timers > 0 then

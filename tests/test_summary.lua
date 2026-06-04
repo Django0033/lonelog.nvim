@@ -170,8 +170,12 @@ test("build_session_summary session 1 notation counts", function()
 	assert_eq(n.dice_lines, 1, "session 1 should have 1 dice line")
 	assert_eq(n.arrows, 1, "session 1 should have 1 arrow")
 	assert_eq(n.consequences, 1, "session 1 should have 1 consequence")
-	assert_eq(n.meta_notes, 1, "session 1 should have 1 meta note")
-	assert_eq(n.narrative_blocks, 0, "session 1 should have 0 narrative blocks")
+end)
+
+test("build_session_summary session 1 prose counts", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes)
+	assert_eq(s.meta_notes, 1, "session 1 should have 1 meta note (from prose parser)")
+	assert_eq(s.narrative_blocks, 0, "session 1 should have 0 narrative blocks")
 end)
 
 test("build_session_summary session 1 filtered tags", function()
@@ -199,8 +203,12 @@ test("build_session_summary session 2 notation counts", function()
 	assert_eq(n.actions, 1, "session 2 should have 1 action")
 	assert_eq(n.dice_lines, 1, "session 2 should have 1 dice line")
 	assert_eq(n.table_rolls, 1, "session 2 should have 1 table roll")
-	assert_eq(n.dialogues, 1, "session 2 should have 1 dialogue")
 	assert_eq(n.questions, 0, "session 2 should have 0 questions")
+end)
+
+test("build_session_summary session 2 prose counts", function()
+	local s = summary.build_session_summary(session2, all_lines, mock_tags, mock_scenes)
+	assert_eq(s.dialogues, 1, "session 2 should have 1 dialogue (from prose parser)")
 end)
 
 test("build_session_summary session 2 filtered tags", function()
@@ -269,6 +277,23 @@ test("format_summary includes scenes", function()
 	assert(found, "format should include S1")
 end)
 
+test("format_summary includes prose count lines", function()
+	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes)
+	local lines = summary.format_summary(s)
+	local found_notes = false
+	local found_narrative = false
+	for _, l in ipairs(lines) do
+		if l:match("Notes") and l:match("%d") then
+			found_notes = true
+		end
+		if l:match("Narrative") and l:match("%d") then
+			found_narrative = true
+		end
+	end
+	assert(found_notes, "format should include Notes count")
+	assert(found_narrative, "format should include Narrative count")
+end)
+
 test("format_summary includes dice info when rolls present", function()
 	local s = summary.build_session_summary(session1, all_lines, mock_tags, mock_scenes)
 	local lines = summary.format_summary(s)
@@ -300,6 +325,8 @@ test("export_summary includes table with scenes and tags", function()
 	local text = summary.export_summary(s)
 	assert(text:match("| Actions"), "export should have actions row")
 	assert(text:match("| Oracle"), "export should have oracle row")
+	assert(text:match("| Meta notes"), "export should have meta notes row")
+	assert(text:match("| Narrative"), "export should have narrative row")
 end)
 
 test("export_summary includes dice section when rolls present", function()
@@ -354,6 +381,9 @@ test("build_session_summary with empty session", function()
 	assert_eq(#s.tags, 0, "empty session should have 0 tags")
 	assert_eq(#s.scenes, 0, "empty session should have 0 scenes")
 	assert_eq(s.dice.count, 0, "empty session should have 0 dice rolls")
+	assert_eq(s.meta_notes, 0, "empty session should have 0 meta notes")
+	assert_eq(s.dialogues, 0, "empty session should have 0 dialogues")
+	assert_eq(s.narrative_blocks, 0, "empty session should have 0 narrative blocks")
 end)
 
 test("session without date has nil date", function()

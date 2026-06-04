@@ -39,7 +39,7 @@ local function session_lines(all_lines, session)
 	return result
 end
 
--- Count notation elements in a set of lines
+-- Count notation elements in a set of lines (non-prose elements)
 local function count_notation(lines)
 	local counts = {
 		actions = 0,
@@ -48,9 +48,6 @@ local function count_notation(lines)
 		arrows = 0,
 		consequences = 0,
 		table_rolls = 0,
-		meta_notes = 0,
-		narrative_blocks = 0,
-		dialogues = 0,
 		combat_blocks = 0,
 	}
 	for _, line in ipairs(lines) do
@@ -71,15 +68,6 @@ local function count_notation(lines)
 		end
 		if line:match("^tbl:") then
 			counts.table_rolls = counts.table_rolls + 1
-		end
-		if line:match("%(not[ea]:") then
-			counts.meta_notes = counts.meta_notes + 1
-		end
-		if line:match("^\\%-%-%-") then
-			counts.narrative_blocks = counts.narrative_blocks + 1
-		end
-		if line:match("^[NPC]+:.*\"") then
-			counts.dialogues = counts.dialogues + 1
 		end
 		if line:match("%[COMBAT%]") then
 			counts.combat_blocks = counts.combat_blocks + 1
@@ -210,6 +198,8 @@ end
 ---@return table SessionSummary
 function M.build_session_summary(session, all_lines, all_tags, all_scenes, cached_progress, roll_stats)
 	local slines = session_lines(all_lines, session)
+	local prose_parser = require("lonelog.parsers.prose")
+	local prose = prose_parser.parse_prose(slines)
 	local summary = {
 		session = session,
 		lines_count = #slines,
@@ -221,6 +211,9 @@ function M.build_session_summary(session, all_lines, all_tags, all_scenes, cache
 		scenes = {},
 		tag_counts = {},
 		scene_counts = {},
+		meta_notes = #prose.meta_notes,
+		dialogues = #prose.dialogues,
+		narrative_blocks = #prose.narrative_blocks,
 	}
 
 	if roll_stats then

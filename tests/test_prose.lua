@@ -11,7 +11,7 @@ _G.vim = _G_vim or {
   log = { levels = {} },
 }
 
-local prose = require("tests.helpers.prose")
+local prose = require("lonelog.parsers.prose")
 local passed, failed = 0, 0
 
 local function check(name, got, expected)
@@ -132,6 +132,18 @@ do
   check("mixed: meta count", #result.meta_notes, 1)
   check("mixed: dialogue count", #result.dialogues, 2)
   check("mixed: narrative count", #result.narrative_blocks, 0)
+end
+
+-- Test: unclosed narrative block
+do
+  local result = prose.parse_prose({
+    "---",
+    "Wind howls through the canyon.",
+    "The party presses onward.",
+  })
+  check_table("unclosed narrative block", result.narrative_blocks, {
+    { start_line = 1, end_line = 3 },
+  })
 end
 
 -- Test: empty/whitespace lines
