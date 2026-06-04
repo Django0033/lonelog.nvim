@@ -22,8 +22,9 @@ local defaults = {
 		scene_next = "<leader>l]",
 
 		-- Addons (lx-)
-		combat_block = "<leader>lxc",
-		dungeon_status = "<leader>lxd",
+	combat_block = "<leader>lxc",
+	combat_status = "<leader>lxv",
+	dungeon_status = "<leader>lxd",
 		room_go = "<leader>lxg",
 		room_state = "<leader>lxs",
 		insert_round = "<leader>lxr",

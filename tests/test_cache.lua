@@ -624,6 +624,7 @@ do
   check("empty: scenes count", #data.scenes, 0)
   check("empty: sessions count", #data.sessions, 0)
   check("empty: tags count", #data.tags, 0)
+  check("empty: combat count", #data.combat, 0)
 end
 
 -- =============================================
@@ -785,6 +786,44 @@ do
   cache.invalidate(3)
   local data_buf3 = cache.get(3)
   check("rolls: buf 3 empty", data_buf3.rolls.total_rolls, 0)
+end
+
+-- =============================================
+-- 30. Combat field: empty when no combat blocks
+-- =============================================
+do
+  -- Buffers 1-4 have no [COMBAT] blocks
+  local data = cache.get(1)
+  check("combat: field exists", type(data.combat) == "table", true)
+  check("combat: empty when no blocks", #data.combat, 0)
+end
+
+-- =============================================
+-- 31. Combat field: populates from combat blocks
+-- =============================================
+do
+  -- Add a temporary buffer with combat data
+  _bufs[5] = {
+    changedtick = 1,
+    lines = {
+      "[COMBAT]",
+      "R1",
+      "[PC:Alex|HP 10/10]",
+      "[F:Goblin|HP 5/5]",
+      "[/COMBAT]",
+    },
+  }
+  cache.invalidate(5)
+  local data = cache.get(5)
+  check("combat: blocks parsed", #data.combat, 1)
+  if #data.combat >= 1 then
+    check("combat: start_line", data.combat[1].start_line, 1)
+    check("combat: is_closed", data.combat[1].is_closed, true)
+    check("combat: combatants count", #data.combat[1].combatants, 2)
+    check("combat: rounds count", #data.combat[1].rounds, 1)
+    check("combat: actions count", #data.combat[1].actions, 2)
+  end
+  _bufs[5] = nil
 end
 
 -- =============================================

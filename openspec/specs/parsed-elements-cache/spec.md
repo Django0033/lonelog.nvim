@@ -32,7 +32,7 @@ The cache entry for a buffer MUST store `{ changedtick, data }`. On `get()`, the
 #### Scenario: Cache miss re-parses
 - GIVEN a buffer whose changedtick differs from cache
 - WHEN `get()` is called
-- THEN it MUST re-parse all three parsers and return fresh data
+- THEN it MUST re-parse all parsers (including combat) and return fresh data
 
 #### Scenario: Invalidate forces re-parse
 - GIVEN a cached buffer entry is invalidated
@@ -43,8 +43,8 @@ The cache entry for a buffer MUST store `{ changedtick, data }`. On `get()`, the
 
 Tags of types N, L, PC, THREAD, F, INV, WEALTH, R MUST be aggregated by name into sorted arrays. Duplicate names across lines MUST be merged into a single entry with running line tracking.
 
-Output keys: `npcs`, `locations`, `pcs`, `threads`, `foes`, `inventory`, `wealth`, `rooms`, `rolls`. Each entity entry: `{name, tags, lines[], first_seen, last_seen, mention_count}`. The `rolls` key is an aggregate object (not an entity array), defined by the Roll Statistics spec.
-(Previously: output keys did not include `rolls`)
+Output keys: `npcs`, `locations`, `pcs`, `threads`, `foes`, `inventory`, `wealth`, `rooms`, `rolls`, `combat`. Each entity entry: `{name, tags, lines[], first_seen, last_seen, mention_count}`. The `rolls` key is an aggregate object (not an entity array), defined by the Roll Statistics spec. The `combat` key is the array returned by `parsers.combat.parse_blocks(bufnr)`.
+(Previously: output keys did not include `rolls` or `combat`)
 
 #### Scenario: NPC aggregation with dedup
 - GIVEN `[N:Elara|friendly]` on lines 6, 7, and 18
@@ -56,10 +56,16 @@ Output keys: `npcs`, `locations`, `pcs`, `threads`, `foes`, `inventory`, `wealth
 - WHEN inspected
 - THEN they MUST appear as "Alpha" then "Zara" (lowercase comparison)
 
-#### Scenario: Rolls field in cache output
-- GIVEN a buffer with dice history and d: lines
+#### Scenario: Combat field in cache output
+- GIVEN a buffer with `[COMBAT]..[/COMBAT]` blocks
 - WHEN `get()` or `refresh()` returns cached data
-- THEN the data table SHALL contain a `rolls` key with the aggregated roll statistics object
+- THEN the data table SHALL contain a `combat` key whose value is an array
+- AND each entry SHALL match the `parse_blocks()` output shape
+
+#### Scenario: No combat blocks returns empty array
+- GIVEN a buffer with no `[COMBAT]` delimiters
+- WHEN `get()` returns cached data
+- THEN `data.combat` SHALL be an empty array `{}`
 
 ### Requirement: Progress Normalization
 
@@ -82,6 +88,15 @@ Scenes and sessions MUST pass through unchanged from their respective parsers. T
 #### Scenario: Scenes identity
 - GIVEN 3 scenes from `parse_scenes()`
 - THEN `cache.get().scenes` MUST be the same array reference as the parser output
+
+### Requirement: Combat Parsing on Refresh
+
+`refresh()` SHALL call `parsers.combat.parse_blocks(bufnr)` and assign the result to `data.combat`. This SHALL happen after tag parsing but before returning the data table.
+
+#### Scenario: Refresh includes combat
+- GIVEN a buffer with a `[COMBAT]` block
+- WHEN `refresh(bufnr)` is called
+- THEN `data.combat` SHALL equal the return value of `parsers.combat.parse_blocks(bufnr)`
 
 ### Requirement: Roll Statistics in Cache Output
 
@@ -116,7 +131,7 @@ Existing `tests/test_cache.lua` MUST be migrated from `tests/helpers/cache.lua` 
 |------|------|----------|
 | Cache miss | Verify changedtick mismatch triggers refresh | MUST |
 | Invalidated buffer | Verify `invalidate()` + `get()` re-parses | MUST |
-| Entity aggregation | Verify all 8 entity types aggregated correctly | MUST |
+| Entity aggregation | Verify all 9 entity types aggregated correctly | MUST |
 | Progress normalization | Verify CLOCK→E remap, current/max parsing | MUST |
 | Inventory/Wealth/Room | Verify INV, WEALTH, R appear as entity groups | SHOULD |
 | Cache isolation | Verify two buffers have independent cache entries | SHOULD |

@@ -27,7 +27,8 @@ CONTENTS                                                *lonelog-contents*
      4.18 Dungeon Status Block ............................... |lonelog-command-dungeon-status|
      4.19 Room Navigation .................................... |lonelog-command-room-nav|
      4.20 Room State Editor .................................. |lonelog-command-room-state|
-      5. Keymaps ............................................. |lonelog-keymaps|
+     4.21 Combat Status ..................................... |lonelog-command-combat-status|
+       5. Keymaps ............................................. |lonelog-keymaps|
   6. Lonelog notation .................................... |lonelog-notation|
     6.1 Core symbols ..................................... |lonelog-notation-symbols|
     6.2 Tag format ....................................... |lonelog-notation-tags|
@@ -825,6 +826,28 @@ Config key: highlight~
    <
    If the current line has no room tag, a notice is shown.
 
+4.21 Combat Status                            *:LonelogCombatStatus*
+                                                  *lonelog-command-combat-status*
+
+   :LonelogCombatStatus  " Show an overview of all combat blocks
+
+   Parses all |[COMBAT]| blocks in the buffer via the combat parser and
+   displays a summary showing for each block: current round, status (open
+   or closed), alive PCs, alive foes, and dead combatants.
+
+   Example output with two combat blocks:
+>
+   Block 1: Round 3/3 closed
+     PCs: Kael (HP 12/12)
+     Foes: Goblin (HP 5), Orco (HP 8)
+     Dead: Esqueleto
+
+   Block 2: Round 1/1 open
+     PCs: Kael (HP 10/12)
+     Foes: Bandido (HP 6)
+<
+   Requires the combat add-on to be enabled (see |lonelog-config|).
+
 ==============================================================================
 5. KEYMAPS                                              *lonelog-keymaps*
 
@@ -862,6 +885,7 @@ Normal mode keymaps~
   Group 3: Add-ons (lx-) (*)~
   Key            Action                        Command ~
   <leader>lxc    Insert combat block            :LonelogCombat
+  <leader>lxv    Show combat status             :LonelogCombatStatus
   <leader>lxr    Insert round marker            :LonelogRound
   <leader>lxd    Insert/update dungeon status   :LonelogDungeonStatus
   <leader>lxg    Navigate to connected room     :LonelogRoomGo

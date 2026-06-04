@@ -273,10 +273,12 @@ function M.refresh(bufnr)
   local tags_mod = require("lonelog.parsers.tags")
   local scenes_mod = require("lonelog.parsers.scenes")
   local summary_mod = require("lonelog.commands.summary")
+  local combat_mod = require("lonelog.parsers.combat")
 
   local all_tags = tags_mod.parse_tags(bufnr)
   local all_scenes = scenes_mod.parse_scenes(bufnr)
   local all_sessions = summary_mod.parse_all_sessions(bufnr)
+  local all_combat = combat_mod.parse_combat_blocks(bufnr)
 
   local entities = aggregate_entities(all_tags)
   local progress = build_progress(all_tags)
@@ -296,6 +298,7 @@ function M.refresh(bufnr)
     scenes = all_scenes,
     sessions = all_sessions,
     rolls = rolls,
+    combat = all_combat,
   }
 
   cache[bufnr] = {
