@@ -1,0 +1,61 @@
+# openspec/config.yaml — lonelog.nvim
+schema: spec-driven
+
+context: |
+  Tech stack: Pure Lua 5.5, Neovim plugin
+  Architecture: Module-based with lazy loading via require(). Single entry point
+    lua/lonelog/init.lua exposes M.setup(opts). Submodules: config, dice, oracle,
+    ui, parsers (tags, scenes, tables), commands (session, narrative, note, summary,
+    progress, campaign), plugin (keymaps, commands, helpers), addons (combat,
+    dungeon, resources). after/syntax/markdown/ for syntax highlighting.
+    doc/lonelog.txt for Vimdoc help.
+  Testing: Custom standalone Lua test harness. 22 test files in tests/.
+    Each file has #!/usr/bin/env lua shebang, mocks _G.vim global,
+    uses package.path to require source modules. Prints PASS/FAIL, exits 1 on failure.
+    No test framework (no busted/plenary). No coverage tool. No linter/formatter/type-checker.
+  Style: Tab indentation (mixed tabs/spaces observed). Local M = {} module pattern.
+    snake_case for functions and variables. Kebab-case filenames.
+    Optional vim.notify for user feedback.
+
+strict_tdd: true
+
+testing:
+  command: lua tests/test_<module>.lua
+  batch_command: 'for f in tests/test_*.lua; do lua "$f" 2>&1 | tail -3; done'
+  framework: custom (standalone Lua scripts)
+  layers:
+    unit: true
+    integration: true
+    e2e: false
+  coverage: false
+  linter: false
+  type_checker: false
+  formatter: false
+  notes: >
+    No test framework detected. Use per-file execution.
+    All 22 tests currently pass (0 failed).
+    Strict TDD is viable with manual runner — write test, run with
+    `lua tests/test_<module>.lua`, verify RED, implement, verify GREEN.
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Follow existing module pattern (local M = {}, return M)
+    - Document Neovim API usage and mock requirements for tests
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns (tab indentation, snake_case)
+    tdd: true
+    test_command: 'lua tests/test_<module>.lua'
+  verify:
+    test_command: 'lua tests/test_<module>.lua'
+    build_command: ''
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
