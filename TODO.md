@@ -1,12 +1,11 @@
 # TODO — lonelog.nvim
 
-Lista unificada de features pendientes, consolidada desde `DEVLOG.md`,
-`docs/superpowers/specs/` y `.opencode/plans/`.
+Lista unificada de features pendientes.
 
 ## S — Small (~60–120 líneas)
 
-- [ ] **Tag Search by Name** — filtro de búsqueda al abrir el tags picker
-- [ ] **Dice Roll History** — historial de últimas N tiradas en la sesión, visible vía comando
+- [x] **Tag Search by Name** — filtro de búsqueda al abrir el tags picker
+- [ ] **Dice Roll History** — UI para ver historial de tiradas (infraestructura ya implementada)
 - [ ] **Dice Macro System** — secuencias con nombre en config (ej. `attack = "2d6+3"`)
 - [ ] **Custom Oracle Tables** — tablas de oráculo personalizadas con entradas ponderadas
 - [ ] **Dead Roster Detection** — excluir muertos del roster automático en bloques `[COMBAT]`
@@ -14,18 +13,18 @@ Lista unificada de features pendientes, consolidada desde `DEVLOG.md`,
 
 ## M — Medium (~120–300 líneas)
 
-- [ ] **Session Roll Statistics** — resumen de tiradas por tipo, distribución de oráculos
+- [x] **Session Roll Statistics** — resumen de tiradas por tipo, distribución de oráculos
 - [ ] **Scene Graph View** — árbol de escenas en ventana flotante
 - [ ] **Custom Random Tables Generator** — tablas aleatorias configurables
-- [ ] **Parsed Elements Cache** — cache unificado de entidades parseadas (NPCs, locaciones, etc.)
+- [x] **Parsed Elements Cache** — cache unificado de entidades parseadas
 - [ ] **Prose Parser** — parser de producción para notas meta, diálogos y bloques narrativos
-- [ ] **Combat Parser** — parser completo de bloques `[COMBAT]` (rounds, combatientes, acciones)
+- [ ] **Combat Parser** — parser completo de bloques `[COMBAT]`
 - [ ] **ASCII Dungeon Map** — mapa de dungeon renderizado en ASCII
 
 ## L — Large (~300–500+ líneas)
 
-- [ ] **Campaign Archive/Export** — exportar campaña a HTML/markdown unificado con referencias cruzadas
-- [ ] **Character Sheet Integration** — hoja de personaje con stats que se auto-actualizan
-- [ ] **Multi-File Campaign Navigation** — navegación de tags/escenas entre múltiples archivos de sesión
+- [ ] **Campaign Archive/Export** — exportar campaña a HTML/markdown unificado
+- [ ] **Character Sheet Integration** — hoja de personaje con stats auto-actualizados
+- [ ] **Multi-File Campaign Navigation** — navegación entre múltiples archivos de sesión
 - [ ] **Interactive Combat Tracker** — seguimiento de combate con iniciativa, HP, rondas
-- [ ] **Automated Dungeon/Room Generator** — generador de mazmorras/habitaciones en formato Lonelog
+- [ ] **Automated Dungeon/Room Generator** — generador de mazmorras/habitaciones
