@@ -214,13 +214,13 @@ function M.mythic_roll(chaos)
 	local final = d10_1 + d10_2 + chaos_mod
 	local result_val, display_val
 	if final <= MYTHIC_EXCEPTIONAL then
-		result = "Exceptional No"
+		result_val, display_val = "exceptional_no", "Exceptional No"
 	elseif final <= MYTHIC_NO then
-		result = "No"
+		result_val, display_val = "no", "No"
 	elseif final <= MYTHIC_YES then
-		result = "Yes"
+		result_val, display_val = "yes", "Yes"
 	else
-		result = "Exceptional Yes"
+		result_val, display_val = "exceptional_yes", "Exceptional Yes"
 	end
 	return {
 		table = "mythic",
